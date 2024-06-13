@@ -1,7 +1,7 @@
 // components/FrequencyButton.tsx
 
 import React, { CSSProperties } from 'react';
-import { FaHeadphones, FaVolumeUp } from 'react-icons/fa';  // Importing icons from react-icons
+import { FaHeadphones, FaVolumeOff, FaVolumeUp } from 'react-icons/fa';  // Importing icons from react-icons
 
 type FrequencyButtonProps = {
   frequency: string;
@@ -24,7 +24,7 @@ const FrequencyButton: React.FC<FrequencyButtonProps> = ({ frequency, hasHeadset
       )}
       {/* Loudspeaker icon */}
       {hasLoudspeaker && (
-        <FaVolumeUp className="absolute top-2 right-2 text-customYellow" />
+        <FaVolumeOff className="absolute top-2 right-2 text-customYellow" />
       )}
       {/* Frequency Text */}
       <span className="absolute bottom-0 text-2xl font-bold">{frequency}</span>

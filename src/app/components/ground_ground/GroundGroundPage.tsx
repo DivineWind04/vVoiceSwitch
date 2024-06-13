@@ -2,7 +2,8 @@
 'use client'
 
 import React, { useState } from 'react';
-import SquareButton from '../base_button/square_button';
+import SquareButton from '../base_button/SquareButton';
+import SquareSelectorButton from '../base_button/SquareSelectorButton';
 
 const GroundGroundPage: React.FC = () => {
   const [currentPage, setCurrentPage] = useState(1); // State to track current page
@@ -21,7 +22,6 @@ const GroundGroundPage: React.FC = () => {
           key={i}
           topLine={`BTN ${i + 1}`}
           onClick={() => console.log(`Button ${i + 1} clicked on page ${currentPage}`)}
-          style={{ margin: '4px' }} // Adjust margin as needed
         />
       );
     }
@@ -30,26 +30,26 @@ const GroundGroundPage: React.FC = () => {
   };
 
   return (
-    <div className="flex flex-col items-center justify-center">
+    <div className="p-4">
+      {/* // extras left out flex flex-col items-center justify-center */}
       {/* Render 3 pages of buttons */}
-      <div className="grid grid-cols-3 gap-0.5">
+      <div className="grid grid-cols-3 mb-2.5 gap-2.5">
         {renderButtons().slice((currentPage - 1) * 18, currentPage * 18)}
       </div>
 
       {/* Navigation buttons */}
-      <div className="flex">
+      <div className="flex gap-2.5">
         {[1, 2, 3].map((page) => (
-          <SquareButton
+          <SquareSelectorButton
             key={page}
             topLine={`G/G ${page}`}
             onClick={() => handlePageChange(page)}
-            style={{ margin: '4px' }} // Adjust margin as needed
           />
         ))}
       </div>
 
       {/* Selected page */}
-      <div className="text-white text-center items-center justify-center font-bold text-lg mt-4">
+      <div className="text-white text-center items-center justify-center font-bold text-lg">
         G/G PAGE {currentPage}
       </div>
     </div>

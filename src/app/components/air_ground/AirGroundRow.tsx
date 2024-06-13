@@ -1,8 +1,8 @@
 // components/AirGroundRow.tsx
 
 import React from 'react';
-import FrequencyButton from './freq_button';
-import SquareButton from '../base_button/square_button';
+import FrequencyButton from './FreqButton';
+import SquareButton from '../base_button/SquareButton';
 
 type AirGroundRowProps = {
   frequency: string;
