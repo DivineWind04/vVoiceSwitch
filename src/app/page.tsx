@@ -9,15 +9,17 @@ import AreaFour from "./_components/special_func/AreaFour";
 export default function HomePage() {
   return (
     <main className="flex min-h-screen flex-col items-center justify-center bg-black text-white">
-      <div className="flex items-center justify-center h-screen">
-        <div className="border-60 border-gray-500 rounded-lg box-border shadow-2xl">
-          <AreaFour />
-          <div className="flex">
-            <AirGroundPage />
-            <GroundGroundPage />
-            <AreaThree />
+      <div className="flex h-screen items-center justify-center">
+        <div className="mt-2 box-border rounded-lg border-60 border-gray-500 shadow-2xl">
+          <div className="mt-2">
+            <AreaFour />
+            <div className="flex">
+              <AirGroundPage />
+              <GroundGroundPage />
+              <AreaThree />
+            </div>
           </div>
-          <StatusArea position="LOCAL EAST" />
+          <StatusArea position="FD/CD" />
         </div>
       </div>
     </main>

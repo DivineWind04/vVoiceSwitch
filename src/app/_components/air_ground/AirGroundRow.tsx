@@ -18,7 +18,7 @@ type AirGroundRowProps = {
 
 const AirGroundRow: React.FC<AirGroundRowProps> = ({ frequency, name, prefMode, currMode, outOfService, offline }) => {
   return (
-    <div className="flex mb-2.5 gap-2.5">
+    <div className="flex mb-1 gap-1">
       {/* Frequency Button */}
       {!offline ? (
         <FrequencyButton

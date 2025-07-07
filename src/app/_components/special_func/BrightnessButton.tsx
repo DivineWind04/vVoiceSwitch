@@ -22,8 +22,8 @@ const BrightnessButton: React.FC<BrightnessButtonProps> = ({ direction, onClick,
   
   return (
     <button
-      className={`relative w-16 h-12 bg-customBlue text-customYellow 
-      border-4 border-customGray flex items-start justify-center text-center
+      className={`relative w-16 h-8 bg-customBlue text-customYellow 
+      border-2 border-customGray flex items-start justify-center text-center
       ${isActive ? 'border-customBlue' : ' border-customWhite'}`}
       onClick={onClick}
       style={{
@@ -36,8 +36,8 @@ const BrightnessButton: React.FC<BrightnessButtonProps> = ({ direction, onClick,
       onMouseLeave={() => setIsActive(false)} // Handle case where mouse leaves without release
       >
       <div className="flex flex-col">
-        <span className={`text-4xl ${direction === 'up' ? '' : 'rotate-180'}`}>^</span>
-        <span className="absolute inset-0 flex items-center justify-center text-lg">&#9728;</span>
+        <span className={`text-2xl ${direction === 'up' ? '' : 'rotate-180'}`}>^</span>
+        <span className="absolute inset-0 flex items-center justify-center text-base">&#9728;</span>
       </div>
     </button>
   );

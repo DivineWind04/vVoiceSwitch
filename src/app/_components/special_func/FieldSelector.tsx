@@ -21,8 +21,8 @@ const FieldSelector: React.FC<FieldSelectorProps> = ({ onClick, style }) => {
 
   return (
     <button
-      className={`items-center relative w-16 h-12 bg-customBlue text-customYellow 
-    border-4 border-customGray flex justify-center text-center
+      className={`items-center relative w-16 h-8 bg-customBlue text-customYellow 
+    border-2 border-customGray flex justify-center text-center
     ${isActive ? 'border-customBlue' : ' border-customWhite'}`}
       onClick={onClick}
       style={{
@@ -35,7 +35,7 @@ const FieldSelector: React.FC<FieldSelectorProps> = ({ onClick, style }) => {
       onMouseLeave={() => setIsActive(false)} // Handle case where mouse leaves without release
     >
       <div className="relative">
-        <span className="text-xl font-bold">SEL</span>
+        <span className="text-sm font-bold">SEL</span>
       </div>
     </button>
   );

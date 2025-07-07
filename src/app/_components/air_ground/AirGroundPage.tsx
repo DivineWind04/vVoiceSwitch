@@ -82,13 +82,13 @@ const AirGroundPage: React.FC = () => {
       {/* Render rows */}
       {renderRows()}
       {/* Control row */}
-      <div className="flex space-x-2.5">
+      <div className="flex space-x-1">
         <SummaryButton />
         {renderPageButtons()}
       </div>
 
       {/* Selected page */}
-      <div className="text-white text-center items-center justify-center font-bold text-lg">
+      <div className="text-white text-center items-center justify-center font-bold text-sm">
         A/G PAGE {selectedPage}
       </div>
     </div>

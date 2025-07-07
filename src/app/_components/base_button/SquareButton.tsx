@@ -27,7 +27,7 @@ const SquareButton: React.FC<SquareButtonProps> = ({ topLine, bottomLine, onClic
   return (
     <button
       className={`relative w-16 h-16 bg-customBlue text-customYellow 
-    border-4 border-customGray flex items-start justify-center text-center
+    border-2 border-customGray flex items-start justify-center text-center
     ${isActive ? 'border-customBlue' : ' border-customWhite'}`}
       style={{
         borderBottomColor: isActive ? '#000080' : '#818181',
@@ -38,17 +38,19 @@ const SquareButton: React.FC<SquareButtonProps> = ({ topLine, bottomLine, onClic
       onMouseUp={handleMouseUp}
       onMouseLeave={() => setIsActive(false)} // Handle case where mouse leaves without release
     >
-      {/* Centered and styled text */}
-      <div className="absolute top-0 flex flex-col items-center space-y-0">
-        <span className="text-lg font-bold uppercase break-words -mb-2 -mt-1">
+      {/* Text anchored to top of indicator */}
+      <div className="absolute bottom-2.5 left-0 right-0 flex flex-col items-center justify-end">
+        <span className="text-lg font-bold uppercase break-words leading-tight">
           {topLine}
         </span>
-        <span className="text-lg font-bold uppercase break-words -mt-2">
-          {bottomLine}
-        </span>
+        {bottomLine && (
+          <span className="text-lg font-bold uppercase break-words leading-tight">
+            {bottomLine}
+          </span>
+        )}
       </div>
       {isIndicatorVisible && (
-        <div className="absolute bottom-1 left-1 right-1 h-3 bg-customGreen"></div>
+        <div className="absolute bottom-0 left-0 right-0 h-3 bg-customGreen"></div>
       )}
     </button>
   );

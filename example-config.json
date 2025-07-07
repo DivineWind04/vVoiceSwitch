@@ -3,27 +3,27 @@
     [
       {
         "name": "LC 1",
-        "frequency": "132.35"
+        "frequency": "118.2"
       },
       {
         "name": "LC 2",
-        "frequency": "124.3"
+        "frequency": "120.5"
       },
       {
         "name": "LC 3",
-        "frequency": "128.75"
-      },
-      {
-        "name": "LC 4",
-        "frequency": "135.3"
-      },
-      {
-        "name": "GUARD V",
         "frequency": "121.5"
       },
       {
+        "name": "LC 4",
+        "frequency": "121.8"
+      },
+      {
+        "name": "GUARD V",
+        "frequency": "124.25"
+      },
+      {
         "name": "GUARD U",
-        "frequency": "243.0"
+        "frequency": "128.65"
       }
     ],
     [
@@ -88,239 +88,181 @@
   "GGLines": [
     [
       {
-        "name_top": "LOC",
+        "name_top": "HSLS",
         "dial_line": 6403,
         "monitor": false,
         "override": false
       },
       {
-        "name_top": "LOC",
-        "name_bottom": "MON",
+        "name_top": "OVR",
+        "name_bottom": "HSLS",
         "dial_line": 6403,
         "monitor": true
       },
       {
-        "name_top": "LOC",
-        "name_bottom": "OVR",
+        "name_top": "A/G",
+        "name_bottom": "HSLS",
         "dial_line": 6403,
         "override": true
       },
+      null,
+      null,
       {
-        "name_top": "CIC",
-        "dial_line": 500
-      },
-      {
-        "name_top": "DEP",
-        "dial_line": 501
-      },
-      {
-        "name_top": "DEP",
-        "name_bottom": "OVR",
+        "name_top": "G/G",
+        "name_bottom": "HSLS",
         "dial_line": 501,
         "override": true
       },
       {
-        "name_top": "DATA",
+        "name_top": "*NWS",
         "dial_line": 502
       },
+      null,
+      null,
       {
-        "name_top": "DATA",
-        "name_bottom": "OVR",
-        "dial_line": 502,
-        "override": true
-      },
-      {
-        "name_top": "DATA",
-        "name_bottom": "MON",
-        "dial_line": 502,
-        "monitor": true
-      },
-      {
-        "name_top": "ZOA",
+        "name_top": "*Area",
+        "name_bottom": "BSup",
         "dial_line": 18001,
         "external": true
       },
       {
-        "name_top": "ZLA",
-        "dial_line": 19001,
+        "name_top": "*Area",
+        "name_bottom": "DSup",
+        "dial_line": 18002,
         "external": true
       },
       {
-        "name_top": "ZAB",
-        "dial_line": 17001,
+        "name_top": "*NCT",
+        "name_bottom": "TMU",
+        "dial_line": 18003,
         "external": true
       },
+      null,
+      null,
+      null,
       {
-        "name_top": "SMO",
-        "name_bottom": "TWR",
-        "dial_line": 15001,
-        "external": true
-      },
-      {
-        "name_top": "LAX",
-        "name_bottom": "LC-N",
-        "dial_line": 16001,
-        "external": true
-      },
-      {
-        "name_top": "LAX",
-        "name_bottom": "LC-S",
-        "dial_line": 16002,
-        "external": true
-      },
-      {
-        "name_top": "HOOK",
-        "name_bottom": "FLASH",
+        "name_top": "HOLD",
         "dial_line": 5026
       },
       {
         "name_top": "IA",
-        "name_bottom": "OVR",
+        "name_bottom": "MON",
         "dial_line": 5028
       },
       {
-        "name_top": ""
+        "name_top": "IA",
+        "name_bottom": "OVR",
+        "dial_line": 5028
       }
     ],
-    [
+[
       {
-        "name_top": "A/G",
-        "name_bottom": "HSLS",
+        "name_top": "GC1",
+        "name_middle": "W",
+        "name_bottom": "OVR",
         "dial_line": 5023
       },
       {
-        "name_top": "HSLS",
-        "dial_line": 5011
+        "name_top": "GC2",
+        "name_middle": "W",
+        "name_bottom": "OVR",
+        "dial_line": 5023
       },
       {
-        "name_top": "G/G",
-        "name_bottom": "HSLS",
-        "dial_line": 5015
+        "name_top": "LC",
+        "name_bottom": "OVR",
+        "dial_line": 5023
+      },
+      null,
+      {
+        "name_top": "GC1",
+        "name_middle": "SE",
+        "name_bottom": "OVR",
+        "dial_line": 5023
       },
       {
-        "name_top": "XFER",
-        "dial_line": 5030
+        "name_top": "LA",
+        "name_bottom": "OVR",
+        "dial_line": 5023
       },
+      null,
+      null,
+      null,
       {
-        "name_top": "HOLD",
-        "dial_line": 5007
-      },
-      {
-        "name_top": "CONF",
-        "dial_line": 5003
-      },
-      {
-        "name_top": "FREQ",
-        "name_bottom": "A/D",
-        "dial_line": 7
-      },
-      {
-        "name_top": "DOOR",
-        "name_bottom": "#1",
-        "dial_line": 5200
-      },
-      {
-        "name_top": "BRF",
-        "dial_line": 5067
-      },
-      {
-        "name_top": "ERAD",
+        "name_top": "LA",
         "dial_line": 5100
       },
+      null,
       {
-        "name_top": "IA",
-        "name_bottom": "OVR",
-        "dial_line": 5066,
-        "override": true
+        "name_top": "LC",
+        "dial_line": 5101
       },
+      null,
+      null,
+      null,
+      null,
       {
-        "name_top": "IA",
-        "name_bottom": "HOLD",
-        "dial_line": 5065
-      },
-      {
-        "name_top": "DSBL",
-        "name_bottom": "AGLS",
-        "dial_line": 5012
-      },
-      {
-        "name_top": "CHIME",
-        "name_bottom": "TYPE",
-        "dial_line": 5017
-      },
-      {
-        "name_top": "CHIME",
-        "name_bottom": "OFF",
-        "dial_line": 5020
-      },
-      {
-        "name_top": "RING",
-        "name_bottom": "MAN",
-        "dial_line": 5006
-      },
-      {
-        "name_top": "SVR",
+        "name_top": "EOC",
         "dial_line": 5028
       },
       {
-        "name_top": "PRIV",
+        "name_top": "CG",
         "dial_line": 5024
       }
     ],
     [
       {
-        "name_top": ""
+        "name_top": "GC1",
+        "name_middle": "W",
+        "name_bottom": "OVR",
+        "dial_line": 5023
       },
       {
-        "name_top": ""
+        "name_top": "GC2",
+        "name_middle": "W",
+        "name_bottom": "OVR",
+        "dial_line": 5023
       },
       {
-        "name_top": ""
+        "name_top": "LC",
+        "name_bottom": "OVR",
+        "dial_line": 5023
+      },
+      null,
+      {
+        "name_top": "GC1",
+        "name_middle": "SE",
+        "name_bottom": "OVR",
+        "dial_line": 5023
       },
       {
-        "name_top": ""
+        "name_top": "LA",
+        "name_bottom": "OVR",
+        "dial_line": 5023
+      },
+      null,
+      null,
+      null,
+      {
+        "name_top": "LA",
+        "dial_line": 5100
+      },
+      null,
+      {
+        "name_top": "LC",
+        "dial_line": 5101
+      },
+      null,
+      null,
+      null,
+      null,
+      {
+        "name_top": "EOC",
+        "dial_line": 5028
       },
       {
-        "name_top": ""
-      },
-      {
-        "name_top": ""
-      },
-      {
-        "name_top": ""
-      },
-      {
-        "name_top": ""
-      },
-      {
-        "name_top": ""
-      },
-      {
-        "name_top": ""
-      },
-      {
-        "name_top": ""
-      },
-      {
-        "name_top": ""
-      },
-      {
-        "name_top": ""
-      },
-      {
-        "name_top": ""
-      },
-      {
-        "name_top": ""
-      },
-      {
-        "name_top": ""
-      },
-      {
-        "name_top": ""
-      },
-      {
-        "name_top": ""
+        "name_top": "CG",
+        "dial_line": 5024
       }
     ]
   ]

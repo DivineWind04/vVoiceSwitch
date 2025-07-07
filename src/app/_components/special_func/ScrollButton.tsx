@@ -22,8 +22,8 @@ const ScrollButton: React.FC<ScrollButtonProps> = ({ direction, onClick, style }
 
   return (
     <button
-      className={`relative w-16 h-12 bg-customBlue text-customYellow 
-    border-4 border-customGray flex items-start justify-center text-center
+      className={`relative w-16 h-8 bg-customBlue text-customYellow 
+    border-2 border-customGray flex items-start justify-center text-center
     ${isActive ? 'border-customBlue' : ' border-customWhite'}`}
       onClick={onClick}
       style={{

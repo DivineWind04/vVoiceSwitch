@@ -10,8 +10,8 @@ export default {
         sans: ['"Arial"', 'sans-serif'],
       },
       colors: {
-        customBlue: '#000080',
-        customYellow: '#ffff00',
+        customBlue: '#06329d',
+        customYellow: '#ffff6b',
         customWhite: '#ffffff',
         customGray: '#818181',
         customGreen: "#02ff00",

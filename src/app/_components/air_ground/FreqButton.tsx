@@ -32,7 +32,7 @@ const FrequencyButton: React.FC<FrequencyButtonProps> = ({ frequency, prefMode: 
 
   return (
     <button
-      className={`relative w-28 h-16 bg-customBlue text-customYellow border-t-4 border-l-4 border-b-4 border-r-4 flex items-start justify-center text-center group ${isActive ? 'border-customBlue' : ''}`}
+      className={`relative w-28 h-16 bg-customBlue text-customYellow border-t-2 border-l-2 border-b-2 border-r-2 flex items-start justify-center text-center group ${isActive ? 'border-customBlue' : ''}`}
       style={{
         borderTopColor: '#ffffff',
         borderLeftColor: '#ffffff',

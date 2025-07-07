@@ -24,7 +24,7 @@ const SquareSelectorButton: React.FC<SquareSelectorButtonProps> = ({ topLine, bo
   return (
     <button
       className={`relative w-16 h-16 bg-customBlue text-customYellow 
-    border-4 border-customGray flex items-start justify-center
+    border-2 border-customGray flex items-start justify-center
     ${isActive ? 'border-customBlue' : ' border-customWhite'}`}
       style={{
         borderBottomColor: isActive ? '#000080' : '#818181',
