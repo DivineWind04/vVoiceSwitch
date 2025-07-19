@@ -3,8 +3,8 @@ import "~/styles/globals.css";
 import { GeistSans } from "geist/font/sans";
 
 export const metadata = {
-  title: "vIVSR",
-  description: "Virtual Interm Voice Switch System",
+  title: "vETVS",
+  description: "Virtual Enhanced Terminal Voice Switch System",
   icons: [{ rel: "icon", url: "/favicon.ico" }],
 };
 
@@ -14,7 +14,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="en" className={`${GeistSans.variable}`}>
+    <html lang="en" className={`${GeistSans.variable} font-ivsr tracking-widest`}>
       <body>
         {children}
       </body>

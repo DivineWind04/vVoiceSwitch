@@ -1,3 +1,25 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+html {
+  -webkit-text-stroke: 0.6pt;
+  -webkit-font-smoothing: antialiased;
+  -text-rendering: optimizeLegibility;
+}
+
+@font-face {
+  font-family: 'ivsr';
+  src: url('/Fonts/PIXEARG_.TTF') format('truetype');
+  font-weight: normal;
+  font-style: normal;
+}
+
+@layer utilities {
+  .clipped-box {
+    clip-path: polygon(0 150px,150px 0,calc(100% - 150px) 0,100% 150px,100% 100%,0 100%);
+  }
+  .clipped-boxSmall {
+    clip-path: polygon(0 0,100% 0,100% calc(100% - 14px),calc(100% - 14px) 100%,14px 100%,0 calc(100% - 14px));
+  }
+}

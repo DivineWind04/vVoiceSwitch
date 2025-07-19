@@ -20,7 +20,7 @@ const AreaThree: React.FC = () => {
     { topLine: "CA", action: () => console.log("CA clicked") },
     {
       topLine: "RECN",
-      bottomLine: "ENB",
+      bottomLine: "ENBL",
       action: () => console.log("RECN ENB clicked"),
     },
     {
@@ -42,9 +42,9 @@ const AreaThree: React.FC = () => {
   ];
 
   return (
-    <div className="space-y-1 p-4">
+    <div className="space-y-1 p-2">
       {/* Render buttons */}
-      <div className="grid grid-flow-col grid-cols-2 grid-rows-7 gap-1">
+      <div className="grid grid-flow-col grid-cols-2 grid-rows-7 gap-[3px]">
         {buttons.map((button, index) =>
           button == null ? (
             <OOSButton key={index} />
@@ -60,7 +60,7 @@ const AreaThree: React.FC = () => {
       </div>
 
       {/* Status Text - Not Implemented */}
-      <div className="mt-4 items-center justify-center text-center text-lg font-bold text-white"></div>
+      <div className="mt-4 items-center justify-center text-center text-[14px] font-bold text-white"></div>
     </div>
   );
 };

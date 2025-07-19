@@ -1,0 +1,299 @@
+<!DOCTYPE html>
+<!-- saved from url=(0052)https://static.zhener.pw/html_app/afv_poc/index.html -->
+<html lang="en"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    
+    <title>AFV Poc Client</title>
+    <link href="./AFV Poc Client_files/bootstrap.min.css" rel="stylesheet" integrity="sha384-LN+7fdVzj6u52u30Kp6M/trliBMCMKTyK833zpbD+pXdCLuTusPj697FH4R/5mcr" crossorigin="anonymous">
+<style>
+        @font-face {
+            font-family: 'NotoSans_online_security'; 
+            src: url(chrome-extension://llbcnfanfmjhpedaedhbcnpgeepdnnok/assets/fonts/noto-sans-regular.woff);
+        }
+
+        @font-face {
+            font-family: 'NotoSans_medium_online_security'; 
+            src: url(chrome-extension://llbcnfanfmjhpedaedhbcnpgeepdnnok/assets/fonts/noto-sans-medium.ttf);
+        }
+
+        @font-face {
+            font-family: 'NotoSans_bold_online_security'; 
+            src: url(chrome-extension://llbcnfanfmjhpedaedhbcnpgeepdnnok/assets/fonts/noto-sans-bold.woff);
+        }
+
+        @font-face {
+            font-family: 'NotoSans_semibold_online_security'; 
+            src: url(chrome-extension://llbcnfanfmjhpedaedhbcnpgeepdnnok/assets/fonts/noto-sans-semibold.ttf);
+        }
+</style></head>
+
+<body>
+    <div class="mt-2 container-fluid">
+        <h2>AFV Poc Client - ZM</h2>
+        <div id="ptt_status">PTT Status: ?</div>
+        <div>Call Status: <span id="callStatus" style="margin-top: 10px;">N/A</span></div>
+        <div style="margin-top: 10px;"></div>
+        <audio src="Ringback.wav" preload="auto" id="ringback"></audio>
+        <audio src="Override.mp3" preload="auto" id="override"></audio>
+        <audio src="GGChime.mp3" preload="auto" id="ggchime"></audio>
+        <input id="messageInput" preload="auto" type="text" placeholder="Type your command">
+        <button onclick="addCall(0)">Add OVRline</button>
+        <button onclick="addCall(1)">Add Ringline</button>
+        <button onclick="addCall(2)">Add VCall</button>
+        <button onclick="sendMessageNow({ type: &#39;stop&#39;, cmd1: &#39;&#39;, dbl1: 1 });stopAudio()">Stop All</button>
+        <div id="call_panel" class="row" style="margin-top: 20px; font-family: monospace;"></div>
+        <div id="chatLog" style="margin-top: 10px;"><p><em>Not Connected to CRC</em></p></div>
+        <div id="contact" style="margin-top: 10px; width: 50%;"></div>
+    </div>
+
+    <style>
+        .action_button {
+            color: #3888EF;
+            cursor: pointer;
+        }
+
+        .danger {
+            color: #F4321F;
+        }
+    </style>
+    <script>
+        let current_callsign = ''
+        let zoa_position_data = {}
+        let call_table = {}
+        async function fetchData() {
+            try {
+                const response = await fetch('zoa_position.json');
+                const data = await response.json();
+                zoa_position_data = data
+            } catch (error) {
+
+            }
+        }
+        function loadAvailablePosition(callsign) {
+            let stp = zoa_position_data;
+            function find(stp, res, found) {
+                for (const e of stp.positions) {
+                    if (e.cs === callsign) {
+                        found = true
+                        break;
+                    }
+                }
+                if (found) {
+                    res.push(...stp.positions)
+                }
+                stp.childFacilities?.map(find, res, found).filter(k => k)
+            }
+            const res = []
+            find(zoa_position_data, res, false)
+            console.log(res)
+        }
+        function loadPosition(position) {
+            call_table = {
+                "3120": ["ZM_TEST_LINE", 1],
+                "491": ["ZOA_NCT_1", 2],
+                "492": ["ZOA_NCT_2", 2],
+                "720": ["ZOA_ZLA_1", 2],
+                "891": ["NCT_TWRS", 2],
+            }
+            const my_position = zoa_position_table[position]
+            if (my_position?.lines) {
+                console.log(zoa_position_table[position])
+            }
+
+        }
+        fetchData()
+        // Replace with your WebSocket server URL
+        let ringback_audio = document.getElementById('ringback');
+        const ggchime_audio = document.getElementById('ggchime');
+        let ringback_interval = null;
+        function addCall(callType, cmd1) {
+            sendMessageNow({ type: 'add', cmd1: cmd1 || document.getElementById('messageInput').value, dbl1: callType })
+        }
+        function resetWindow() {
+            const prefix = current_callsign?.substring(0, 7)
+            sendMessageNow({ type: 'del', cmd1: '', dbl1: 0 })
+            setTimeout(() => {
+                loadPosition(current_callsign)
+                addCall(2, '491')
+                addCall(2, '492')
+                addCall(2, '720')
+                addCall(2, '891')
+            }, 500)
+        }
+        let socket = null;
+        setInterval(() => {
+            if (!socket) {
+                connect()
+            }
+        }, 1000)
+        function connect() {
+            socket = new WebSocket('ws://localhost:9002');
+            socket.onopen = () => {
+                document.getElementById('chatLog').innerHTML = '<div><em>Connected to AFV (CRC)</em></div>';
+                // auto monitor this line
+            };
+
+            socket.onmessage = (event) => {
+                try {
+                    const data = JSON.parse(event.data)
+                    if (data.type === 'message') {
+                        document.getElementById('chatLog').innerHTML += `<div>${data.cmd1}</div>`;
+                    } else if (data.type === 'call') {
+                        ringback_audio = document.getElementById('ringback');
+                        if (data.cmd1 === 'connected') {
+                            ringback_audio.pause();
+                            clearInterval(ringback_interval)
+                        } else if (data.cmd1 === 'terminated') {
+                            ringback_audio.pause();
+                            clearInterval(ringback_interval)
+                        }
+                        document.getElementById('callStatus').innerText = data.cmd1
+                    } else if (data.type === 'channel_status') {
+                        renderChannelStatus(data.data)
+                    } else if (data.type === 'call_sign') {
+                        current_callsign = data.cmd1;
+                        resetWindow()
+                    }
+                    return
+                }
+                catch {
+
+                }
+                if (event.data === 'PttOpen') {
+                    document.getElementById('ptt_status').innerText = 'PTT: Open'
+                } else if (event.data === 'PttClosed') {
+                    document.getElementById('ptt_status').innerText = 'PTT: Closed'
+                } else {
+                    document.getElementById('chatLog').innerHTML += `<div>${event.data}</div>`;
+                }
+            };
+
+            socket.onerror = (error) => {
+                console.error('WebSocket error:', error);
+                socket = null
+            };
+
+            socket.onclose = () => {
+                document.getElementById('chatLog').innerHTML = '<p><em>Not Connected to CRC</em></p>';
+                socket = null
+            };
+        }
+
+        function sendMessageNow(message) {
+            if (message && socket.readyState === WebSocket.OPEN) {
+                if (typeof message === "object") {
+                    socket.send(JSON.stringify(message));
+                } else {
+                    socket.send(message);
+                }
+
+            } else {
+                alert('Connection is not open or message is empty');
+            }
+        }
+
+        function sendMessage() {
+            const input = document.getElementById('messageInput');
+            const message = input.value;
+            if (message && socket.readyState === WebSocket.OPEN) {
+                socket.send(message);
+                document.getElementById('chatLog').innerHTML += `<p><strong>You:</strong> ${message}</p>`;
+                input.value = '';
+            } else {
+                alert('Connection is not open or message is empty');
+            }
+        }
+
+        function setTx(freq, mode) {
+            sendMessageNow({ type: 'tx', cmd1: "" + freq, dbl1: mode })
+        }
+
+        function setRx(freq, mode) {
+            sendMessageNow({ type: 'rx', cmd1: "" + freq, dbl1: mode })
+        }
+
+        function stopAudio() {
+            ringback_audio.pause();
+            ggchime_audio.pause();
+        }
+
+        function chime(audio) {
+            if (audio.paused) {
+                audio.currentTime = 0
+                audio.play();
+            }
+        }
+
+        function renderChannelStatus(data) {
+            document.getElementById('call_panel').innerHTML = data?.map(k => {
+                let content = ''
+                const txButton = '<div onClick="setTx(' + k.freq + ', ' + !k.t + ')" class="action_button">' + (k.t ? '[TX]' : '[__]') + '</div>';
+                const rxButton = '<div onClick="setRx(' + k.freq + ', ' + !k.r + ')" class="action_button">' + (k.r ? '[RX]' : '[__]') + '</div>';
+                if (k.call === 'A/G') {
+                    content = `${k.call} ${(k.freq / 1000000).toFixed(3)} ${txButton} ${rxButton}`
+                } else {
+                    const call_type = k?.call?.substring(0, 1)
+                    const call_id = k?.call?.substring(3)
+                    content = 'G/G: (' + call_type + ')' + (call_table[call_id]?.[0] || call_id) + ' ';
+                    if (k.call?.startsWith('SO_')) {
+                        const l = `sendMessageNow({ type: 'call', cmd1: '${k.call.substring(3)}' , dbl1: 2 })`
+                        if (k.status === 'idle') {
+                            content += '<div onClick="' + l + '" class="action_button">[ACTIVATE]</div>'
+                        } else if (k.status === 'chime') {
+                            content += '<div onClick="' + l + '" class="action_button">[PICK]</div><span id="chime_flash">**</span>'
+                            setTimeout(() => document.getElementById('chime_flash').innerText = '', 500)
+                        } else if (k.status === 'online') {
+                            content += '<span>Active</span><div onClick="' + l + '" class="action_button">[JOIN]</div>'
+                        } else if (k.status === 'ok') {
+                            content += '<div onClick="' + `sendMessageNow({ type: 'stop', cmd1: '${k.call.substring(3)}', dbl1: 1 });` + '" class="action_button danger">[QUIT]</div>'
+                        }
+                    } else {
+                        if (k.status == '' || k.status == 'off') {
+                            let clickFunc = ''
+                            if (k.call?.startsWith('DL_')) {
+                                content += '<div onClick="' + `sendMessageNow({ type: 'call', cmd1: '${k.call.substring(3)}', dbl1: 1 })` + '" class="action_button">[RING]</div>'
+                            } else {
+                                content += '<div onClick="' + `sendMessageNow({ type: 'call', cmd1: '${k.call.substring(3)}', dbl1: 0 })` + '" class="action_button">[OVR]</div>'
+                            }
+                        } else if (k.status == 'ok' || k.status == 'chime' || k.status == 'ringing') {
+                            const cl = `sendMessageNow({ type: 'stop', cmd1: '${k.call.substring(3)}', dbl1: 1 }); stopAudio();`
+                            const pu = `sendMessageNow({ type: 'pick_up', cmd1: '${k.call.substring(3)}', dbl1: 1 })`
+                            if (k.status === 'chime') {
+                                chime(ggchime_audio);
+                                content += '<div onClick="' + pu + '" class="action_button">[ACCEPT]</div> '
+                            } else if (k.status == 'ringing') {
+                                chime(ringback_audio)
+                                content += 'Calling...'
+                            } else {
+                                stopAudio();
+                            }
+                            content += '<div onClick="' + cl + '" class="action_button danger">[STOP]</div>'
+                        } else {
+                            content += k.status;
+                        }
+
+
+                    }
+                }
+                return `<div class="col-1">${content}</div>`
+            }).join('\n')
+            console.log(data)
+
+            function renderContact() {
+                let newHtml = '<table class="table"><thead><tr><th>Alias</th><th>Dial</th><th>Op</th></tr></thead>';
+                newHtml += Object.keys(call_table).map(k => {
+                    const d = call_table[k]
+                    let action = ''
+                    if (d[1] == 0) {
+                        action = `<div onclick="addCall(0, '${k}'); sendMessageNow({ type: 'call', cmd1: '${k}', dbl1: 0 })" class="action_button">[OVR]</div>`;
+                    }
+                    return `<tr><td>${d[0]}</td><td>${k}</td><td>${action}</td></tr>`
+                }).join("\n")
+                newHtml += '</table>'
+                document.getElementById('contact').innerHTML = newHtml
+            }
+            renderContact()
+        }
+    </script>
+
+
+</body></html>

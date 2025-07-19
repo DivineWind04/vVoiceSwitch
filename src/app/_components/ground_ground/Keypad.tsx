@@ -1,26 +1,26 @@
 // components/Keypad.tsx
 "use client";
 
-import SquareButton from "../base_button/SquareButton";
+import KeypadButton from "../ground_ground/KeypadButton";
 
 const Keypad: React.FC = () => {
   return (
-    <div className="items-center space-x-1">
-      <input className="h-10 w-48 center bg-customBlue">{/* Dialing Box */}</input>
-      <div className="grid grid-cols-3 gap-1">
+    <div className="items-center space-x-2">
+      {/* <input className="h-8 w-48 center bg-customBlue">{/* Dialing Box</input>*/}
+      <div className="grid grid-cols-3 gap-[4px]">
         <>
-          <SquareButton topLine="" bottomLine="1"/>
-          <SquareButton topLine="ABC" bottomLine="2" />
-          <SquareButton topLine="DEF" bottomLine="3" />
-          <SquareButton topLine="GHI" bottomLine="4" />
-          <SquareButton topLine="JKL" bottomLine="5" />
-          <SquareButton topLine="MNO" bottomLine="6" />
-          <SquareButton topLine="PRS" bottomLine="7" />
-          <SquareButton topLine="TUV" bottomLine="8" />
-          <SquareButton topLine="XYZ" bottomLine="9" />
-          <SquareButton topLine="*" bottomLine="" />
-          <SquareButton topLine="" bottomLine="0" />
-          <SquareButton topLine="#" bottomLine="" />
+          <KeypadButton topLine="" bottomLine="1"/>
+          <KeypadButton topLine="ABC" bottomLine="2" />
+          <KeypadButton topLine="DEF" bottomLine="3" />
+          <KeypadButton topLine="GHI" bottomLine="4" />
+          <KeypadButton topLine="JKL" bottomLine="5" />
+          <KeypadButton topLine="MNO" bottomLine="6" />
+          <KeypadButton topLine="PRS" bottomLine="7" />
+          <KeypadButton topLine="TUV" bottomLine="8" />
+          <KeypadButton topLine="WXY" bottomLine="9" />
+          <KeypadButton topLine="*" bottomLine="" />
+          <KeypadButton topLine="" bottomLine="0" />
+          <KeypadButton topLine="#" bottomLine="" />
         </>
       </div>
     </div>

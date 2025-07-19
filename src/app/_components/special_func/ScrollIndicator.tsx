@@ -9,7 +9,7 @@ type ScrollIndicatorProps = {
 const ScrollIndicator: React.FC<ScrollIndicatorProps> = ({ indicate }) => {
   return (
     <div
-      className={`w-3 h-3 ${indicate ? 'bg-customYellow' : 'bg-customBlue'}`}
+      className={`w-[18px] h-[18px] ${indicate ? 'bg-customYellow' : 'bg-customBlue'}`}
     ></div>
   );
 };

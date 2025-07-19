@@ -8,9 +8,11 @@ export default {
     extend: {
       fontFamily: {
         sans: ['"Arial"', 'sans-serif'],
+        ivsr: ['"ivsr"', ...fontFamily.sans],
       },
       colors: {
-        customBlue: '#06329d',
+        customBlue: '#1f67fa',
+        customLightBlue: '#3275ff',
         customYellow: '#ffff6b',
         customWhite: '#ffffff',
         customGray: '#818181',

@@ -1,22 +1,19 @@
-// components/KeypadButton.tsx
+// components/ChiseledSelectorButton.tsx
 
 import React, { useState } from 'react';
 
-type KeypadButtonProps = {
+type ChiseledSelectorButtonProps = {
   topLine: string;
   bottomLine?: string;
   onClick?: () => void; // Optional onClick handler
-  showIndicator?: boolean; // Optional prop to show indicator
   style?: React.CSSProperties;
 };
 
-const KeypadButton: React.FC<KeypadButtonProps> = ({ topLine, bottomLine, onClick, showIndicator = false, style }) => {
+const ChiseledSelectorButton: React.FC<ChiseledSelectorButtonProps> = ({ topLine, bottomLine, onClick, style }) => {
   const [isActive, setIsActive] = useState(false);
-  const [isIndicatorVisible, setIndicatorVisible] = useState(showIndicator);
 
   const handleMouseDown = () => {
     setIsActive(true);
-    setIndicatorVisible(!isIndicatorVisible); // Toggle indicator visibility
   };
 
   const handleMouseUp = () => {
@@ -26,8 +23,8 @@ const KeypadButton: React.FC<KeypadButtonProps> = ({ topLine, bottomLine, onClic
 
   return (
     <button
-      className={`relative w-[49px] h-[49px] border-double bg-customBlue text-customYellow 
-    border-[8px] border-customBlack flex items-start justify-center text-center
+      className={`relative w-16 h-14 bg-customBlue text-customYellow 
+    border-4 border-customBlack flex items-start justify-center text-center clipped-boxSmall
     ${isActive ? 'border-black' : 'border-customLightBlue'}`}
       style={{
         borderBottomColor: isActive ? '#1f67fa' : '#000000',
@@ -47,19 +44,16 @@ const KeypadButton: React.FC<KeypadButtonProps> = ({ topLine, bottomLine, onClic
       onMouseUp={handleMouseUp}
       onMouseLeave={() => setIsActive(false)} // Handle case where mouse leaves without release
     >
-      {/* Text anchored to top of indicator */}
-      <div className="absolute bottom-0 left-0 right-0 flex flex-col items-center justify-end">
-        <span className="text-[9px] font uppercase break-words leading-tight">
+      {/* Centered and styled text */}
+      <div className={`flex flex-col h-full justify-center ${bottomLine ? '' : 'items-center'}`}>
+        <span className="text-[12px] font">
           {topLine}
         </span>
-        {bottomLine && (
-          <span className="text-[9px] font uppercase break-words leading-tight">
-            {bottomLine}
-          </span>
-        )}
+        {bottomLine && <span className="text-[12px] font-bold">{bottomLine}</span>}
       </div>
+
     </button>
   );
 };
 
-export default KeypadButton;
+export default ChiseledSelectorButton;

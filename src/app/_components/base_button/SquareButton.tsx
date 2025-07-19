@@ -27,11 +27,20 @@ const SquareButton: React.FC<SquareButtonProps> = ({ topLine, bottomLine, onClic
   return (
     <button
       className={`relative w-16 h-16 bg-customBlue text-customYellow 
-    border-2 border-customGray flex items-start justify-center text-center
-    ${isActive ? 'border-customBlue' : ' border-customWhite'}`}
+    border-4 border-customBlack flex items-start justify-center text-center
+    ${isActive ? 'border-black' : 'border-customLightBlue'}`}
       style={{
-        borderBottomColor: isActive ? '#000080' : '#818181',
-        borderRightColor: isActive ? '#000080' : '#818181',
+        borderBottomColor: isActive ? '#1f67fa' : '#000000',
+        borderRightColor: isActive ? '#1f67fa' : '#000000',
+        backgroundImage: `
+          linear-gradient(45deg, #1f67fa 25%, transparent 25%), 
+          linear-gradient(-45deg, #1f67fa 25%, transparent 25%), 
+          linear-gradient(45deg, transparent 75%, #1f67fa 75%), 
+          linear-gradient(-45deg, transparent 75%, #1f67fa 75%)
+        `,
+        backgroundSize: '2px 2px',
+        backgroundPosition: '0 0, 0 1px, 1px -1px, -1px 0px',
+        backgroundColor: '#000000',
         ...style
       }}
       onMouseDown={handleMouseDown}
@@ -39,18 +48,18 @@ const SquareButton: React.FC<SquareButtonProps> = ({ topLine, bottomLine, onClic
       onMouseLeave={() => setIsActive(false)} // Handle case where mouse leaves without release
     >
       {/* Text anchored to top of indicator */}
-      <div className="absolute bottom-2.5 left-0 right-0 flex flex-col items-center justify-end">
-        <span className="text-lg font-bold uppercase break-words leading-tight">
+      <div className="absolute bottom-[14px] left-0 right-0 flex flex-col items-center justify-end">
+        <span className="text-[14px] font uppercase break-words leading-tight">
           {topLine}
         </span>
         {bottomLine && (
-          <span className="text-lg font-bold uppercase break-words leading-tight">
+          <span className="text-[14px] font uppercase break-words leading-tight">
             {bottomLine}
           </span>
         )}
       </div>
       {isIndicatorVisible && (
-        <div className="absolute bottom-0 left-0 right-0 h-3 bg-customGreen"></div>
+        <div className="absolute bottom-[1px] w-[46px] h-[13px] py-[2px] bg-customGreen px-[5px]"></div>
       )}
     </button>
   );

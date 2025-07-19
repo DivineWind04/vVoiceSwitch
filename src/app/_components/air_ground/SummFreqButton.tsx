@@ -1,23 +1,23 @@
-// components/FrequencyButton.tsx
+// components/SummFreqButton.tsx
 
 "use client"; // Mark as Client Component if using Next.js
 
 import React, { CSSProperties, useState } from 'react';
 import { FaHeadphones, FaVolumeOff } from 'react-icons/fa';
 
-type FrequencyButtonProps = {
+type SummFreqButtonProps = {
   frequency: string;
   name: string;
-  prefMode: boolean; // True for headset (initial), False for loudspeaker
-  currMode: boolean; // True for headset, False for loudspeaker
+  prefMode?: boolean; // True for headset (initial), False for loudspeaker
+  currMode?: boolean; // True for headset, False for loudspeaker
   style?: CSSProperties;
   onClick?: () => void;
 };
 
-const FrequencyButton: React.FC<FrequencyButtonProps> = ({ frequency, prefMode: initialprefMode, currMode: initialCurrentMode, name, style, onClick }) => {
+const SummFreqButton: React.FC<SummFreqButtonProps> = ({ frequency, prefMode: initialprefMode, currMode: initialCurrentMode, name, style, onClick }) => {
   const [isActive, setIsActive] = useState(false);
-  const [isprefMode, setIsprefMode] = useState(initialprefMode); // Initialize prefMode to the provided prop
-  const [isCurrentMode, setIsCurrentMode] = useState(initialCurrentMode); // Initialize current mode to false
+  const [isprefMode, setIsprefMode] = useState(initialprefMode ?? false); // Initialize prefMode to the provided prop or false
+  const [isCurrentMode, setIsCurrentMode] = useState(initialCurrentMode ?? false); // Initialize current mode to false
 
   const handleMouseDown = () => {
     setIsActive(true);
@@ -32,7 +32,7 @@ const FrequencyButton: React.FC<FrequencyButtonProps> = ({ frequency, prefMode: 
 
   return (
     <button
-      className={`relative w-28 h-16 bg-customBlue text-customYellow border-[4px] flex items-start justify-center text-center group ${isActive ? 'border-customBlue' : ''}`}
+      className={`relative w-16 h-16 bg-customBlue text-customYellow border-[4px] flex items-start justify-center text-center group ${isActive ? 'border-customBlue' : ''}`}
       style={{
         borderTopColor: isActive ? '#000000' : '#3275ff',
         borderLeftColor: isActive ? '#000000' : '#3275ff',
@@ -76,7 +76,7 @@ const FrequencyButton: React.FC<FrequencyButtonProps> = ({ frequency, prefMode: 
       )}
 
       {/* Frequency Text */}
-      <span className="absolute bottom-0 text-[14px] font pb-4">{frequency}</span>
+      <span className="absolute bottom-0 left-0 text-[10px] font pb-[20px] pl-1">{frequency}</span>
 
       {/* Hover Info Box
       <div className="absolute bottom-full top-0 -left-1/2 transform -translate-x-1/2 mb-2 w-max max-w-xs p-2 mr-4 self-center text-center text-customYellow bg-customGray border border-customBlue rounded-md shadow-lg opacity-0 transition-opacity duration-300 group-hover:opacity-100 pointer-events-none">
@@ -86,4 +86,4 @@ const FrequencyButton: React.FC<FrequencyButtonProps> = ({ frequency, prefMode: 
   );
 };
 
-export default FrequencyButton;
+export default SummFreqButton;

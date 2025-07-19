@@ -9,10 +9,10 @@ type DisplayFieldProps = {
 const DisplayField: React.FC<DisplayFieldProps> = ({ label }) => {
   return (
     <div className="flex items-center space-x-1">
-      <div className="w-64 h-3 bg-customBlue">
+      <div className="w-60 h-4 bg-customBlue">
         {/* Empty Box */}
       </div>
-      <span className="text-customYellow font-bold text-sm">{label}</span>
+      <span className="text-yellow-300 font-bold text-[14px]">{label}</span>
     </div>
   );
 };
