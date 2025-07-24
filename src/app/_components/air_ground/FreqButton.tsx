@@ -4,6 +4,7 @@
 
 import React, { CSSProperties, useState } from 'react';
 import { FaHeadphones, FaVolumeOff } from 'react-icons/fa';
+import { useWebSocket } from '~/contexts/WebSocketContext';
 
 type FrequencyButtonProps = {
   frequency: string;
@@ -18,6 +19,7 @@ const FrequencyButton: React.FC<FrequencyButtonProps> = ({ frequency, prefMode: 
   const [isActive, setIsActive] = useState(false);
   const [isprefMode, setIsprefMode] = useState(initialprefMode); // Initialize prefMode to the provided prop
   const [isCurrentMode, setIsCurrentMode] = useState(initialCurrentMode); // Initialize current mode to false
+  const { service } = useWebSocket();
 
   const handleMouseDown = () => {
     setIsActive(true);
@@ -25,8 +27,16 @@ const FrequencyButton: React.FC<FrequencyButtonProps> = ({ frequency, prefMode: 
 
   const handleMouseUp = () => {
     setIsActive(false);
-    setIsprefMode(!isprefMode); // Toggle prefMode
-    setIsCurrentMode(!isCurrentMode); // Toggle current mode
+    setIsprefMode(!isprefMode);
+    setIsCurrentMode(!isCurrentMode);
+    
+    // Send TX/RX commands via WebSocket
+    const freqMHz = parseFloat(frequency) * 1000000; // Convert to Hz
+    if (service) {
+      service.setTx(freqMHz, !isprefMode);
+      service.setRx(freqMHz, !isCurrentMode);
+    }
+    
     if (onClick) onClick();
   };
 

@@ -1,6 +1,7 @@
 // components/DAButton.tsx
 
 import React, { useState } from 'react';
+import { useWebSocket } from '~/contexts/WebSocketContext';
 
 type DAButtonProps = {
   topLine: string;
@@ -16,6 +17,7 @@ type DAButtonProps = {
 const DAButton: React.FC<DAButtonProps> = ({ topLine, middleLine, bottomLine, onClick, showIndicator = false, style, latching, dialLine }) => {
   const [isActive, setIsActive] = useState(false);
   const [isIndicatorVisible, setIndicatorVisible] = useState(showIndicator);
+  const { service } = useWebSocket();
 
   const handleMouseDown = () => {
     setIsActive(true);
@@ -24,9 +26,13 @@ const DAButton: React.FC<DAButtonProps> = ({ topLine, middleLine, bottomLine, on
 
   const handleMouseUp = () => {
     setIsActive(false);
+    
+    // Make call via WebSocket if dialLine is provided
+    if (service && dialLine) {
+      service.makeCall(dialLine.toString(), 0); // 0 for override call
+    }
+    
     if (onClick) onClick();
-    // if non-latching, hide indicator on release
-    if (!latching) setIndicatorVisible(false);
   };
 
   return (

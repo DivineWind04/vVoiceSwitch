@@ -1,22 +1,26 @@
 import "~/styles/globals.css";
-
 import { GeistSans } from "geist/font/sans";
+import { type Metadata } from "next";
+import { TRPCReactProvider } from "~/trpc/react";
+import { WebSocketProvider } from "~/contexts/WebSocketContext";
 
-export const metadata = {
+export const metadata: Metadata = {
   title: "vIVSR",
-  description: "Virtual Interm Voice Switch System",
+  description: "Virtual IVSR Interface",
   icons: [{ rel: "icon", url: "/favicon.ico" }],
 };
 
 export default function RootLayout({
   children,
-}: {
-  children: React.ReactNode;
-}) {
+}: Readonly<{ children: React.ReactNode }>) {
   return (
     <html lang="en" className={`${GeistSans.variable}`}>
       <body>
-        {children}
+        <TRPCReactProvider>
+          <WebSocketProvider>
+            {children}
+          </WebSocketProvider>
+        </TRPCReactProvider>
       </body>
     </html>
   );

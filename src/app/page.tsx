@@ -5,6 +5,7 @@ import GroundGroundPage from "./_components/ground_ground/GroundGroundPage";
 import AreaThree from "./_components/special_func/AreaThree";
 import StatusArea from "./_components/status/StatusArea";
 import AreaFour from "./_components/special_func/AreaFour";
+import WebSocketStatus from "./_components/status/WebSocketStatus";
 
 export default function HomePage() {
   return (
@@ -20,6 +21,7 @@ export default function HomePage() {
             </div>
           </div>
           <StatusArea position="FD/CD" />
+          <WebSocketStatus />
         </div>
       </div>
     </main>

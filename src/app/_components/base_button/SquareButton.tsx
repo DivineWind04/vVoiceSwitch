@@ -24,15 +24,28 @@ const SquareButton: React.FC<SquareButtonProps> = ({ topLine, bottomLine, onClic
     if (onClick) onClick();
   };
 
+const checkerboardStyle = {
+    backgroundImage: `
+      linear-gradient(45deg, #163c9dff 25%, transparent 25%), 
+      linear-gradient(-45deg, #163c9dff 25%, transparent 25%), 
+      linear-gradient(45deg, transparent 75%, #163c9dff 75%), 
+      linear-gradient(-45deg, transparent 75%, #163c9dff 75%)
+    `,
+    backgroundSize: '4px 4px',
+    backgroundPosition: '0 0, 0 2px, 2px -2px, -2px 0px',
+    backgroundColor: '#06329D', // Slightly lighter blue base
+    ...style
+  };
+
   return (
     <button
-      className={`relative w-16 h-16 bg-customBlue text-customYellow 
+      className={`relative w-16 h-16 text-customYellow 
     border-2 border-customGray flex items-start justify-center text-center
     ${isActive ? 'border-customBlue' : ' border-customWhite'}`}
       style={{
         borderBottomColor: isActive ? '#000080' : '#818181',
         borderRightColor: isActive ? '#000080' : '#818181',
-        ...style
+        ...checkerboardStyle
       }}
       onMouseDown={handleMouseDown}
       onMouseUp={handleMouseUp}
