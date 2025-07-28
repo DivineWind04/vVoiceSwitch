@@ -1,7 +1,5 @@
 'use client';
 import { useEffect, useRef, useState } from 'react';
-import { Id, toast, ToastContainer } from 'react-toastify';
-import 'react-toastify/ReactToastify.css';
 import RdvsComponent from './rdvs';
 import './styles.css';
 import VscsComponent from './vscs';
