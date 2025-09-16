@@ -12,13 +12,20 @@ type AirGroundRowProps = {
   offline?: boolean;
 };
 
+const formatFreq = (freq: number) => {
+  if (!freq) return "";
+  const val = freq / 1_000_000;
+  if (val % 1 === 0) return val.toFixed(1);
+  return val.toString().replace(/0+$/, '').replace(/\.$/, '');
+};
+
 const AirGroundRow: React.FC<AirGroundRowProps> = ({ data, offline }) => {
   const sendMsg = useCoreStore((s: any) => s.sendMessageNow);
   const ptt = useCoreStore((s: any) => s.ptt);
   const freq = data?.freq;
   const prefMode = !!data?.h; // preferred route headset flag
   const currMode = !!data?.h; // current shown as same for now
-  const name = data ? (data.name || (freq ? (Math.floor(freq / 10000) / 100) : '')) : '';
+  const name = data ? (data.name || (freq ? formatFreq(freq) : '')) : '';
   const outOfService = false; // placeholder; adapt if model provides
   const txIndicator = data?.t ? (ptt ? 'flutter active' : 'steady green') : '';
   const rxIndicator = data?.r ? (data?.talking ? 'flutter active' : 'steady green') : '';
@@ -28,7 +35,7 @@ const AirGroundRow: React.FC<AirGroundRowProps> = ({ data, offline }) => {
       {!offline ? (
         <FrequencyButton
           name={name}
-          frequency={freq ? String(Math.floor(freq / 10000) / 100) : ''}
+          frequency={freq ? formatFreq(freq) : ''}
           prefMode={prefMode}
           currMode={currMode}
           onToggleRoute={(toHeadset) => {

@@ -63,8 +63,20 @@ const StvsBase: React.FC = () => {
   React.useEffect(() => setMounted(true), []);
   if (!mounted) return null;
 
-  // Always 6 frequency buttons
-  const freqButtons = Array.from({ length: 6 }, (_, i) => freqData[i]?.freq || "");
+  // Always 6 frequency buttons, formatted to up to 3 decimals
+  const formatFreq = (freq: number) => {
+    if (!freq) return "";
+    const val = freq / 1_000_000;
+    if (val % 1 === 0) return val.toFixed(1); // whole number, show .0
+    return val.toString().replace(/0+$/, '').replace(/\.$/, '');
+  };
+  const freqButtons = Array.from({ length: 6 }, (_, i) => {
+    const f = freqData[i];
+    if (!f) return "";
+    if (f.name) return f.name;
+    if (f.freq) return formatFreq(f.freq);
+    return "";
+  });
   // Always 12 G/G buttons (4x3 grid)
   const ggButtons = Array.from({ length: 12 }, (_, i) => ggData[i]?.call_name || ggData[i]?.call);
   return (
@@ -169,7 +181,7 @@ const StvsBase: React.FC = () => {
         {freqButtons.map((freq, i) => (
           <StvsButton
             key={"freq-"+i}
-            label={freq ? String(Math.floor(freq / 10000) / 100) : ''}
+            label={freq}
             style={{
               left: `${(515 + i*60)/899.16*59}%`,
               top: `${(52/164.4)*100}%`,
