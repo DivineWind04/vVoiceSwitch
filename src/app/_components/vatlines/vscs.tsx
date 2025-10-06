@@ -620,7 +620,7 @@ export default function VscsComponent(props: VscsProps) {
                 <VscsUtil sendMsg={sendMsg} />
                 
                 {/* Overlay the UTIL function buttons on top of the content */}
-                <div className="absolute bottom-1 left-2 flex flex-wrap gap-3 justify-center">
+                <div className="absolute bottom-1 left-2 flex flex-wrap gap-3 justify-center" style={{ zIndex: 25 }}>
                   {screenMode === 'UTIL' ? (
                     isAltScreen ? (
                       // Screen selection mode - show SCRN ALT + magenta screen options in overlay position
@@ -667,7 +667,23 @@ export default function VscsComponent(props: VscsProps) {
                         >
                           UTIL
                         </VscsStaticButton>
-                      </>
+                        {/* R/T button positioned in overlay for UTIL mode */}
+                        <div className="col-span-2 relative">
+                          {/* R/T Indicator positioned above the static button */}
+                          <div className="absolute -top-[117px] right-[265px] text-black bg-zinc-50 text-center w-[165px] h-5">
+                            <div className="text-center text-lg leading-tight">
+                              {rtEnabled ? 'R/T ON' : 'R/T OFF'}
+                            </div>
+                          </div>
+                          <div 
+                            className="relative -top-[105px] right-[265px] vscs-static-button w-[80px] h-20 bg-cyan-400 cursor-pointer mt-2"
+                            onClick={() => setRtEnabled(!rtEnabled)}
+                          >
+                          </div>
+                        </div>
+                        {/* Large grey area positioned next to R/T button in UTIL mode */}
+                        <div className="bg-stone-500 vscs-empty absolute -top-[105px] right-[440px] w-[335px] h-[80px] mt-2"></div>
+                              </>
                     ) : (
                       // Normal UTIL function buttons
                       <>
@@ -698,7 +714,7 @@ export default function VscsComponent(props: VscsProps) {
                         {/* R/T button positioned in overlay for UTIL mode */}
                         <div className="col-span-2 relative">
                           {/* R/T Indicator positioned above the static button */}
-                          <div className="absolute -top-[115px] right-[265px] text-black bg-zinc-50 text-center w-[165px] h-5">
+                          <div className="absolute -top-[117px] right-[265px] text-black bg-zinc-50 text-center w-[165px] h-5">
                             <div className="text-center text-lg leading-tight">
                               {rtEnabled ? 'R/T ON' : 'R/T OFF'}
                             </div>
@@ -709,6 +725,8 @@ export default function VscsComponent(props: VscsProps) {
                           >
                           </div>
                         </div>
+                        {/* Large grey area positioned next to R/T button in UTIL mode */}
+                        <div className="bg-stone-500 vscs-empty absolute -top-[105px] right-[440px] w-[335px] h-[80px] mt-2"></div>
                               </>
                     )
                   ) : null}
@@ -814,7 +832,7 @@ export default function VscsComponent(props: VscsProps) {
             </VscsStaticButton>
           )}
           <div className="grid col-span-9 grid-cols-subgrid text-center -mt-3">
-            <div className={`text-black bg-zinc-50 text-center px-0.0 py-0.0 ml-0.0 mr-[13px] h-4 ${screenMode === 'UTIL' ? 'transform -translate-y-24 translate-x-2' : ''}`}>
+            <div className={`text-black bg-zinc-50 text-center px-0.0 py-0.0 ml-0.0 mr-[13px] h-4 ${screenMode === 'UTIL' ? 'transform  -translate-y-[109px] translate-x-2' : ''}`}>
               <div className="text-center text-lg leading-tight">
                 {screenMode === 'AG1' ? 'A/G 1' :
                  screenMode === 'AG2' ? 'A/G 2' : 
@@ -824,7 +842,7 @@ export default function VscsComponent(props: VscsProps) {
                  'G/G 1'}
               </div>
             </div>
-            <div className={`text-black bg-zinc-50 text-center px-0.0 py-0.0 ml-0.0 mr-[13px] h-4 ${screenMode === 'UTIL' ? 'transform -translate-y-24 translate-x-2' : ''}`}>
+            <div className={`text-black bg-zinc-50 text-center px-0.0 py-0.0 ml-0.0 mr-[13px] h-4 ${screenMode === 'UTIL' ? 'transform -translate-y-[109px] translate-x-2' : ''}`}>
               <div className="text-center text-lg leading-tight">{func}</div>
             </div>
             <div className="col-span-7 h-4"></div>

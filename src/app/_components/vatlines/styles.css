@@ -264,7 +264,7 @@
     font-family: 'TerminusTTF-Bold', 'Courier New', Courier, monospace;
     width: 800px !important;
     height: 600px !important;
-    font-weight: bold;
+    font-weight: normal;
     /* Use configurable TED color scheme */
     color: var(--ted-screen-text);
     background-color: var(--ted-screen-background);
@@ -476,7 +476,7 @@
     flex-direction: column;
     justify-content: top;
     align-items: center;
-    font-size: 18px;
+    font-size: 13pt;
     font-weight: lighter;
     text-align: center;
     border: none;
@@ -755,7 +755,7 @@
     flex: 1; /* Equal width distribution with gaps */
     /* Inherit most styles from .vscs-static-button */
     font-size: 10px !important; /* Override the larger font size */
-    font-weight: bold !important;
+    font-weight: normal !important;
     font-family: 'VSCS', monospace; /* Use VSCS font */
     height: 100%;
     /* Removed transition for instant color changes */
@@ -989,7 +989,7 @@
 .vscs-button.ag-busy .first-line,
 .vscs-button.ag-monitoring .first-line {
     display: block !important; /* Show the first line containing frequency */
-    font-weight: bold;
+    font-weight: normal;
     font-size: 14px;
     margin-bottom: 4px;
 }
@@ -1288,7 +1288,7 @@
     background-color: #ccc; /* Light gray header */
     color: black;
     font-size: 6.5px;
-    font-weight: bold;
+    font-weight: normal;
     text-align: center;
     padding: 8px;
     border: 1px solid #404040;
@@ -1321,7 +1321,7 @@
     background-color: #f0ff00; /* Yellow header */
     color: black;
     font-size: 6.5px;
-    font-weight: bold;
+    font-weight: normal;
     text-align: center;
     padding: 4px;
     height: 12px;
@@ -1414,7 +1414,7 @@
 .util-slider-label-right {
     font-size: 7px;
     color: black;
-    font-weight: bold;
+    font-weight: normal;
 }
 
 .util-slider-track {
@@ -1455,7 +1455,7 @@
     background-color: #a8ffff; /* Cyan button */
     color: black;
     font-size: 6px;
-    font-weight: bold;
+    font-weight: normal;
     text-align: center;
     padding: 4px;
     border: 1px solid #333;
@@ -1489,7 +1489,7 @@
     background-color: white;
     color: black;
     font-size: 6.5px;
-    font-weight: bold;
+    font-weight: normal;
     padding: 2px 8px;
     border: 1px solid #333;
 }
@@ -1520,7 +1520,7 @@
     background-color: white;
     color: black;
     font-size: 6.5px;
-    font-weight: bold;
+    font-weight: normal;
     padding: 2px 8px;
     text-align: center;
     min-width: 40px;
@@ -1559,4 +1559,43 @@
 .ag-freq-header.guard-frequency::after {
     background-color: white !important; /* White lines for contrast on red background */
     box-shadow: 50px -6px 0 -4px white, 50px 6px 0 -4px white !important;
+}
+
+/* VSCS Settings Modal Styling */
+.vscs-settings-modal .ant-modal-content {
+    background-color: #404040 !important;
+    border: 2px solid #666666 !important;
+}
+
+.vscs-settings-modal .ant-modal-header {
+    background-color: #404040 !important;
+    border-bottom: 1px solid #666666 !important;
+}
+
+.vscs-settings-modal .ant-modal-title {
+    color: #ffffff !important;
+    font-family: 'VSCS', monospace !important;
+}
+
+.vscs-settings-modal .ant-modal-body {
+    background-color: #404040 !important;
+    color: #ffffff !important;
+}
+
+.vscs-settings-modal .ant-tree {
+    background-color: transparent !important;
+    color: #ffffff !important;
+}
+
+.vscs-settings-modal .ant-tree-node-content-wrapper {
+    color: #ffffff !important;
+}
+
+.vscs-settings-modal .ant-tree-node-content-wrapper:hover {
+    background-color: #666666 !important;
+}
+
+.vscs-settings-modal .ant-tree-checkbox-checked .ant-tree-checkbox-inner {
+    background-color: #40E0D0 !important;
+    border-color: #40E0D0 !important;
 }
