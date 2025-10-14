@@ -1015,7 +1015,7 @@ export default function SocketPage(props: { config: Position }) {
               <source src="/vscs/Ringback.wav" type="audio/wav" />
             </audio>
             <audio ref={vscsOverride} playsInline>
-              <source src="/vscs/Override.wav" type="audio/wav" />
+              <source src="/vscs/Override.mp3" type="audio/mp3" />
             </audio>
             <audio ref={error}>
               <source src="/Error.wav" type="audio/wav" />

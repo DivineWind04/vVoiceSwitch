@@ -3,8 +3,14 @@ import { useCoreStore, type Facility } from './model'
 import axios from 'axios'
 import SettingModal from './pages/setting'
 import Button from 'antd/es/button'
-import Panel from './components/panel'
 import { Alert } from 'antd'
+
+// Import UI wrapper components
+import VSCSWrapper from './components/VSCSWrapper'
+import ETVSWrapper from './components/ETVSWrapper'
+import STVSWrapper from './components/STVSWrapper'
+import IVSRWrapper from './components/IVSRWrapper'
+import RDVSWrapper from './components/RDVSWrapper'
 
 
 function App() {
@@ -13,7 +19,26 @@ function App() {
   const setPosData = useCoreStore(s => s.setPositionData)
   const callsign = useCoreStore(s => s.callsign)
   const afv_version = useCoreStore(s => s.afv_version)
-  const [versionAlert, setVersionAlert] = useState(null)
+  const currentUI = useCoreStore(s => s.currentUI) // Get current UI from store
+  const [versionAlert, setVersionAlert] = useState<any>(null)
+
+  // Function to render the appropriate UI component based on current UI context
+  const renderUI = () => {
+    switch (currentUI) {
+      case 'etvs':
+        return <ETVSWrapper />;
+      case 'stvs':
+        return <STVSWrapper />;
+      case 'ivsr':
+        return <IVSRWrapper />;
+      case 'rdvs':
+        return <RDVSWrapper />;
+      case 'vscs':
+      default:
+        return <VSCSWrapper />;
+    }
+  };
+
   useEffect(() => {
     function find(stp: Facility, found: boolean) {
       for (const e of stp.positions) {
@@ -37,7 +62,7 @@ function App() {
     axios.get('/html_app/afv_poc/patch/version.json').then(r => {
       const version_data = r.data
       const latest_version = version_data.latest_version - 0
-      const current_version = afv_version - 0
+      const current_version = parseFloat(afv_version) || 0
       const lowest_allowable_version = version_data.lowest_allowable_version - 0
       if (current_version < lowest_allowable_version) {
         version_data.must_upgrade = true
@@ -66,7 +91,7 @@ function App() {
         {connected && !versionAlert?.must_upgrade ? <div>
           <em>Connected to AFV (CRC)</em>
           <Button onClick={() => setSettingModal(true)}>Setting</Button>
-          <Panel />
+          {renderUI()}
         </div> : <>
           Not Connected
         </>}

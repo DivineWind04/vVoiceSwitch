@@ -22,6 +22,7 @@ interface CoreState {
     positionData: Facility;
     callsign: string;
     selectedPositions: Position[],
+    currentUI: string; // Current UI context (vscs, etvs, stvs, ivsr, rdvs)
 
     ag_status: any[],
     gg_status: any[],
@@ -32,18 +33,155 @@ interface CoreState {
     updateSelectedPositions: (poss: Position[]) => void;
     setCallsign: (call_sign: string, cid: number) => void;
     sendMessageNow: (data: any) => void;
+    setCurrentUI: (ui: string) => void;
 }
 
 let call_table: Record<string, [string, number]> = {}
 
-// Guard DOM access for Next.js SSR safety
-const ringback_audio: HTMLAudioElement | null =
-    typeof document !== 'undefined' ? (document.getElementById('ringback') as HTMLAudioElement | null) : null;
-const ggchime_audio: HTMLAudioElement | null =
-    typeof document !== 'undefined' ? (document.getElementById('ggchime') as HTMLAudioElement | null) : null;
+// UI-specific audio configuration
+interface AudioConfig {
+    ringback: string;
+    ggchime: string;
+    override?: string;
+}
+
+const audioConfigs: Record<string, AudioConfig> = {
+    vscs: {
+        ringback: 'Ringback.wav',
+        ggchime: 'GGChime.mp3',
+        override: 'Override.mp3'
+    },
+    etvs: {
+        ringback: 'Override_Term.wav',
+        ggchime: 'RDVS_Chime.m4a'
+    },
+    stvs: {
+        ringback: 'Override_Term.wav',
+        ggchime: 'RDVS_Chime.m4a'
+    },
+    ivsr: {
+        ringback: 'Override_Term.wav',
+        ggchime: 'RDVS_Chime.m4a'
+    },
+    rdvs: {
+        ringback: 'Ringback.wav',
+        ggchime: 'GGChime.mp3'
+    }
+};
+
+// Function to detect current UI context
+export function getCurrentUIContext(): string {
+    if (typeof window === 'undefined') return 'vscs'; // Default for SSR
+    
+    // First, try to detect from URL path
+    const path = window.location.pathname;
+    if (path.includes('/vscs')) return 'vscs';
+    if (path.includes('/etvs')) return 'etvs';
+    if (path.includes('/stvs')) return 'stvs';
+    if (path.includes('/ivsr')) return 'ivsr';
+    if (path.includes('/rdvs')) return 'rdvs';
+    
+    // If no URL-based detection, try to get from position data in store
+    try {
+        // Access the Zustand store to get selected position data
+        const state = (window as any).__ZUSTAND_STORE_STATE__ || useCoreStore.getState();
+        if (state?.selectedPositions?.length > 0) {
+            const position = state.selectedPositions[0];
+            // Check if position has a UI field (from JSON)
+            if (position.ui) {
+                return position.ui.toLowerCase();
+            }
+            // Check if position has panelType (from database)
+            if (position.panelType) {
+                return position.panelType.toLowerCase();
+            }
+        }
+    } catch (err) {
+        // Ignore errors accessing store
+        console.debug('Could not access position data for UI context:', err);
+    }
+    
+    // Default to VSCS if no specific UI detected
+    return 'vscs';
+}
+
+// Function to create or get audio element for specific UI
+function getAudioElement(audioType: 'ringback' | 'ggchime'): HTMLAudioElement | null {
+    if (typeof document === 'undefined') return null;
+    
+    const uiContext = getCurrentUIContext();
+    const config = audioConfigs[uiContext];
+    
+    // Fallback to VSCS config if current UI config not found
+    const defaultConfig = audioConfigs.vscs || { ringback: 'Ringback.wav', ggchime: 'GGChime.mp3' };
+    const audioSrc = config ? config[audioType] : defaultConfig[audioType];
+    
+    // Create unique ID for this UI context and audio type
+    const audioId = `${uiContext}_${audioType}`;
+    
+    // Check if element already exists
+    let audioElement = document.getElementById(audioId) as HTMLAudioElement | null;
+    
+    if (!audioElement) {
+        // Create new audio element
+        audioElement = document.createElement('audio');
+        audioElement.id = audioId;
+        audioElement.src = audioSrc;
+        audioElement.preload = 'auto';
+        document.body.appendChild(audioElement);
+    }
+    
+    return audioElement;
+}
+
+// Guard DOM access for Next.js SSR safety - these will be dynamically updated
+let ringback_audio: HTMLAudioElement | null = null;
+let ggchime_audio: HTMLAudioElement | null = null;
+
+// Initialize audio elements when document is available
+if (typeof document !== 'undefined') {
+    ringback_audio = getAudioElement('ringback');
+    ggchime_audio = getAudioElement('ggchime');
+}
+
+// Function to refresh audio elements when UI context changes
+export function refreshAudioElements() {
+    if (typeof document !== 'undefined') {
+        ringback_audio = getAudioElement('ringback');
+        ggchime_audio = getAudioElement('ggchime');
+    }
+}
+
+// Function to set UI context based on position selection (for position-based UI switching)
+export function setUIContextFromPosition(position: any) {
+    // This will trigger refreshAudioElements to use the correct audio files
+    // when position data indicates a specific UI type
+    let detectedUI = 'vscs'; // default
+    
+    if (position?.ui) {
+        detectedUI = position.ui.toLowerCase();
+    } else if (position?.panelType) {
+        detectedUI = position.panelType.toLowerCase();
+    }
+    
+    console.log('Setting UI context from position:', detectedUI, position);
+    
+    // Refresh audio elements with new context
+    refreshAudioElements();
+    
+    return detectedUI;
+}
 
 function stopAudio() {
     try {
+        // Get current audio elements in case UI context changed
+        const currentRingback = getAudioElement('ringback');
+        const currentGgchime = getAudioElement('ggchime');
+        
+        currentRingback?.pause?.();
+        currentGgchime?.pause?.();
+        
+        // Also stop the cached references
         ringback_audio?.pause?.();
         ggchime_audio?.pause?.();
     } catch {
@@ -84,6 +222,7 @@ export const useCoreStore = create<CoreState>((set: any, get: any) => {
         callsign: '',
         positionData: { childFacilities: [], id: '', name: '', positions: [] },
         selectedPositions: [],
+        currentUI: 'vscs', // Default to VSCS
 
         ag_status: [],
         gg_status: [],
@@ -103,6 +242,15 @@ export const useCoreStore = create<CoreState>((set: any, get: any) => {
             set({
                 selectedPositions: poss,
             })
+            
+            // Set UI context based on first selected position for audio system
+            if (poss && poss.length > 0) {
+                const detectedUI = setUIContextFromPosition(poss[0]);
+                set({
+                    currentUI: detectedUI
+                });
+            }
+            
             resetWindow();
         },
     setCallsign: (call_sign: string, cid: number) => {
@@ -111,6 +259,11 @@ export const useCoreStore = create<CoreState>((set: any, get: any) => {
                 cid
             })
             resetWindow();
+        },
+        setCurrentUI: (ui: string) => {
+            set({
+                currentUI: ui
+            })
         }
     }
 
@@ -216,10 +369,10 @@ export const useCoreStore = create<CoreState>((set: any, get: any) => {
                     set({ afv_version: data.cmd1 })
                 } else if (data.type === 'call') {
                     if (data.cmd1 === 'connected') {
-            try { ringback_audio?.pause?.(); } catch {}
+            try { getAudioElement('ringback')?.pause?.(); } catch {}
             clearInterval(ringback_interval)
                     } else if (data.cmd1 === 'terminated') {
-            try { ringback_audio?.pause?.(); } catch {}
+            try { getAudioElement('ringback')?.pause?.(); } catch {}
             clearInterval(ringback_interval)
                     }
                     // document.getElementById('callStatus').innerText = data.cmd1
@@ -242,9 +395,9 @@ export const useCoreStore = create<CoreState>((set: any, get: any) => {
 
                             } else {
                                 if (k.status === 'chime') {
-                                    chime(ggchime_audio);
+                                    chime(getAudioElement('ggchime'));
                                 } else if (k.status == 'ringing') {
-                                    chime(ringback_audio)
+                                    chime(getAudioElement('ringback'))
                                 } else {
                                     stopAudio();
                                 }

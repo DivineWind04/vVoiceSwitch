@@ -42,33 +42,15 @@ export default function VscsAG({ page, sendMsg }: VscsAGProps) {
     return [];
   };
   
-  // Filter A/G status data for the specific page
-  const currentSlice = useMemo(() => {
-    const start = (page - 1) * ITEMS_PER_PAGE;
-    const end = start + ITEMS_PER_PAGE;
-    const slice = ag_status.slice(start, end);
-    // Pad with empty slots if needed
-    if (slice.length < ITEMS_PER_PAGE) {
-      return [...slice, ...new Array(ITEMS_PER_PAGE - slice.length).fill(undefined)];
-    }
-    return slice;
-  }, [ag_status, page]);
-
-  // Convert A/G data to button format - expand for multiple radio sites
-  const buttons = useMemo(() => {
+  // First, expand ALL A/G frequencies to buttons (including radio site expansion)
+  const allExpandedButtons = useMemo(() => {
     const expandedButtons: any[] = [];
     
-    currentSlice.forEach((data: any, index: number) => {
+    // Expand all frequencies with their radio sites
+    ag_status.forEach((data: any, index: number) => {
       if (!data) {
-        // Empty/unassigned button
-        expandedButtons.push({
-          shortName: '',
-          longName: '',
-          target: '',
-          type: ButtonType.NONE,
-          radioSiteIndex: 0,
-          originalData: null
-        });
+        // Skip empty data
+        return;
       } else {
         // Get radio sites for this frequency
         const radioSites = getRadioSitesForFreq(parseInt(data.freq));
@@ -102,13 +84,65 @@ export default function VscsAG({ page, sendMsg }: VscsAGProps) {
       }
     });
 
+    return expandedButtons;
+  }, [ag_status]);
+
+  // Then slice the expanded buttons for the specific page with overflow logic
+  const currentSlice = useMemo(() => {
+    // Implement overflow logic at the button level (after radio site expansion)
+    if (page === 1) {
+      // Page 1: show first ITEMS_PER_PAGE buttons
+      const slice = allExpandedButtons.slice(0, ITEMS_PER_PAGE);
+      // Pad with empty slots if needed
+      if (slice.length < ITEMS_PER_PAGE) {
+        return [...slice, ...new Array(ITEMS_PER_PAGE - slice.length).fill({
+          shortName: '',
+          longName: '',
+          target: '',
+          type: ButtonType.NONE,
+          radioSiteIndex: 0,
+          originalData: null
+        })];
+      }
+      return slice;
+    } else if (page === 2) {
+      // Page 2: show overflow buttons (buttons beyond ITEMS_PER_PAGE)
+      const slice = allExpandedButtons.slice(ITEMS_PER_PAGE);
+      // Limit to ITEMS_PER_PAGE buttons and pad if needed
+      const limitedSlice = slice.slice(0, ITEMS_PER_PAGE);
+      if (limitedSlice.length < ITEMS_PER_PAGE) {
+        return [...limitedSlice, ...new Array(ITEMS_PER_PAGE - limitedSlice.length).fill({
+          shortName: '',
+          longName: '',
+          target: '',
+          type: ButtonType.NONE,
+          radioSiteIndex: 0,
+          originalData: null
+        })];
+      }
+      return limitedSlice;
+    } else {
+      // For other pages, return empty array padded to ITEMS_PER_PAGE
+      return new Array(ITEMS_PER_PAGE).fill({
+        shortName: '',
+        longName: '',
+        target: '',
+        type: ButtonType.NONE,
+        radioSiteIndex: 0,
+        originalData: null
+      });
+    }
+  }, [allExpandedButtons, page]);
+
+  // Convert button data to grid format, handling guard frequency placement
+  const buttons = useMemo(() => {
     // Separate Guard frequencies from regular frequencies
-    const guardFreqs = expandedButtons.filter(btn => 
+    const guardFreqs = currentSlice.filter(btn => 
       btn.type !== ButtonType.NONE && 
       (parseInt(btn.target) === 121500000 || parseInt(btn.target) === 243000000)
     );
     
-    const regularFreqs = expandedButtons.filter(btn => 
+    const regularFreqs = currentSlice.filter(btn => 
       btn.type === ButtonType.NONE || 
       (parseInt(btn.target) !== 121500000 && parseInt(btn.target) !== 243000000)
     );
@@ -158,7 +192,7 @@ export default function VscsAG({ page, sendMsg }: VscsAGProps) {
     }
     
     return grid;
-  }, [currentSlice]);
+  }, [currentSlice, page]);
 
   // Helper function to get A/G visual state
   const getAGState = (data: any) => {
@@ -174,12 +208,14 @@ export default function VscsAG({ page, sendMsg }: VscsAGProps) {
   const handleAGSubButtonClick = (freq: string, type: 'tx' | 'rx' | 'hs') => {
     if (!freq) return;
     
-    // Find the button data from currentSlice
-    const buttonData = currentSlice.find((data: any) => 
-      data && (data.freq === freq)
+    // Find the button data from currentSlice - look in originalData
+    const buttonObj = currentSlice.find((btn: any) => 
+      btn && btn.originalData && (btn.originalData.freq === freq)
     );
     
-    if (!buttonData) return;
+    if (!buttonObj || !buttonObj.originalData) return;
+    
+    const buttonData = buttonObj.originalData;
     
     // Don't allow interaction with busy frequencies
     if (buttonData.busy || buttonData.status === 'busy') {
@@ -209,12 +245,14 @@ export default function VscsAG({ page, sendMsg }: VscsAGProps) {
   const handleUnselectedFrequencyClick = (freq: string) => {
     if (!freq) return;
     
-    // Find the button data from currentSlice
-    const buttonData = currentSlice.find((data: any) => 
-      data && (data.freq === freq)
+    // Find the button data from currentSlice - look in originalData
+    const buttonObj = currentSlice.find((btn: any) => 
+      btn && btn.originalData && (btn.originalData.freq === freq)
     );
     
-    if (!buttonData) return;
+    if (!buttonObj || !buttonObj.originalData) return;
+    
+    const buttonData = buttonObj.originalData;
     
     // Don't allow interaction with busy frequencies
     if (buttonData.busy || buttonData.status === 'busy') {
@@ -232,7 +270,7 @@ export default function VscsAG({ page, sendMsg }: VscsAGProps) {
   // Handle dynamic button states for A/G frequencies
   useEffect(() => {
     // For the new 3-button layout, we don't need to manipulate CSS classes
-    // The state is handled directly in the React component via currentSlice data
+    // The state is handled directly in the React component via button data
     
     // We can keep this for any future dynamic styling needs
     // Currently the button states are managed by React state in the JSX

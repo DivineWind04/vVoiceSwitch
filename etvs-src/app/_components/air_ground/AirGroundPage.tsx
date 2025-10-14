@@ -1,7 +1,7 @@
 // components/AirGroundPage.tsx
 'use client'
 
-import React, { useState } from 'react';
+import React, { useState, useMemo } from 'react';
 import AirGroundRow from './AirGroundRow';
 import FrequencyButton from './FreqButton';
 import ChiseledSelectorButton from '../base_button/ChiseledSelectorButton';
@@ -46,7 +46,22 @@ const AirGroundPage: React.FC<AirGroundPageProps> = ({ isGG3Active = false, curr
   // Use live ag_status from store, like ivsr
   const ag_status = useCoreStore(s => s.ag_status);
   const ITEM_PER_PAGE = 6;
-  const currentFreqPage = ag_status.slice((selectedPage - 1) * ITEM_PER_PAGE, selectedPage * ITEM_PER_PAGE);
+  // Implement overflow logic: if there are more frequencies than can fit on page 1, 
+  // automatically overflow them to page 2
+  const currentFreqPage = useMemo(() => {
+    if (selectedPage === 1) {
+      // Page 1: show first ITEM_PER_PAGE items
+      return ag_status.slice(0, ITEM_PER_PAGE);
+    } else if (selectedPage === 2) {
+      // Page 2: show overflow items (items beyond ITEM_PER_PAGE)
+      const slice = ag_status.slice(ITEM_PER_PAGE);
+      // Limit to ITEM_PER_PAGE items
+      return slice.slice(0, ITEM_PER_PAGE);
+    } else {
+      // For other pages, use existing logic
+      return ag_status.slice((selectedPage - 1) * ITEM_PER_PAGE, selectedPage * ITEM_PER_PAGE);
+    }
+  }, [ag_status, selectedPage]);
 
   const renderRows = () => {
     const rows: React.JSX.Element[] = [];

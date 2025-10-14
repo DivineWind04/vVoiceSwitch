@@ -1,7 +1,7 @@
 import { Col, Row } from "antd";
-import { useCoreStore } from "../model";
-import { ReactComponent as HSIcon } from '../assets/headphone.svg'
-import { ReactComponent as LSIcon } from '../assets/speaker.svg'
+import { useCoreStore } from "./model";
+import { ReactComponent as HSIcon } from '../public/headphone.svg'
+import { ReactComponent as LSIcon } from '../public/speaker.svg'
 import './button.scss'
 import { useState } from "react";
 
@@ -90,7 +90,22 @@ function AGPanel() {
 
     const ITEM_PER_PAGE = 6
     const [page, setPage] = useState(1)
-    const current_slice = ag_status.slice((page - 1) * ITEM_PER_PAGE, (page) * ITEM_PER_PAGE - 1)
+    // Implement overflow logic: if there are more frequencies than can fit on page 1, 
+    // automatically overflow them to page 2
+    let current_slice;
+    if (page === 1) {
+      // Page 1: show first ITEM_PER_PAGE items
+      current_slice = ag_status.slice(0, ITEM_PER_PAGE);
+    } else if (page === 2) {
+      // Page 2: show overflow items (items beyond ITEM_PER_PAGE)
+      const slice = ag_status.slice(ITEM_PER_PAGE);
+      // Limit to ITEM_PER_PAGE items
+      current_slice = slice.slice(0, ITEM_PER_PAGE);
+    } else {
+      // For other pages, use existing logic
+      current_slice = ag_status.slice((page - 1) * ITEM_PER_PAGE, (page) * ITEM_PER_PAGE - 1);
+    }
+    
     if (current_slice.length < ITEM_PER_PAGE) {
         current_slice.push(...new Array(ITEM_PER_PAGE - current_slice.length))
     }
@@ -189,7 +204,22 @@ function GGPanel() {
     const gg_status = useCoreStore(s => s.gg_status)
     const ITEM_PER_PAGE = 18
     const [page, setPage] = useState(1)
-    const current_slice = gg_status.slice((page - 1) * ITEM_PER_PAGE, (page) * ITEM_PER_PAGE)
+    // Implement overflow logic: if there are more G/G entries than can fit on page 1,
+    // automatically overflow them to page 2
+    let current_slice;
+    if (page === 1) {
+      // Page 1: show first ITEM_PER_PAGE items
+      current_slice = gg_status.slice(0, ITEM_PER_PAGE);
+    } else if (page === 2) {
+      // Page 2: show overflow items (items beyond ITEM_PER_PAGE)
+      const slice = gg_status.slice(ITEM_PER_PAGE);
+      // Limit to ITEM_PER_PAGE items
+      current_slice = slice.slice(0, ITEM_PER_PAGE);
+    } else {
+      // For other pages, use existing logic
+      current_slice = gg_status.slice((page - 1) * ITEM_PER_PAGE, (page) * ITEM_PER_PAGE);
+    }
+    
     if (current_slice.length < ITEM_PER_PAGE) {
         current_slice.push(...new Array(ITEM_PER_PAGE - current_slice.length))
     }

@@ -128,14 +128,29 @@ function VscsPanel(props: VscsProps & { panelId?: string; defaultScreenMode?: st
       currentPage = 1;
     }
     
-    const start = (currentPage - 1) * ITEMS_PER_PAGE;
-    const end = start + ITEMS_PER_PAGE;
-    const slice = gg_status.slice(start, end);
-    // Pad with empty slots if needed
-    if (slice.length < ITEMS_PER_PAGE) {
-      return [...slice, ...new Array(ITEMS_PER_PAGE - slice.length).fill(undefined)];
+    // Implement overflow logic: if there are more G/G entries than can fit on page 1,
+    // automatically overflow them to page 2
+    if (currentPage === 1) {
+      // Page 1: show first ITEMS_PER_PAGE items
+      const slice = gg_status.slice(0, ITEMS_PER_PAGE);
+      // Pad with empty slots if needed
+      if (slice.length < ITEMS_PER_PAGE) {
+        return [...slice, ...new Array(ITEMS_PER_PAGE - slice.length).fill(undefined)];
+      }
+      return slice;
+    } else if (currentPage === 2) {
+      // Page 2: show overflow items (items beyond ITEMS_PER_PAGE)
+      const slice = gg_status.slice(ITEMS_PER_PAGE);
+      // Limit to ITEMS_PER_PAGE items and pad if needed
+      const limitedSlice = slice.slice(0, ITEMS_PER_PAGE);
+      if (limitedSlice.length < ITEMS_PER_PAGE) {
+        return [...limitedSlice, ...new Array(ITEMS_PER_PAGE - limitedSlice.length).fill(undefined)];
+      }
+      return limitedSlice;
+    } else {
+      // For other pages, return empty array padded to ITEMS_PER_PAGE
+      return new Array(ITEMS_PER_PAGE).fill(undefined);
     }
-    return slice;
     }, [gg_status, screenMode]);
 
   const btns: Button[] = useMemo(() => {

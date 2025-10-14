@@ -23,14 +23,35 @@ const AirGroundPage: React.FC = () => {
   const ag_status = useCoreStore((s: any) => s.ag_status);
   const ITEM_PER_PAGE = 6;
   const currentSlice = useMemo(() => {
-    const start = (selectedPage - 1) * ITEM_PER_PAGE;
-    const end = start + ITEM_PER_PAGE;
-    const slice = ag_status.slice(start, end);
-    // ensure length 6
-    if (slice.length < ITEM_PER_PAGE) {
-      return [...slice, ...new Array(ITEM_PER_PAGE - slice.length).fill(undefined)]
+    // Implement overflow logic: if there are more frequencies than can fit on page 1, 
+    // automatically overflow them to page 2
+    if (selectedPage === 1) {
+      // Page 1: show first ITEM_PER_PAGE items
+      const slice = ag_status.slice(0, ITEM_PER_PAGE);
+      // ensure length 6
+      if (slice.length < ITEM_PER_PAGE) {
+        return [...slice, ...new Array(ITEM_PER_PAGE - slice.length).fill(undefined)]
+      }
+      return slice;
+    } else if (selectedPage === 2) {
+      // Page 2: show overflow items (items beyond ITEM_PER_PAGE)
+      const slice = ag_status.slice(ITEM_PER_PAGE);
+      // Limit to ITEM_PER_PAGE items and pad if needed
+      const limitedSlice = slice.slice(0, ITEM_PER_PAGE);
+      if (limitedSlice.length < ITEM_PER_PAGE) {
+        return [...limitedSlice, ...new Array(ITEM_PER_PAGE - limitedSlice.length).fill(undefined)];
+      }
+      return limitedSlice;
+    } else {
+      // For other pages, use existing logic (pages 3,4,5)
+      const start = (selectedPage - 1) * ITEM_PER_PAGE;
+      const end = start + ITEM_PER_PAGE;
+      const slice = ag_status.slice(start, end);
+      if (slice.length < ITEM_PER_PAGE) {
+        return [...slice, ...new Array(ITEM_PER_PAGE - slice.length).fill(undefined)]
+      }
+      return slice;
     }
-    return slice;
   }, [ag_status, selectedPage]);
 
   const handleSumClick = () => {

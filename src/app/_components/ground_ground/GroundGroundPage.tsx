@@ -22,13 +22,34 @@ const GroundGroundPage: React.FC = () => {
   const gg_status = useCoreStore((s: any) => s.gg_status);
   const ITEM_PER_PAGE = 18;
   const currentSlice = useMemo(() => {
-    const start = (currentPage - 1) * ITEM_PER_PAGE;
-    const end = start + ITEM_PER_PAGE;
-    const slice = gg_status.slice(start, end);
-    if (slice.length < ITEM_PER_PAGE) {
-      return [...slice, ...new Array(ITEM_PER_PAGE - slice.length).fill(undefined)];
+    // Implement overflow logic: if there are more G/G entries than can fit on page 1,
+    // automatically overflow them to page 2
+    if (currentPage === 1) {
+      // Page 1: show first ITEM_PER_PAGE items
+      const slice = gg_status.slice(0, ITEM_PER_PAGE);
+      if (slice.length < ITEM_PER_PAGE) {
+        return [...slice, ...new Array(ITEM_PER_PAGE - slice.length).fill(undefined)];
+      }
+      return slice;
+    } else if (currentPage === 2) {
+      // Page 2: show overflow items (items beyond ITEM_PER_PAGE)
+      const slice = gg_status.slice(ITEM_PER_PAGE);
+      // Limit to ITEM_PER_PAGE items and pad if needed
+      const limitedSlice = slice.slice(0, ITEM_PER_PAGE);
+      if (limitedSlice.length < ITEM_PER_PAGE) {
+        return [...limitedSlice, ...new Array(ITEM_PER_PAGE - limitedSlice.length).fill(undefined)];
+      }
+      return limitedSlice;
+    } else {
+      // For other pages, use existing logic
+      const start = (currentPage - 1) * ITEM_PER_PAGE;
+      const end = start + ITEM_PER_PAGE;
+      const slice = gg_status.slice(start, end);
+      if (slice.length < ITEM_PER_PAGE) {
+        return [...slice, ...new Array(ITEM_PER_PAGE - slice.length).fill(undefined)];
+      }
+      return slice;
     }
-    return slice;
   }, [gg_status, currentPage]);
 
   const renderButtons = () => {

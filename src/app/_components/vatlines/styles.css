@@ -1169,13 +1169,17 @@
 /* Guard frequency unselected buttons - thick red border per Manual Page 13 */
 .ag-frequency-container .vscs-button.guard-frequency-unselected,
 .vscs-button.guard-frequency-unselected {
-    border: 3px solid #FF0000 !important; /* Thick red border for guard frequencies */
+    border: 7px solid #FF0000 !important; /* Thick red border for guard frequencies */
 }
 
 /* Guard frequency unselected buttons - red inner border to match outer border */
 .ag-frequency-container .vscs-button.guard-frequency-unselected::before,
 .vscs-button.guard-frequency-unselected::before {
-    border: 3px solid #FF0000 !important; /* Red inner border for guard frequencies */
+    border: 7px solid #FF0000 !important; /* Same thickness red inner border for guard frequencies */
+    top: 9px !important; /* Position to create 1px gap after 7px outer border */
+    left: 9px !important;
+    right: 9px !important;
+    bottom: 9px !important;
 }
 
 /* Regular transmitting buttons - rgb(255, 123, 0) inner border only per Manual Page 13 */

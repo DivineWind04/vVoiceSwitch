@@ -56,6 +56,9 @@ export interface Position {
 export enum PanelType {
   RDVS = 'RDVS',
   VSCS = 'VSCS',
+  ETVS = 'ETVS',
+  STVS = 'STVS',
+  IVSR = 'IVSR',
 }
 
 export interface PositionConfiguration {
