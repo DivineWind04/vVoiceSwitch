@@ -18,9 +18,9 @@ const FreqRow: React.FC<FreqRowProps> = ({ entries }) => {
   const renderCols = () => {
     const cols: React.JSX.Element[] = [];
     entries.map(entry => {
-      cols.push(
-          <FrequencyButton frequency={entry.frequency} name={entry.name} squareBtn={true}
-                           prefMode={entry.prefMode} currMode={entry.currMode}/>)
+    cols.push(
+      <FrequencyButton frequency={String(entry.frequency)} name={entry.name} squareBtn={true}
+               prefMode={entry.prefMode} currMode={entry.currMode}/>)
     })
     // If there are less than 5 frequencies, add empty buttons
     while (cols.length < 5) {
