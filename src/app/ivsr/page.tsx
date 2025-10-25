@@ -1,3 +1,4 @@
+"use client";
 // Example usage: you can use filteredPosition in your UI below
 import React, { useState } from "react";
 import SettingModal from "../_components/vatlines/SettingModal";
