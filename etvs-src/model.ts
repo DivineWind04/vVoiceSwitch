@@ -1,18 +1,5 @@
-import { create } from 'zustand'
-interface Position {
-    cs: string;
-    pos: string;
-    freq: number;
-    rn: string;
-    lines: any[];
-}
-
-export interface Facility {
-    childFacilities: Facility[];
-    id: string;
-    name: string;
-    positions: Position[];
-}
+import { create } from 'zustand';
+import type { Facility, Position } from '../src/types/vatlines_types';
 
 interface CoreState {
     connected: boolean;
@@ -21,13 +8,13 @@ interface CoreState {
     cid: number;
     positionData: Facility;
     callsign: string;
-    selectedPositions: Position[],
+    selectedPositions: Position[];
 
-    ag_status: any[],
-    gg_status: any[],
-    vscs_status: any[],
+    ag_status: any[];
+    gg_status: any[];
+    vscs_status: any[];
 
-    setPositionData: (data: any) => void;
+    setPositionData: (data: Facility) => void;
     setConnected: (status: boolean) => void;
     updateSelectedPositions: (poss: Position[]) => void;
     setCallsign: (call_sign: string, cid: number) => void;
@@ -82,7 +69,7 @@ export const useCoreStore = create<CoreState>((set: any, get: any) => {
     cid: 0,
         ptt: false,
         callsign: '',
-        positionData: { childFacilities: [], id: '', name: '', positions: [] },
+    positionData: { childFacilities: [], facilityId: '', positions: [], editors: [], createdAt: new Date(), updatedAt: new Date(), deletedAt: new Date(), parentFacility: null },
         selectedPositions: [],
 
         ag_status: [],

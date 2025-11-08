@@ -1,19 +1,13 @@
-export interface Facility {
-  facilityId: string;
-
-  parentFacility: Facility;
-
-  childFacilities: Facility[];
-
-  positions: Position[];
-
-  editors: Editor[];
-  createdAt: Date;
-
-  updatedAt: Date;
-
-  deletedAt: Date;
-}
+  export interface Facility {
+    facilityId: string;
+    parentFacility?: Facility | null;
+    childFacilities: Facility[];
+    positions: Position[];
+    editors: Editor[];
+    createdAt: Date;
+    updatedAt: Date;
+    deletedAt: Date;
+  }
 
 export interface Editor {
   id: string;
@@ -106,8 +100,8 @@ export interface Layout {
 }
 
 export enum ButtonType {
-  'SHOUT' = 'SHOUT',
-  'OVERRIDE' = 'OVERRIDE',
-  'RING' = 'RING',
-  'NONE' = 'NONE',
+  SHOUT = 'SHOUT',
+  OVERRIDE = 'OVERRIDE',
+  RING = 'RING',
+  NONE = 'NONE',
 }

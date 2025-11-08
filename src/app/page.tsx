@@ -1,7 +1,7 @@
 
 "use client";
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useCoreStore } from '../model';
 import VscsComponent from '../app/_components/vatlines/vscs';
 import ETVSWrapper from '../components/ETVSWrapper';
@@ -9,10 +9,58 @@ import STVSWrapper from '../components/STVSWrapper';
 import IVSRPage from './ivsr/page';
 import RDVSWrapper from '../components/RDVSWrapper';
 import SettingModal from '../pages/setting';
+import { Alert } from 'antd';
 
 export default function Page() {
   const [settingModal, setSettingModal] = useState(false);
   const currentUI = useCoreStore(s => s.currentUI);
+  const selectedPositions = useCoreStore(s => s.selectedPositions);
+  const connected = useCoreStore(s => s.connected);
+  const setPositionData = useCoreStore(s => s.setPositionData);
+  const positionData = useCoreStore(s => s.positionData);
+  const callsign = useCoreStore(s => s.callsign);
+  const afv_version = useCoreStore(s => s.afv_version);
+  const [versionAlert, setVersionAlert] = useState<any>(null);
+
+  // Load JSON data and version info on component mount
+  useEffect(() => {
+    // Load position data - store the FULL JSON structure for settings modal
+    const loadPositionData = async () => {
+      try {
+        const response = await fetch('/zoa_position.json');
+        const data = await response.json();
+        console.log('Loaded position data:', data);
+        // Store the complete data structure, not filtered
+        setPositionData(data);
+      } catch (error) {
+        console.error('Failed to load position data:', error);
+      }
+    };
+
+    // Load version info
+    const loadVersionInfo = async () => {
+      try {
+        const response = await fetch('/html_app/afv_poc/patch/version.json');
+        const version_data = await response.json();
+        const latest_version = version_data.latest_version - 0;
+        const current_version = parseFloat(afv_version || '0');
+        const lowest_allowable_version = version_data.lowest_allowable_version - 0;
+        if (current_version < lowest_allowable_version) {
+          version_data.must_upgrade = true;
+        }
+        setVersionAlert(latest_version > current_version ? version_data : null);
+      } catch (error) {
+        console.error('Failed to load version info:', error);
+      }
+    };
+
+    // Always load the data to ensure it's available
+    loadPositionData();
+    if (afv_version) {
+      loadVersionInfo();
+    }
+  }, [setPositionData, afv_version]);
+
   // VSCS Zustand state mapping
   const activeLandlines = useCoreStore(s => s.activeLandlines || []);
   const incomingLandlines = useCoreStore(s => s.incomingLandlines || []);
@@ -68,7 +116,56 @@ export default function Page() {
 
   return (
     <div className="min-h-screen bg-zinc-700 p-4">
-      {renderUI()}
+      {/* Version Alert */}
+      {versionAlert && (
+        <Alert 
+          type={versionAlert?.must_upgrade ? "error" : "warning"} 
+          style={{ marginBottom: 10 }} 
+          closable={!versionAlert?.must_upgrade}
+          onClose={() => setVersionAlert(null)} 
+          showIcon 
+          message={
+            <>
+              Latest AFV version {versionAlert.latest_version} is available.
+              {afv_version ? ` Your current version is: ${afv_version}.` : null}
+              {versionAlert?.must_upgrade ? ` Lowest usable version is ${versionAlert.lowest_allowable_version}, you must at least update to that version.` : ""}
+              <br />
+              Download Link: <a href={versionAlert.link?.windows} target='_blank'>[Windows]</a> <a href={versionAlert.link?.macos} target='_blank'>[macOS]</a>
+            </>
+          } 
+        />
+      )}
+      
+      {!connected ? (
+        <div className="flex items-center justify-center min-h-screen">
+          <div className="text-center text-white">
+            <h2 className="text-2xl font-bold mb-4">AFV Client</h2>
+            <p className="text-lg text-zinc-300">Not Connected</p>
+          </div>
+        </div>
+      ) : !selectedPositions || selectedPositions.length === 0 ? (
+        <div className="flex items-center justify-center min-h-screen">
+          <div className="text-center text-white">
+            <h2 className="text-2xl font-bold mb-4">Welcome to AFV Client</h2>
+            <p className="text-lg text-zinc-300 mb-6">Please select a position to continue</p>
+            <button 
+              onClick={() => setSettingModal(true)}
+              className="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
+            >
+              Settings
+            </button>
+          </div>
+        </div>
+      ) : versionAlert?.must_upgrade ? (
+        <div className="flex items-center justify-center min-h-screen">
+          <div className="text-center text-white">
+            <h2 className="text-2xl font-bold mb-4">Update Required</h2>
+            <p className="text-lg text-zinc-300">Please update your AFV client to continue.</p>
+          </div>
+        </div>
+      ) : (
+        renderUI()
+      )}
       <SettingModal open={settingModal} setModal={setSettingModal} />
     </div>
   );

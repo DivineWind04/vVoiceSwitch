@@ -57,7 +57,27 @@ interface CoreState {
 
 let call_table: Record<string, [string, number]> = {}
 
-// UI-specific audio configuration
+// RDVS-specific types
+export interface RDVSButton {
+    id: string;
+    label: string;
+    status: string;
+    group: number;
+    type: string;
+}
+
+export interface RDVSGroup {
+    id: number;
+    buttons: RDVSButton[];
+}
+
+export interface RDVSPage {
+    id: number;
+    groups: RDVSGroup[];
+    footer: string[];
+}
+
+// RDVS fields are now part of the main CoreState and store definition below.
 interface AudioConfig {
     ringback: string;
     ggchime: string;

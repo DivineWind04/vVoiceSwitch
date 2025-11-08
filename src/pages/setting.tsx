@@ -35,9 +35,23 @@ function SettingModal({ open, setModal }: SettingModalProps) {
     const positionsData = useCoreStore(s => s.positionData)
     const updateSelectedPosition = useCoreStore(s => s.updateSelectedPositions)
     const [treeSelection, setTreeSelection] = useState<Key[]>([])
+    
+    console.log('SettingModal positionsData:', positionsData);
+    
     const [treeData, mapData] = useMemo(() => {
         const mapData: { [key: string]: any } = {};
-        return [[processSingleFacility(positionsData, '', mapData)], mapData]
+        console.log('Processing facility data:', positionsData);
+        
+        if (!positionsData || !positionsData.id) {
+            console.log('No valid facility data, returning empty tree');
+            return [[], mapData];
+        }
+        
+        const result = [processSingleFacility(positionsData, '', mapData)];
+        console.log('Generated tree data:', result);
+        console.log('Generated map data:', mapData);
+        
+        return [result, mapData];
     }, [positionsData])
 
     const onSubmit = async () => {

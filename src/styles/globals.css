@@ -1,3 +1,39 @@
+/* RDVS Cyan Box Indicator Animations */
+.rdvs-flash {
+  animation: rdvs-flash 1s steps(2, start) infinite;
+}
+@keyframes rdvs-flash {
+  0%, 50% { opacity: 1; }
+  51%, 100% { opacity: 0; }
+}
+
+.rdvs-wink {
+  animation: rdvs-wink 1s steps(2, start) infinite;
+}
+@keyframes rdvs-wink {
+  0%, 95% { opacity: 1; }
+  96%, 100% { opacity: 0; }
+}
+
+.rdvs-flutter {
+  animation: rdvs-flutter 1s steps(12, start) infinite;
+}
+@keyframes rdvs-flutter {
+  0%, 80% { opacity: 1; }
+  81%, 100% { opacity: 0; }
+}
+
+/* RDVS Air-to-Ground Circle Flutter - 8Hz frequency like other UIs */
+@keyframes flutter-8hz {
+  0%, 50% { 
+    opacity: 1; 
+    transform: scale(1); 
+  }
+  51%, 100% { 
+    opacity: 0; 
+    transform: scale(0.8); 
+  }
+}
 body {
 	background: #000 !important;
 	color-scheme: dark;

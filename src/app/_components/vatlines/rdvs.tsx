@@ -1,19 +1,7 @@
 import Image from 'next/image';
 import { useEffect, useState, useMemo } from 'react';
 // TODO: Import or define ActiveLandline, CALL_TYPE, Configuration, IncomingLandline as needed
-import { ButtonType, CALL_TYPE, Configuration, ActiveLandline, IncomingLandline } from './types';
-// Type-safe discriminated union for button config
-type StandardButton = {
-  variant?: 'button';
-  shortName?: string;
-  longName?: string;
-  name?: string;
-  target: string;
-  type: ButtonType;
-  fillDesign?: string;
-  textColor?: string;
-  frequency?: string;
-};
+import { Button, ButtonType, CALL_TYPE, Configuration, ActiveLandline, IncomingLandline } from './types';
 type RadioButton = {
   variant: 'radio';
   radioSize: 'short' | 'long';
@@ -27,7 +15,7 @@ type RadioButton = {
   indicatorColor?: string;
   indicatorBg?: string;
 };
-type ButtonConfig = StandardButton | RadioButton;
+type ButtonConfig = Button | RadioButton;
 interface ButtonLayout {
   order: number;
   button: ButtonConfig;
@@ -42,12 +30,12 @@ interface RdvsProps {
   heldLandlines: string[];
   config: Configuration;
   buttonPress: (id: string, type: CALL_TYPE) => void;
-  toggleGg: () => void;
-  toggleOver: () => void;
-  ggRoute: boolean;
-  overrideRoute: boolean;
   holdBtn: () => void;
   releaseBtn: () => void;
+  toggleGg: () => void;
+  toggleOver: () => void;
+  ggLoud: boolean;
+  overrideLoud: boolean;
   settingsEdit: (val: boolean) => void;
   volume: {
     volume: number;
@@ -115,13 +103,18 @@ export default function RdvsComponent(props: RdvsProps) {
       if (found) {
         slice.push(found.button);
       } else {
-        // Default to a standard button
+        // Default to a standard button (shared Button type)
         slice.push({
-          variant: 'button',
+          id: `empty-${i}`,
+          label: '',
           shortName: '',
           longName: '',
           target: '',
           type: ButtonType.NONE,
+          dialCode: '',
+          layouts: [],
+          createdAt: new Date(),
+          updatedAt: new Date(),
         });
       }
     }
@@ -274,7 +267,7 @@ export default function RdvsComponent(props: RdvsProps) {
                 );
               } else {
                 // Fill with non-radio buttons in order
-                const stdBtn = nonRadioBtns.shift() as StandardButton | undefined;
+                const stdBtn = nonRadioBtns.shift() as Button | undefined;
                 if (stdBtn && typeof stdBtn.type !== 'undefined') {
                   cells.push(
                     <RdvsButtonComponent

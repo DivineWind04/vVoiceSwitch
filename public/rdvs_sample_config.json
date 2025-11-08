@@ -1,0 +1,68 @@
+{
+  "id": "rdvs-demo",
+  "name": "Sample RDVS Panel",
+  "layouts": [
+    {
+      "order": 0,
+      "button": {
+        "id": "btn-override-1",
+        "label": "Override 1",
+        "shortName": "OVR1",
+        "longName": "Override Channel 1",
+        "target": "OVR1",
+        "type": "OVERRIDE",
+        "dialCode": "5001",
+        "layouts": [],
+        "createdAt": "2025-10-28T00:00:00.000Z",
+        "updatedAt": "2025-10-28T00:00:00.000Z"
+      }
+    },
+    {
+      "order": 1,
+      "button": {
+        "id": "btn-shout-1",
+        "label": "Shout 1",
+        "shortName": "SHOUT1",
+        "longName": "Shout Channel 1",
+        "target": "SHOUT1",
+        "type": "SHOUT",
+        "dialCode": "6001",
+        "layouts": [],
+        "createdAt": "2025-10-28T00:00:00.000Z",
+        "updatedAt": "2025-10-28T00:00:00.000Z"
+      }
+    },
+    {
+      "order": 2,
+      "button": {
+        "id": "btn-radio-1",
+        "variant": "radio",
+        "label": "Radio Option 1",
+        "radioSize": "short",
+        "checked": false,
+        "onChange": null,
+        "bgColor": "#2222ff",
+        "textColor": "#ffffff",
+        "labelColor": "#00ff00",
+        "indicatorColor": "#ff0000",
+        "indicatorBg": "#2222ff"
+      }
+    },
+    {
+      "order": 3,
+      "button": {
+        "id": "btn-radio-2",
+        "variant": "radio",
+        "label": "Radio Option 2",
+        "radioSize": "long",
+        "checked": true,
+        "onChange": null,
+        "bgColor": "#2222ff",
+        "textColor": "#ffffff",
+        "labelColor": "#00ff00",
+        "indicatorColor": "#ff0000",
+        "indicatorBg": "#2222ff"
+      }
+    }
+  ]
+}
