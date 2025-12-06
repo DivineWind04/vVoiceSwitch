@@ -9,7 +9,11 @@ import SummaryButton from './SummaryButton';
 
 import { useCoreStore } from '~/model';
 
-const AirGroundPage: React.FC = () => {
+interface AirGroundPageProps {
+  hideRows?: boolean;
+}
+
+const AirGroundPage: React.FC<AirGroundPageProps> = ({ hideRows = false }) => {
   // State for the selected page
   const [selectedPage, setSelectedPage] = useState(1);
   const [showFreqSummary, setShowFreqSummary] = useState(false);
@@ -125,11 +129,11 @@ const AirGroundPage: React.FC = () => {
 
   
   return (
-    <div className="p-4">
+    <div className={hideRows ? "px-4 pt-0 pb-4" : "p-4"}>
       {/* Render rows */}
-      {renderRows()}
+      {!hideRows && renderRows()}
       {/* Control row */}
-      <div className="flex space-x-1">
+      <div className="flex gap-0.5">
         {!showFreqSummary &&
         <SummaryButton onClick={handleSumClick} />
         }
@@ -137,9 +141,15 @@ const AirGroundPage: React.FC = () => {
       </div>
 
       {/* Selected page */}
-      <div className="text-white text-center items-center justify-center font-bold text-sm">
-        A/G PAGE {selectedPage}
-      </div>
+      {!hideRows ? (
+        <div className="text-white text-center items-center justify-center font-bold text-sm">
+          A/G PAGE {selectedPage}
+        </div>
+      ) : (
+        <div className="text-white text-center items-center justify-center font-bold text-sm">
+          G/G PAGE 3
+        </div>
+      )}
     </div>
   );
 };

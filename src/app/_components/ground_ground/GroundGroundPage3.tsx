@@ -89,16 +89,12 @@ const GroundGroundPage3: React.FC = () => {
   };
 
   return (
-    <div className="pt-4 pb-4 px-4">
+    <div className="pt-4 pb-1 px-8">
       {/* 6 rows x 5 columns grid for page 3 */}
-      <div className="mb-0.5">
-        <div className="flex grid grid-cols-5 gap-1">
+      <div>
+        <div className="flex grid grid-cols-5 gap-x-0.1 gap-y-1">
           {renderButtons()}
         </div>
-      </div>
-      {/* Page label */}
-      <div className="text-center text-sm font-bold text-white mt-0.5">
-        G/G PAGE 3
       </div>
     </div>
   );

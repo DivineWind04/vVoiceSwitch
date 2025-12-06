@@ -2,7 +2,7 @@
   "latest_version": "2.1.0",
   "lowest_allowable_version": "1.9.0",
   "link": {
-    "windows": "https://example.com/download/afv-windows.exe",
-    "macos": "https://example.com/download/afv-macos.dmg"
+    "windows": "https://static.zhener.pw/html_app/afv_poc/patch/afv_patch_windows_latest.zip",
+    "macos": "https://static.zhener.pw/html_app/afv_poc/patch/afv_patch_macos_latest.zip"
   }
 }

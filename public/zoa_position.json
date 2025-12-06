@@ -11277,7 +11277,7 @@
                             "pos": "GC",
                             "freq": 133575000,
                             "rn": "Castle Ground",
-                            "ui": "ivsr",
+                            "ui": "lstar",
                             "lines": [
                                 [
                                     "811602",
@@ -11292,7 +11292,7 @@
                             "pos": "LC",
                             "freq": 118175000,
                             "rn": "Castle Tower",
-                            "ui": "ivsr",
+                            "ui": "lstar",
                             "lines": [
                                 [
                                     "811602",
@@ -11351,7 +11351,7 @@
                             "pos": "GC",
                             "freq": 121700000,
                             "rn": "Modesto Ground",
-                            "ui": "ivsr",
+                            "ui": "lstar",
                             "lines": [
                                 [
                                     "811043",
@@ -11366,7 +11366,7 @@
                             "pos": "LC",
                             "freq": 125300000,
                             "rn": "Modesto Tower",
-                            "ui": "ivsr",
+                            "ui": "lstar",
                             "lines": [
                                 [
                                     "811043",
@@ -12137,7 +12137,7 @@
                     "pos": "GC",
                     "freq": 118300000,
                     "rn": "Truckee Ground",
-                    "ui": "ivsr",
+                    "ui": "lstar",
                     "lines": [],
                     "lines_obj": {}
                 },
@@ -12146,7 +12146,7 @@
                     "pos": "LC",
                     "freq": 120575000,
                     "rn": "Truckee Tower",
-                    "ui": "ivsr",
+                    "ui": "lstar",
                     "lines": [],
                     "lines_obj": {}
                 }

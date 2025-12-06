@@ -22,10 +22,18 @@ export default function IVSRPage() {
 					<div className="mt-2">
 						<AreaFour />
 						<div className="flex">
-							{/* Left side - Always show AirGroundPage, with Page 3 grid below when G/G page 3 is selected */}
+							{/* Left side */}
 							<div className="flex flex-col">
-								<AirGroundPage />
-								{currentGGPage === 3 && <GroundGroundPage3 />}
+								{currentGGPage === 3 ? (
+									/* When G/G page 3 is selected, show G/G page 3 grid, then A/G buttons below */
+									<>
+										<GroundGroundPage3 />
+										<AirGroundPage hideRows={true} />
+									</>
+								) : (
+									/* Otherwise show normal A/G page */
+									<AirGroundPage />
+								)}
 							</div>
 							{/* Right side - Show G/G page 2 when page 3 is selected, otherwise show current page */}
 							<GroundGroundPage currentPage={currentGGPage === 3 ? 2 : currentGGPage} onPageChange={setCurrentGGPage} />
