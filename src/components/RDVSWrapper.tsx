@@ -8,7 +8,7 @@ import { ButtonType } from '../app/_components/vatlines/types';
 import type { RdvsButtonComponentProps, StandardButtonProps } from '../app/_components/vatlines/rdvs_button';
 import { useCoreStore } from '../model';
 import RdvsButtonComponent from '../app/_components/vatlines/rdvs_button'; // Import the RdvsButtonComponent
-import RdvsDialpad from '../app/_components/vatlines/rdvs_dialpad'; // Import the RdvsDialpad component
+import RdvsKeypad from '../app/_components/vatlines/rdvs_keypad'; // Unified keypad component
 import { rdvsButtonPatterns } from './rdvsButtonPatterns';
 import '../app/_components/vatlines/styles.css'; // Import styles for RDVS font
 
@@ -90,7 +90,7 @@ export default function RDVSWrapper() {
       if (lineType === 0) typeLetter = 'O';  // Override
       else if (lineType === 1) typeLetter = 'C';  // Ring
       else if (lineType === 2) typeLetter = 'A';  // Shout
-      else if (lineType === 3) typeLetter = 'D';  // Dial
+      else if (lineType === 3) typeLetter = '';  // Dial
       
       // Get call type and ID for proper messaging
       const call_id = Array.isArray(line) ? line[0] : (line.id || line.call?.substring(3) || '');
@@ -227,10 +227,15 @@ export default function RDVSWrapper() {
               sendMsg({ type: 'stop', cmd1: call_id, dbl1: 1 }); // Hangup shout call (dbl1: 1 for SO lines)
             }
           } else if (lineTypeValue === 3) {
-            // Dial line - open the dialpad with the trunk name from the label
+            // Dial line - toggle the dialpad with the trunk name from the label
             // The label (line1) contains the trunk name (e.g., "APCH", "S-BAY", "E/W/V")
-            console.log('RDVS: Opening dialpad for trunk:', line1);
-            setActiveDialLine({ trunkName: line1, lineType: lineTypeValue });
+            console.log('RDVS: Toggling dialpad for trunk:', line1);
+            // Toggle behavior: if same trunk is clicked, close dialpad; otherwise open with new trunk
+            if (activeDialLine && activeDialLine.trunkName === line1) {
+              setActiveDialLine(null);
+            } else {
+              setActiveDialLine({ trunkName: line1, lineType: lineTypeValue });
+            }
           }
           
           // Log the action for debugging cyan box animations
@@ -258,13 +263,20 @@ export default function RDVSWrapper() {
     };
   }, []);
   
-  // Handle dialpad toggle
+  // Handle IA (Indirect Access) button toggle
+  // Per 2.4.7.1: Press IA pushbutton -> dial tone is heard, keypad appears, IA indicator turns on
   const handleDialpadToggle = () => {
     const newState = !dialpadActive;
     setDialpadActive(newState);
+    setKeypadActive(newState); // IA button also toggles keypad visibility
+    
+    // Close dial line dialpad if open
+    if (newState && activeDialLine) {
+      setActiveDialLine(null);
+    }
     
     if (newState) {
-      // Turning dialpad ON - hang up all active calls and play dial tone
+      // Turning IA ON - hang up all active calls and play dial tone
       if (gg_status && Array.isArray(gg_status)) {
         gg_status.forEach((status: any) => {
           if (status && (status.status === 'ok' || status.status === 'active')) {
@@ -273,19 +285,19 @@ export default function RDVSWrapper() {
             
             // Determine correct dbl1 value based on call type
             const dbl1 = call_type === 'SO' ? 1 : 2;
-            console.log('RDVS: Hanging up call for dialpad:', { call_id, call_type, dbl1 });
+            console.log('RDVS: Hanging up call for IA dialpad:', { call_id, call_type, dbl1 });
             sendMsg({ type: 'stop', cmd1: call_id, dbl1 });
           }
         });
       }
       
-      // Play dial tone
+      // Play dial tone (per 2.4.7.1: "Dial tone is received to indicate that dialing may proceed")
       if (dialToneAudio) {
         dialToneAudio.currentTime = 0;
         dialToneAudio.play().catch(err => console.error('Failed to play dial tone:', err));
       }
     } else {
-      // Turning dialpad OFF - stop dial tone
+      // Turning IA OFF - stop dial tone
       if (dialToneAudio) {
         dialToneAudio.pause();
         dialToneAudio.currentTime = 0;
@@ -422,8 +434,30 @@ export default function RDVSWrapper() {
       
       {/* TED Interior Matrix - Independent quadrant positioning for precise control */}
       <div className="relative">
-        {/* Quadrant 1: Top-left (5×4 grid) - Toggles between buttons and keypad */}
-        {!keypadActive ? (
+        {/* Quadrant 1: Top-left (5×4 grid) - Toggles between buttons, keypad, or dial line dialpad */}
+        {activeDialLine ? (
+          /* Dial Line Dialpad - replaces Quadrant 1 when a dial line is active (same size as keypad) */
+          <div 
+            className="absolute"
+            style={{ 
+              top: '-64px',
+              left: '-74px',
+              width: '383px',
+              height: '255px',
+              zIndex: 100
+            }}
+          >
+            <RdvsKeypad
+              mode="dialline"
+              trunkName={activeDialLine.trunkName}
+              onClose={() => setActiveDialLine(null)}
+              onCallInitiated={(target) => {
+                console.log('RDVS: Dial call initiated to:', target);
+              }}
+              embedded={true}
+            />
+          </div>
+        ) : !keypadActive ? (
           <div 
             className="absolute grid grid-cols-5"
             style={{ 
@@ -455,7 +489,7 @@ export default function RDVSWrapper() {
             })()}
           </div>
         ) : (
-          /* Keypad overlay - replaces Quadrant 1 when active */
+          /* IA/Keypad overlay - replaces Quadrant 1 when active */
           <div 
             className="absolute"
             style={{ 
@@ -466,14 +500,18 @@ export default function RDVSWrapper() {
               zIndex: 100
             }}
           >
-            <img 
-              src="/rdvs/SVG/Keypad.png" 
-              alt="Keypad"
-              style={{ 
-                width: '110%', 
-                height: '110%',
-                objectFit: 'contain'
+            <RdvsKeypad
+              mode="ia"
+              iaActive={dialpadActive}
+              onClose={() => {
+                setKeypadActive(false);
+                setDialpadActive(false);
+                if (dialToneAudio) {
+                  dialToneAudio.pause();
+                  dialToneAudio.currentTime = 0;
+                }
               }}
+              embedded={true}
             />
           </div>
         )}
@@ -644,7 +682,22 @@ export default function RDVSWrapper() {
             height: '40px',
             zIndex: 1000,
           }}
-          onClick={() => setKeypadActive(!keypadActive)}
+          onClick={() => {
+            const newKeypadState = !keypadActive;
+            setKeypadActive(newKeypadState);
+            // If turning off keypad and IA was active, also turn off IA
+            if (!newKeypadState && dialpadActive) {
+              setDialpadActive(false);
+              if (dialToneAudio) {
+                dialToneAudio.pause();
+                dialToneAudio.currentTime = 0;
+              }
+            }
+            // Close dial line dialpad if opening keypad
+            if (newKeypadState && activeDialLine) {
+              setActiveDialLine(null);
+            }
+          }}
         >
           {keypadActive && (
             <img 
@@ -694,18 +747,6 @@ export default function RDVSWrapper() {
           ) : null;
         })()}
         
-        {/* Dial Line Dialpad - Shows when a type 3 dial line is clicked */}
-        {activeDialLine && (
-          <RdvsDialpad
-            trunkName={activeDialLine.trunkName}
-            onClose={() => setActiveDialLine(null)}
-            onCallInitiated={(target) => {
-              console.log('RDVS: Dial call initiated to:', target);
-              // Optionally close dialpad after call is initiated
-              // setActiveDialLine(null);
-            }}
-          />
-        )}
       </div>
       {/* Footer spacing */}
       <div style={{ height: '48px', width: '100%' }}></div>

@@ -258,8 +258,6 @@ export function setUIContextFromPosition(position: any) {
         detectedUI = position.panelType.toLowerCase();
     }
     
-    console.log('Setting UI context from position:', detectedUI, position);
-    
     // Refresh audio elements with new context
     refreshAudioElements();
     
@@ -330,7 +328,38 @@ export const useCoreStore = create<CoreState>((set: any, get: any) => {
     heldLandlines: [],
     buttonPress: () => {},
     holdBtn: () => {},
-    releaseBtn: () => {},
+    releaseBtn: () => {
+        // Release all active G/G calls
+        const { gg_status } = get();
+        const activeCalls = (gg_status || []).filter((call: any) => 
+            call && (call.status === 'ok' || call.status === 'active')
+        );
+        
+        console.log('[releaseBtn] Releasing', activeCalls.length, 'active calls');
+        
+        activeCalls.forEach((call: any) => {
+            // Extract call ID - handle different formats (SO_, gg_, etc.)
+            let call_id;
+            const fullCall = call.call;
+            
+            if (fullCall?.startsWith('SO_')) {
+                // Shout/Override format: "SO_891" -> "891"
+                call_id = fullCall.substring(3);
+            } else if (fullCall?.startsWith('gg_')) {
+                // Ground-Ground format: "gg_05_123" -> extract the ID part
+                call_id = fullCall.substring(6);
+            } else {
+                // Fallback
+                call_id = fullCall?.substring(5) || '';
+            }
+            
+            if (call_id) {
+                const isShoutOverride = fullCall?.startsWith('SO_');
+                console.log('[releaseBtn] Stopping call:', call_id, 'isShoutOverride:', isShoutOverride);
+                sendMessageNow({ type: 'stop', cmd1: call_id, dbl1: isShoutOverride ? 1 : 2 });
+            }
+        });
+    },
     toggleGg: () => {},
     toggleOver: () => {},
     ggLoud: false,
@@ -357,14 +386,12 @@ export const useCoreStore = create<CoreState>((set: any, get: any) => {
             })
         },
         updateSelectedPositions: (poss: Position[]) => {
-            console.log('[model] updateSelectedPositions called with:', poss);
             set({
                 selectedPositions: poss,
             })
             // Set UI context based on first selected position for audio system
             if (poss && poss.length > 0) {
                 const detectedUI = setUIContextFromPosition(poss[0]);
-                console.log('[model] set currentUI from position:', detectedUI);
                 set({
                     currentUI: detectedUI
                 });
@@ -381,7 +408,6 @@ export const useCoreStore = create<CoreState>((set: any, get: any) => {
             resetWindow();
         },
         setCurrentUI: (ui: string) => {
-            console.log('[model] setCurrentUI called with:', ui);
             set({
                 currentUI: ui
             })
@@ -508,6 +534,9 @@ export const useCoreStore = create<CoreState>((set: any, get: any) => {
         }
         socket.onopen = () => {
             ds.setConnected(true)
+            // Request sync immediately to get call_sign/cid for auto-detection
+            console.log('[WebSocket] Connected, sending sync request');
+            sendMessageNow({ type: 'sync' })
         };
         socket.onerror = (error) => {
             console.error('WebSocket error:', error, 'URL:', wsUrl);
@@ -579,6 +608,7 @@ export const useCoreStore = create<CoreState>((set: any, get: any) => {
                         vscs_status: new_vscs,
                     })
                 } else if (data.type === 'call_sign') {
+            console.log('[WebSocket] Received call_sign:', data.cmd1, 'CID:', data.dbl1);
             ds.setCallsign(data.cmd1, data.dbl1)
                 } else if (data.type === 'call_begin' || data.type === 'call_end') {
                     const { ag_status } = get()

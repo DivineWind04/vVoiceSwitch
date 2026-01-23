@@ -1,9 +1,9 @@
 'use client';
 import { useEffect } from 'react';
-import axios from 'axios';
 import VscsComponent from '../_components/vatlines/vscs';
 import { Configuration, ButtonType } from '../_components/vatlines/types';
 import { useCoreStore } from '~/model';
+import { loadAllFacilities, findPositionByCallsign } from '~/lib/facilityLoader';
 
 // Mock configuration based on example-config.json structure
 const mockConfiguration: Configuration = {
@@ -39,29 +39,22 @@ export default function VscsPage() {
   const callsign = useCoreStore((s: any) => s.callsign);
 
   useEffect(() => {
-    function find(stp: any, found: boolean): any {
-      if (!stp) return null;
-      if (Array.isArray(stp.positions)) {
-        for (const e of stp.positions) {
-          if (e.cs === callsign) {
-            return stp;
-          }
+    // Load all facilities and find the one containing the current position
+    loadAllFacilities().then(({ merged }) => {
+      if (callsign) {
+        const result = findPositionByCallsign(merged, callsign);
+        if (result?.facility) {
+          setPosData(result.facility);
+          return;
         }
       }
-      if (Array.isArray(stp.childFacilities)) {
-        for (const k of stp.childFacilities) {
-          const f = find(k, found);
-          if (f) return f;
-        }
-      }
-      return null;
-    }
-    
-    axios.get('/zoa_position.json').then(r => {
-      const prod = find(r.data, false);
-      setPosData(prod || r.data); // Use the full data if find doesn't return anything
+      // Fallback to full merged data
+      setPosData(merged);
     }).catch(() => {
-      // Optionally handle error
+      // Fallback to ZOA only
+      fetch('/zoa_position.json')
+        .then(r => r.json())
+        .then(data => setPosData(data));
     });
   }, [setPosData, callsign]);
   return (

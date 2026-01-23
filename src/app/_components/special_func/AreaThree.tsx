@@ -11,14 +11,37 @@ const AreaThree: React.FC<{ setSettingModal: (v: boolean) => void }> = ({ setSet
 
   const sendMsg = useCoreStore((s: any) => s.sendMessageNow);
   const gg_status = useCoreStore((s: any) => s.gg_status);
-  // Find the first active G/G call (customize as needed)
-  const activeCall = gg_status.find((c: any) => c && c.status && c.status !== 'off' && c.status !== '');
 
   const relAction = () => {
-    if (!activeCall) return;
-    if (activeCall.status === 'overridden' || activeCall.status === 'terminate') return;
-    const call_id = activeCall.call?.substring(3);
-    sendMsg({ type: 'stop', cmd1: call_id, dbl1: 2 });
+    // Release ALL active G/G calls
+    const activeCalls = (gg_status || []).filter((call: any) => 
+      call && (call.status === 'ok' || call.status === 'active')
+    );
+    
+    console.log('[REL] Releasing', activeCalls.length, 'active calls');
+    
+    activeCalls.forEach((call: any) => {
+      // Extract call ID - handle different formats (SO_, gg_, etc.)
+      let call_id;
+      const fullCall = call.call;
+      
+      if (fullCall?.startsWith('SO_')) {
+        // Shout/Override format: "SO_891" -> "891"
+        call_id = fullCall.substring(3);
+      } else if (fullCall?.startsWith('gg_')) {
+        // Ground-Ground format: "gg_05_123" -> extract the ID part
+        call_id = fullCall.substring(6);
+      } else {
+        // Fallback
+        call_id = fullCall?.substring(5) || '';
+      }
+      
+      if (call_id) {
+        const isShoutOverride = fullCall?.startsWith('SO_');
+        console.log('[REL] Stopping call:', call_id, 'isShoutOverride:', isShoutOverride);
+        sendMsg({ type: 'stop', cmd1: call_id, dbl1: isShoutOverride ? 1 : 2 });
+      }
+    });
   };
 
   const buttons = [

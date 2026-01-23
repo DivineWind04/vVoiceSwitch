@@ -19,9 +19,9 @@ export const rdvsButtonPatterns = {
     fill: 'solid',
   },
   DIAL: {
-    bg: '#1a4d1a',  // Dark green for dial lines
-    fg: '#00ff00',  // Bright green text
-    border: '#2d8c2d',
+    bg: '#264199',
+    fg: '#fff',
+    border: '#264199',
     fill: 'solid',
   },
   MONITOR: {
