@@ -8,12 +8,22 @@ import AirGroundPage from "../_components/air_ground/AirGroundPage";
 import GroundGroundPage from "../_components/ground_ground/GroundGroundPage";
 import GroundGroundPage3 from "../_components/ground_ground/GroundGroundPage3";
 import StatusArea from "../_components/status/StatusArea";
+import { useCoreStore } from "../../model";
 
 export default function IVSRPage() {
 	const [settingModal, setSettingModal] = useState(false);
 	const [currentGGPage, setCurrentGGPage] = useState(1);
-	// TODO: Replace with real filteredPosition logic
-	const filteredPosition = { pos: "FD/CD" };
+	
+	// Get selected position from store
+	const selectedPositions = useCoreStore((s: any) => s.selectedPositions);
+	const positionData = useCoreStore((s: any) => s.positionData);
+	
+	// Get the filtered position - use selectedPositions first, fallback to positionData
+	const filteredPosition = selectedPositions && selectedPositions.length > 0
+		? selectedPositions[0]
+		: positionData?.positions && positionData.positions.length > 0
+			? positionData.positions[0]
+			: { pos: "FD/CD" };
 	return (
 		<main className="flex min-h-screen flex-col items-center justify-center bg-black text-white">
 			<SettingModal open={settingModal} setModal={setSettingModal} position={filteredPosition} />
