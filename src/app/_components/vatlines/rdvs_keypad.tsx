@@ -30,7 +30,7 @@ const DTMF_FREQUENCIES: Record<string, [number, number]> = {
   '*': [941, 1209], '0': [941, 1336], '#': [941, 1447],
 };
 
-// IA Function Codes from manual section 2.4.7.4
+// IA Function Codes
 const IA_FUNCTION_CODES: Record<string, { description: string; totalDigits: number }> = {
   '0': { description: 'Intercom Call', totalDigits: 4 },
   '1': { description: 'Override Intercom', totalDigits: 4 },

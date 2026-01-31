@@ -283,10 +283,10 @@ function playDTMFTone(key: string, duration: number = 100) {
   osc2.stop(endTime);
 }
 
-// VIK Call States (expanded per TI 6690.17A)
+// VIK Call States
 type VikCallState = 'idle' | 'ready' | 'dialing' | 'ringing' | 'active' | 'busy' | 'released' | 'timeout' | 'denied' | 'held';
 
-// VIK Messages per TI 6690.17A Table A-2
+// VIK Messages
 const VIK_MESSAGES = {
   // Status messages
   READY: 'READY',
@@ -383,6 +383,302 @@ const VIK_MESSAGES = {
 // Line type constants matching position.json format
 const LINE_TYPE_OVERRIDE = 0;
 const LINE_TYPE_RING = 1;
+
+// VDM Message Types
+type VdmMessageType = 'error' | 'status' | 'warning';
+
+interface VdmMessage {
+  type: VdmMessageType;
+  text: string;
+  line2?: string; // Optional second line
+}
+
+// VDM Messages
+const VDM_MESSAGES = {
+  // A/G Communication messages
+  AG_COMM_LOST: { type: 'status' as VdmMessageType, text: 'A/G Communications Lost.' },
+  AG_MON_DESEL_DENIED: { type: 'error' as VdmMessageType, text: 'A/G MON Deselection Denied:', line2: 'AG MON cannot be Deselected from a Suspended State.' },
+  AG_PSN_REL_TERMINATED: { type: 'error' as VdmMessageType, text: 'A/G PSN REL Terminated:', line2: 'Two headsets are not present.' },
+  
+  // BUEC messages
+  BUEC_FREQ_NOT_CLASSMARKED: { type: 'error' as VdmMessageType, text: 'BUEC Denied: Freq. not classmarked.' },
+  BUEC_FREQ_NOT_SELECTED: { type: 'error' as VdmMessageType, text: 'BUEC Denied: Freq. not selected.' },
+  BUEC_UNAVAILABLE: { type: 'status' as VdmMessageType, text: 'BUEC is Unavailable for Requested Frequency.' },
+  
+  // Call Denied messages
+  CALL_DENIED_FWD_UNASSIGNED: { type: 'error' as VdmMessageType, text: 'Call Denied: Call FWD to Unassigned Destination.' },
+  CALL_DENIED_TERMINATES_HERE: { type: 'error' as VdmMessageType, text: 'Call Denied: Call terminates at this position.' },
+  CALL_DENIED_DEST_OTS: { type: 'status' as VdmMessageType, text: 'Call Denied: Destination OTS.' },
+  CALL_DENIED_SWITCH_OTS: { type: 'status' as VdmMessageType, text: 'Call Denied: G/G switch node OTS.' },
+  CALL_DENIED_INVALID_DEST: { type: 'error' as VdmMessageType, text: 'Call Denied: Invalid Destination.' },
+  CALL_DENIED_INVALID_NUMBER: { type: 'error' as VdmMessageType, text: 'Call Denied: Invalid Number.' },
+  CALL_DENIED_NO_RESPONSE: { type: 'error' as VdmMessageType, text: 'Call Denied: No response to call action.' },
+  CALL_DENIED_ALREADY_ACTIVE: { type: 'error' as VdmMessageType, text: 'Call Denied: Position Already Active in Call.' },
+  CALL_DENIED_ALREADY_IN_CONF: { type: 'error' as VdmMessageType, text: 'Call Denied: Position Already Active in Conference.' },
+  
+  // Call Forward messages
+  CALL_FWD_DENIED_GG_IN_PROGRESS: { type: 'error' as VdmMessageType, text: 'Call FWD Denied: G/G call in progress.' },
+  CALL_FWD_DENIED_INVALID_DEST: { type: 'error' as VdmMessageType, text: 'Call FWD Denied: Invalid destination.' },
+  CALL_FWD_DENIED_LOOP: { type: 'error' as VdmMessageType, text: 'Call FWD Denied: Loop closure.' },
+  CALL_FWD_DENIED_NO_RESPONSE: { type: 'error' as VdmMessageType, text: 'Call FWD denied: No response to CALL FWD attempt.' },
+  CALL_FWD_DISABLED_LOOP: { type: 'error' as VdmMessageType, text: 'Call FWD Disabled: Possible Loop Closure.' },
+  CALL_FWD_DISABLE_DENIED_GG: { type: 'error' as VdmMessageType, text: 'Call FWD disable denied: G/G call in progress.' },
+  CALL_FWD_DISABLED_SUPER: { type: 'status' as VdmMessageType, text: 'Call FWD disabled by Supervisor/Maintainer.' },
+  CALL_FWD_DISABLE_DENIED_NOT_ACTIVE: { type: 'error' as VdmMessageType, text: 'Call FWD disable denied: Call FWD is not active at selected position.' },
+  CALL_FWD_DISABLE_DENIED_INVALID: { type: 'error' as VdmMessageType, text: 'Call FWD Disable Request Denied: Position number is not valid.' },
+  CALL_RELEASED_NO_RESPONSE: { type: 'error' as VdmMessageType, text: 'Call Released: No response to call action.' },
+  
+  // Conference messages
+  CONF_LIMIT_REACHED: { type: 'error' as VdmMessageType, text: 'CONF member limit reached.' },
+  ALL_PRESET_CONF_BUSY: { type: 'status' as VdmMessageType, text: 'All Preset Conference members are busy, OTS, or timed out.' },
+  FACILITY_CONF_LIMIT: { type: 'error' as VdmMessageType, text: 'Facility Conference Resource Limit Reached.' },
+  
+  // Frequency messages
+  FREQ_NOT_CLASSMARKED_BOTH: { type: 'error' as VdmMessageType, text: 'Freq. not classmarked for both XMTR and RCVR Main/Stby change.' },
+  DISABLE_LAST_EMERG_PROHIBITED: { type: 'error' as VdmMessageType, text: 'Disabling the last transmitter of the last enabled UHF or VHF emergency frequency is prohibited.' },
+  DIVERSITY_DENIED_NOT_SELECTED: { type: 'error' as VdmMessageType, text: 'Diversity Denied: Freq not selected.' },
+  
+  // Function Denied messages
+  FUNC_DENIED_AG_STATUS: { type: 'error' as VdmMessageType, text: 'Function Denied: Cannot complete this function on A/G Status Screen.' },
+  FUNC_DENIED_INVALID_DEST: { type: 'error' as VdmMessageType, text: 'Function Denied: Invalid Destination.' },
+  
+  // G/G messages
+  GG_CALLS_RELEASED_VIK: { type: 'error' as VdmMessageType, text: 'G/G Calls are Released with VIK Connect/Disconnect' },
+  GG_PSN_REL_TERMINATED: { type: 'error' as VdmMessageType, text: 'G/G PSN REL Terminated:', line2: 'Two headsets are not present.' },
+  
+  // Hold Denied messages
+  HOLD_DENIED_CA_FULL: { type: 'error' as VdmMessageType, text: 'Hold Denied: CA queue full.' },
+  HOLD_DENIED_NOT_ACTIVE: { type: 'error' as VdmMessageType, text: 'Hold Denied: Call not active.' },
+  HOLD_DENIED_NO_MEMBERS: { type: 'error' as VdmMessageType, text: 'Hold Denied: No members active.' },
+  HOLD_DENIED_OVR: { type: 'error' as VdmMessageType, text: 'Hold Denied: OVR cannot be placed on hold.' },
+  HOLD_DENIED_PROG_CONF: { type: 'error' as VdmMessageType, text: 'HOLD Denied: Prog Conf and/or G/G Classmark Removed Via Reconfig. Can Continue in CONF or Release.' },
+  HOLD_DENIED_VOICE_CALLS: { type: 'error' as VdmMessageType, text: 'Hold Denied: Voice Calls cannot be placed on hold.' },
+  
+  // Holler messages
+  HOLLER_DENIED_INVALID_DA: { type: 'warning' as VdmMessageType, text: 'Holler On/Off Denied: Invalid DA' },
+  
+  // Inconsistent Maps
+  INCONSISTENT_MAPS: { type: 'error' as VdmMessageType, text: 'Inconsistent Maps: Notify Supervisor of G/G Call Received on Unassigned DA' },
+  
+  // Main/Stby messages
+  MAIN_STBY_DENIED_NOT_CLASSMARKED: { type: 'error' as VdmMessageType, text: 'Main/Stby Denied: Freq. not classmarked.' },
+  MAIN_STBY_DENIED_NOT_SELECTED: { type: 'error' as VdmMessageType, text: 'Main/Stby Denied: Freq. not selected.' },
+  MAIN_STBY_DENIED_ON_BUEC: { type: 'error' as VdmMessageType, text: 'Main/Stby Denied: Freq. on BUEC.' },
+  
+  // Member messages
+  MEMBER_PROG_CONF_ON_HOLD: { type: 'error' as VdmMessageType, text: 'Member active in a Prog Conf on Hold. Touch PROG CONF button to resume.' },
+  
+  // No response messages
+  NO_RESPONSE_PROG_CONF: { type: 'error' as VdmMessageType, text: 'No response to PROG CONF action. PROG CONF originator released.' },
+  NO_RESPONSE_VOICE_MON: { type: 'error' as VdmMessageType, text: 'No response to VOICE MON action. All voice monitors release.' },
+  
+  // Override messages
+  OVR_DENIED_LIMIT: { type: 'error' as VdmMessageType, text: 'OVR Denied: Limit to Selected Console Reached.' },
+  OVR_DENIED_LOOP: { type: 'error' as VdmMessageType, text: 'OVR Denied: Possible loop closure.' },
+  
+  // PROG CONF messages
+  PROG_CONF_ADD_DENIED_TYPE: { type: 'error' as VdmMessageType, text: 'PROG CONF Add Denied: Call type invalid.' },
+  PROG_CONF_ADD_DENIED_ACTIVE: { type: 'error' as VdmMessageType, text: 'PROG CONF Add Denied: Member already active.' },
+  PROG_CONF_ADD_DENIED_LIMIT: { type: 'error' as VdmMessageType, text: 'PROG CONF Add Denied: Member limit reached.' },
+  PROG_CONF_ADD_DENIED_RECONFIG: { type: 'error' as VdmMessageType, text: 'PROG CONF Add Denied: Prog Conf and/or G/G Classmark Removed via Reconfig.' },
+  PROG_CONF_ADD_DENIED_VIK_ACTIVE: { type: 'error' as VdmMessageType, text: 'PROG CONF Add Denied: VIK currently active.' },
+  PROG_CONF_DESELECT_DENIED: { type: 'error' as VdmMessageType, text: 'PROG CONF deselect denied: Invalid index number.' },
+  
+  // PSN REL messages
+  PSN_REL_SPLIT_ENABLED: { type: 'warning' as VdmMessageType, text: 'PSN REL Terminated: Position enabled Split Mode.' },
+  PSN_REL_SPLIT_DISABLED: { type: 'warning' as VdmMessageType, text: 'PSN REL Terminated: Position disabled Split Mode.' },
+  
+  // PTT messages
+  PTT_CONF_LOST: { type: 'error' as VdmMessageType, text: 'PTT Confirmation Lost on Enabled XMTR.' },
+  PTT_TIMEOUT: { type: 'error' as VdmMessageType, text: 'PTT Timeout on an Enabled XMTR.' },
+  
+  // Reconfiguration messages
+  RECONFIG_CANCEL_COMPLETE: { type: 'error' as VdmMessageType, text: 'Reconfiguration Cancel Complete' },
+  RECONFIG_CANCEL_ERRORS: { type: 'error' as VdmMessageType, text: 'Reconfiguration Cancel Complete With Errors.' },
+  RECONFIG_CANCEL_IN_PROGRESS: { type: 'error' as VdmMessageType, text: 'Reconfiguration Cancel in Progress.' },
+  RECONFIG_CANCELLED: { type: 'status' as VdmMessageType, text: 'Reconfiguration Cancelled.' },
+  RECONFIG_COMPLETED: { type: 'status' as VdmMessageType, text: 'Reconfiguration Completed.' },
+  RECONFIG_COMPLETED_ERRORS: { type: 'error' as VdmMessageType, text: 'Reconfiguration Completed with Errors.' },
+  RECONFIG_IN_PROGRESS: { type: 'status' as VdmMessageType, text: 'Reconfiguration in Progress.' },
+  
+  // REM Mute messages
+  REM_MUTE_DENIED_NOT_CLASSMARKED: { type: 'error' as VdmMessageType, text: 'REM Mute Denied: Freq. not classmarked.' },
+  REM_MUTE_DENIED_NOT_SELECTED: { type: 'error' as VdmMessageType, text: 'REM Mute Denied: Freq. not selected.' },
+  REM_MUTE_DENIED_ON_BUEC: { type: 'error' as VdmMessageType, text: 'REM Mute Denied: Freq. on BUEC.' },
+  REM_MUTE_DENIED_RCVR: { type: 'error' as VdmMessageType, text: 'REM Mute Denied: RCVR not selected.' },
+  REM_MUTE_XCPL_WARNING: { type: 'warning' as VdmMessageType, text: "REM Muting a XCPL'd freq. negates the XCPL." },
+  
+  // Simultaneous touches
+  SIMULTANEOUS_TOUCHES: { type: 'error' as VdmMessageType, text: 'Simultaneous touches to a display are prohibited.' },
+  
+  // Site Selection
+  SITE_SELECTION_DENIED: { type: 'error' as VdmMessageType, text: 'Site Selection Denied: Position not classmarked for Site Selection.' },
+  
+  // Split Denied messages
+  SPLIT_DENIED_NOT_CLASSMARKED: { type: 'error' as VdmMessageType, text: 'Split Denied: Position not A/G and G/G classmarked.' },
+  SPLIT_DENIED_NO_HEADSETS: { type: 'error' as VdmMessageType, text: 'Split Denied: Two headsets are not present.' },
+  SPLIT_DENIED_NO_SPEAKERS: { type: 'error' as VdmMessageType, text: 'Split Denied: Two loudspeakers are not present.' },
+  
+  // TEST messages
+  TEST_DENIED_NOT_CLASSMARKED: { type: 'error' as VdmMessageType, text: 'TEST Denied: Freq not Classmarked.' },
+  TEST_DENIED_NOT_SELECTED: { type: 'error' as VdmMessageType, text: 'TEST Denied: Freq not selected.' },
+  TEST_DISABLED_XCPL: { type: 'error' as VdmMessageType, text: 'TEST disabled XCPL.' },
+  
+  // Trunk Access
+  TRUNK_ACCESS_DENIED: { type: 'error' as VdmMessageType, text: 'Trunk Access Denied: Trunk in-use but not answered.' },
+  
+  // UTIL test messages
+  UTIL_TEST_DENIED_GG: { type: 'error' as VdmMessageType, text: 'UTIL test denied: G/G call in progress.' },
+  UTIL_TEST_TERMINATED: { type: 'error' as VdmMessageType, text: 'UTIL test terminated: Position initiated G/G call.' },
+  
+  // Voice Mon messages
+  VOICE_MON_DENIED_LOOP: { type: 'error' as VdmMessageType, text: 'Voice Mon Denied: Possible loop closure.' },
+  VOICE_MON_DENIED_ALREADY_ACTIVE: { type: 'error' as VdmMessageType, text: 'Voice Mon Denied: Member Already Active.' },
+  VOICE_MON_DENIED_LIMIT: { type: 'error' as VdmMessageType, text: 'Voice Mon Denied: Simultaneous Voice Mon limit reached.' },
+  VOICE_MON_DESEL_DENIED_INDEX: { type: 'error' as VdmMessageType, text: 'Voice Mon Deselection Denied: Invalid index number.' },
+  VOICE_MON_DESEL_DENIED_SUSPENDED: { type: 'error' as VdmMessageType, text: 'Voice Mon Deselection Denied: Voice Mon cannot be deselected from a suspended state.' },
+  VOICE_MON_DISABLED_UNASSIGNED: { type: 'error' as VdmMessageType, text: 'Voice Mon Disabled: Position Unassigned.' },
+  
+  // XCPL messages
+  XCPL_REM_MUTE_WARNING: { type: 'warning' as VdmMessageType, text: 'XCPL a Freq. with a REM Muted RCVR negates the XCPL.' },
+  XCPL_DENIED_TEST: { type: 'error' as VdmMessageType, text: 'XCPL Denied: Freq has TEST assigned.' },
+  XCPL_DENIED_NOT_CLASSMARKED: { type: 'error' as VdmMessageType, text: 'XCPL Denied: Freq. not classmarked.' },
+  XCPL_DENIED_NOT_SELECTED: { type: 'error' as VdmMessageType, text: 'XCPL Denied: Freq. not selected.' },
+  XCPL_DENIED_PAIRED: { type: 'error' as VdmMessageType, text: 'XCPL Denied: Freq. paired.' },
+} as const;
+
+// R/T Auxiliary Message Area Types
+interface CallForwardInfo {
+  type: 'DA' | 'IA'; // DA = Direct Access initiated, IA = Interphone Access initiated
+  positionLetter?: string; // e.g., "A27"
+  sectorNumber?: string; // e.g., "SHIN"
+  dialCode?: string; // e.g., "627"
+}
+
+interface OverridingPosition {
+  position: string; // e.g., "R32", "R44", "SUP1"
+  dialCode: string; // e.g., "832", "844", "213"
+}
+
+// R/T Auxiliary Message Area Component
+// Shows call forwarding info or overriding positions based on R/T state
+function RtAuxiliaryMessageArea({ 
+  rtEnabled, 
+  callForwardInfo, 
+  overridingPositions 
+}: { 
+  rtEnabled: boolean; 
+  callForwardInfo: CallForwardInfo | null;
+  overridingPositions: OverridingPosition[];
+}) {
+  // Determine background color based on state
+  // R/T ON with override or no forwarding: Green (#008000)
+  // R/T OFF or ON with call forwarding: Light blue/cyan (#87CEEB - matching doc images)
+  const hasOverride = overridingPositions.length > 0;
+  const bgColor = rtEnabled && !callForwardInfo ? '#008000' : '#87CEEB'; // Green when R/T ON without forwarding, light blue otherwise
+  const textColor = rtEnabled && !callForwardInfo ? 'white' : 'black';
+  
+  return (
+    <div 
+      className="w-full h-full flex flex-col justify-start items-start p-2"
+      style={{ backgroundColor: bgColor, color: textColor }}
+    >
+      {/* Call Forwarding Display (when active) */}
+      {callForwardInfo && (
+        <div className="text-sm">
+          {callForwardInfo.type === 'DA' ? (
+            <>
+              <div>CALLS FWD TO:</div>
+              <div>{callForwardInfo.positionLetter} {callForwardInfo.sectorNumber}</div>
+            </>
+          ) : (
+            <>
+              <div>CALLS FWD TO:</div>
+              <div>{callForwardInfo.dialCode}</div>
+            </>
+          )}
+        </div>
+      )}
+      
+      {/* Overriding Positions Display (when R/T ON and being overridden) */}
+      {rtEnabled && hasOverride && (
+        <div className="text-sm w-full">
+          {overridingPositions.map((pos, idx) => (
+            <div key={idx} className="flex justify-between w-full">
+              <span>{pos.position}</span>
+              <span>{pos.dialCode}</span>
+            </div>
+          ))}
+        </div>
+      )}
+    </div>
+  );
+}
+
+// VDM Message Display Component - shows messages in pink area, grey when no message
+function VdmMessageDisplay({ message }: { message: VdmMessage | null }) {
+  // Pink/salmon background color for messages, grey when no message
+  const bgColor = message ? '#FFB6C1' : '#78716c'; // Pink when message, stone-500 grey when none
+  
+  // Render error icon (triangle with !)
+  const ErrorIcon = () => (
+    <svg width="40" height="40" viewBox="0 0 40 40" style={{ marginRight: '8px' }}>
+      <polygon points="20,5 38,35 2,35" fill="none" stroke="black" strokeWidth="2" />
+      <text x="20" y="30" textAnchor="middle" fontSize="20" fontWeight="bold">!</text>
+    </svg>
+  );
+  
+  // Render warning icon (rectangle with lines)
+  const WarningIcon = () => (
+    <svg width="40" height="40" viewBox="0 0 40 40" style={{ marginRight: '8px' }}>
+      <rect x="5" y="8" width="30" height="24" fill="none" stroke="black" strokeWidth="2" />
+      <line x1="10" y1="15" x2="30" y2="15" stroke="black" strokeWidth="2" />
+      <line x1="10" y1="20" x2="30" y2="20" stroke="black" strokeWidth="2" />
+      <line x1="10" y1="25" x2="25" y2="25" stroke="black" strokeWidth="2" />
+    </svg>
+  );
+  
+  // If no message, show empty grey area
+  if (!message) {
+    return (
+      <div 
+        className="col-start-1 col-end-5 w-[335px] h-[80px] mt-2 vscs-empty"
+        style={{ backgroundColor: bgColor }}
+      />
+    );
+  }
+  
+  return (
+    <div 
+      className="col-start-1 col-end-5 w-[335px] h-[80px] mt-2 flex items-center px-3"
+      style={{ backgroundColor: bgColor }}
+    >
+      {/* Icon based on message type */}
+      {message.type === 'error' && <ErrorIcon />}
+      {message.type === 'warning' && <WarningIcon />}
+      {message.type === 'status' && (
+        <span style={{ marginRight: '8px', fontSize: '16px', fontWeight: 'light' }}>***<br/>***</span>
+      )}
+      
+      {/* Message text */}
+      <div style={{ flex: 1, textAlign: 'left' }}>
+        <div style={{ fontSize: '14px', fontWeight: 'light', color: 'black' }}>
+          {message.text}
+        </div>
+        {message.line2 && (
+          <div style={{ fontSize: '13px', color: 'black' }}>
+            {message.line2}
+          </div>
+        )}
+      </div>
+      
+      {/* Right side asterisks for status messages */}
+      {message.type === 'status' && (
+        <span style={{ marginLeft: '8px', fontSize: '16px', fontWeight: 'light' }}>***<br/>***</span>
+      )}
+    </div>
+  );
+}
 const LINE_TYPE_SHOUT = 2;
 
 // Helper function to find a line ID from position data by dial code
@@ -432,6 +728,10 @@ function findLineIdByDialCode(
     console.log('VIK: Position not found or has no lines:', posCallsign);
     return null;
   }
+  
+  // Debug: Log all lines being searched
+  console.log('VIK: Searching lines for dialCode:', dialCode, 'lineType:', lineType);
+  console.log('VIK: Available lines:', currentPos.lines.map((l: any) => `[${l[0]}, type:${l[1]}, desc:${l[2]}]`).join(', '));
   
   // Search for matching line by type and dial code
   // Line format: [id, lineType, description]
@@ -547,7 +847,7 @@ function VikKeypad() {
   // Get current selected position
   const currentPosition = selectedPositions && selectedPositions.length > 0 ? selectedPositions[0] : null;
 
-  // Determine call type prompt based on first digit (per TI 6690.17A Table A-2)
+  // Determine call type prompt based on first digit
   const getCallTypePrompt = (firstDigit: string): string => {
     switch (firstDigit) {
       case '0': return VIK_MESSAGES.IC_CALL;       // Intercom call within facility
@@ -826,7 +1126,7 @@ function VikKeypad() {
     console.log('VIK handleInit called - callState:', callState, 'dialBuffer:', dialBuffer);
     
     if (callState === 'idle') {
-      // Enter ready state - per manual: "READY is displayed on VIK. Numeric matrix and backspace key illuminate."
+      // Enter ready state - READY is displayed, numeric matrix and backspace key illuminate
       setDisplayLine1(VIK_MESSAGES.READY);
       setDisplayLine2('');
       setDialBuffer('');
@@ -912,7 +1212,7 @@ function VikKeypad() {
       setDisplayLine2('');
       setCallState('released');
       
-      // Clear after 3 seconds per manual
+      // Clear after 3 seconds
       setTimeout(() => {
         setDisplayLine1('');
         setDisplayLine2('');
@@ -1195,20 +1495,61 @@ function VscsPanel(props: VscsProps & { panelId?: string; defaultScreenMode?: st
   const [screenMode, setScreenMode] = useState(props.defaultScreenMode || 'GG1'); // Use default or fallback to 'GG1'
   const [isAltScreen, setIsAltScreen] = useState(false); // Track if we're in alternate screen selection mode
   const [rtEnabled, setRtEnabled] = useState(false); // Track R/T button state (default OFF)
+  const [callForwardInfo, setCallForwardInfo] = useState<CallForwardInfo | null>(null); // Track call forwarding info
+  const [overridingPositions, setOverridingPositions] = useState<OverridingPosition[]>([]); // Track positions overriding this one
   const [emergencyPttPressed, setEmergencyPttPressed] = useState({
     uhf: false,
     both: false,
     vhf: false
   }); // Track emergency PTT button press states
+  const [vdmMessage, setVdmMessage] = useState<VdmMessage | null>(null); // VDM message display state
   
   const gg_status = useCoreStore((s: any) => s.gg_status);
   const ag_status = useCoreStore((s: any) => s.ag_status);
   const sendMsg = useCoreStore((s: any) => s.sendMessageNow);
   const positionData = useCoreStore((s: any) => s.positionData);
+  const overrideStatus = useCoreStore((s: any) => s.overrideStatus); // OV_ calls from WebSocket
+  const isBeingOverridden = useCoreStore((s: any) => s.isBeingOverridden); // Active override state
   const selectedPositions = useCoreStore((s: any) => s.selectedPositions);
   
   // Get the currently selected position for line type lookups
   const currentPosition = selectedPositions && selectedPositions.length > 0 ? selectedPositions[0] : null;
+  
+  // Update overridingPositions from WebSocket OV_ data
+  useEffect(() => {
+    if (overrideStatus && Array.isArray(overrideStatus)) {
+      // Filter for active overrides and map to OverridingPosition format
+      const activeOverrides = overrideStatus
+        .filter((ov: any) => ov && (ov.status === 'ok' || ov.status === 'active'))
+        .map((ov: any) => ({
+          position: ov.call_name || ov.call?.substring(3) || 'Unknown',
+          dialCode: ov.call?.substring(3) || ''
+        }));
+      
+      setOverridingPositions(activeOverrides);
+      
+      // Log for debugging
+      if (activeOverrides.length > 0) {
+        console.log('[VSCS] Override positions updated:', activeOverrides);
+      }
+    } else {
+      setOverridingPositions([]);
+    }
+  }, [overrideStatus]);
+  
+  // Helper function to show VDM message with optional auto-dismiss
+  const showVdmMessage = (message: VdmMessage, autoDismissMs?: number) => {
+    setVdmMessage(message);
+    if (autoDismissMs) {
+      setTimeout(() => setVdmMessage(null), autoDismissMs);
+    }
+  };
+  
+  // Helper to show VDM message from predefined messages
+  const showVdmError = (messageKey: keyof typeof VDM_MESSAGES, autoDismissMs: number = 5000) => {
+    const msg = VDM_MESSAGES[messageKey];
+    showVdmMessage(msg, autoDismissMs);
+  };
   
   // Check if guard frequencies (121.500, 243.000) are currently active in A/G status
   const hasGuardFrequencies = useMemo(() => {
@@ -1300,7 +1641,7 @@ function VscsPanel(props: VscsProps & { panelId?: string; defaultScreenMode?: st
     });
   }, [currentSlice, currentPosition, screenMode]);
 
-  // Generate multi-line data for G/G buttons based on Manual Page 27
+  // Generate multi-line data for G/G buttons
   const generateGGMultiLineData = (data: any, buttonIndex: number) => {
     if (!data) return undefined;
     
@@ -1464,11 +1805,20 @@ function VscsPanel(props: VscsProps & { panelId?: string; defaultScreenMode?: st
           break;
           
         case 'busy':
+          // Show VDM message for busy line
+          showVdmMessage({ type: 'status', text: 'Call Denied:', line2: 'Destination busy.' }, 5000);
+          console.log('Line is busy:', buttonData.status);
+          break;
         case 'hold':
+          // Show VDM message for hold state
+          showVdmError('HOLD_DENIED_NOT_ACTIVE', 5000);
+          console.log('Call is on hold:', buttonData.status);
+          break;
         case 'pending':
         case 'terminate':
         case 'overridden':
-          // No action allowed for these states
+          // No action allowed for these states - show message
+          showVdmMessage({ type: 'status', text: 'Call Denied:', line2: 'No response to call action.' }, 5000);
           console.log('No action available for status:', buttonData.status);
           break;
           
@@ -1855,7 +2205,7 @@ function VscsPanel(props: VscsProps & { panelId?: string; defaultScreenMode?: st
                         >
                           UTIL
                         </VscsStaticButton>
-                        {/* R/T button positioned in overlay for UTIL mode */}
+                        {/* R/T button positioned in overlay for UTIL mode - screen selection */}
                         <div className="col-span-2 relative">
                           {/* R/T Indicator positioned above the static button */}
                           <div className="absolute text-black bg-zinc-50 text-center w-[165px] h-5" style={{ bottom: '280px', left: '345px', zIndex: 25 }}>
@@ -1864,13 +2214,65 @@ function VscsPanel(props: VscsProps & { panelId?: string; defaultScreenMode?: st
                             </div>
                           </div>
                           <div 
-                            className="relative vscs-static-button w-[165px] h-20 bg-[#40e0d0] cursor-pointer mt-2"
-                            onClick={() => setRtEnabled(!rtEnabled)} style={{ bottom: '200px', left: '345px', zIndex: 25 }}
+                            className="relative vscs-static-button w-[165px] h-20 cursor-pointer mt-2 flex flex-col justify-start items-start p-2 text-left"
+                            style={{ 
+                              bottom: '200px', 
+                              left: '345px', 
+                              zIndex: 25,
+                              backgroundColor: overridingPositions.length > 0 ? '#008000' : '#87CEEB',
+                              color: 'black'
+                            }}
+                            onClick={() => setRtEnabled(!rtEnabled)}
                           >
+                            {/* Call Forwarding Display */}
+                            {callForwardInfo && (
+                              <div className="text-sm leading-tight">
+                                {callForwardInfo.type === 'DA' ? (
+                                  <>
+                                    <div>CALLS FWD TO:</div>
+                                    <div>{callForwardInfo.positionLetter} {callForwardInfo.sectorNumber}</div>
+                                  </>
+                                ) : (
+                                  <>
+                                    <div>CALLS FWD TO:</div>
+                                    <div>{callForwardInfo.dialCode}</div>
+                                  </>
+                                )}
+                              </div>
+                            )}
+                            {/* Overriding Positions Display (always shown when being overridden) */}
+                            {overridingPositions.length > 0 && (
+                              <div className="text-sm w-full leading-tight">
+                                {overridingPositions.map((pos, idx) => (
+                                  <div key={idx} className="flex justify-between w-full">
+                                    <span>{pos.position}</span>
+                                    <span>{pos.dialCode}</span>
+                                  </div>
+                                ))}
+                              </div>
+                            )}
                           </div>
                         </div>
-                        {/* Large grey area positioned next to R/T button in UTIL mode */}
-                        <div className="bg-stone-500 vscs-empty absolute -top-[105px] left-[0px] w-[335px] h-[80px] mt-2"></div>
+                        {/* VDM Message Display Area in UTIL mode - screen selection view */}
+                        <div 
+                          className="absolute -top-[105px] left-[0px] w-[335px] h-[80px] mt-2 flex items-center px-3"
+                          style={{ backgroundColor: vdmMessage ? '#FFB6C1' : '#78716c' }}
+                        >
+                          {vdmMessage && (
+                            <>
+                              {vdmMessage.type === 'error' && (
+                                <svg width="40" height="40" viewBox="0 0 40 40" style={{ marginRight: '8px' }}>
+                                  <polygon points="20,5 38,35 2,35" fill="none" stroke="black" strokeWidth="2" />
+                                  <text x="20" y="30" textAnchor="middle" fontSize="20" fontWeight="bold">!</text>
+                                </svg>
+                              )}
+                              <div style={{ flex: 1, textAlign: 'left' }}>
+                                <div style={{ fontSize: '14px', fontWeight: 'bold', color: 'black' }}>{vdmMessage.text}</div>
+                                {vdmMessage.line2 && <div style={{ fontSize: '13px', color: 'black' }}>{vdmMessage.line2}</div>}
+                              </div>
+                            </>
+                          )}
+                        </div>
                               </>
                     ) : (
                       // Normal UTIL function buttons
@@ -1899,7 +2301,7 @@ function VscsPanel(props: VscsProps & { panelId?: string; defaultScreenMode?: st
                         <VscsStaticButton onClick={() => {/* TODO: Implement S/W MAINT */}}>
                           S/W<br />MAINT
                         </VscsStaticButton>
-                        {/* R/T button positioned in overlay for UTIL mode */}
+                        {/* R/T button positioned in overlay for UTIL mode - normal */}
                         <div className="col-span-2 relative">
                           {/* R/T Indicator positioned above the static button */}
                           <div className="absolute text-black bg-zinc-50 text-center w-[165px] h-5" style={{ bottom: '280px', left: '345px', zIndex: 25 }}>
@@ -1908,13 +2310,65 @@ function VscsPanel(props: VscsProps & { panelId?: string; defaultScreenMode?: st
                             </div>
                           </div>
                           <div 
-                            className="relative vscs-static-button w-[165px] h-20 bg-[#40e0d0] cursor-pointer mt-2"
-                            onClick={() => setRtEnabled(!rtEnabled)} style={{ bottom: '200px', left: '345px', zIndex: 25 }}
+                            className="relative vscs-static-button w-[165px] h-20 cursor-pointer mt-2 flex flex-col justify-start items-start p-2 text-left"
+                            style={{ 
+                              bottom: '200px', 
+                              left: '345px', 
+                              zIndex: 25,
+                              backgroundColor: overridingPositions.length > 0 ? '#008000' : '#87CEEB',
+                              color: 'black'
+                            }}
+                            onClick={() => setRtEnabled(!rtEnabled)}
                           >
+                            {/* Call Forwarding Display */}
+                            {callForwardInfo && (
+                              <div className="text-sm leading-tight">
+                                {callForwardInfo.type === 'DA' ? (
+                                  <>
+                                    <div>CALLS FWD TO:</div>
+                                    <div>{callForwardInfo.positionLetter} {callForwardInfo.sectorNumber}</div>
+                                  </>
+                                ) : (
+                                  <>
+                                    <div>CALLS FWD TO:</div>
+                                    <div>{callForwardInfo.dialCode}</div>
+                                  </>
+                                )}
+                              </div>
+                            )}
+                            {/* Overriding Positions Display (always shown when being overridden) */}
+                            {overridingPositions.length > 0 && (
+                              <div className="text-sm w-full leading-tight">
+                                {overridingPositions.map((pos, idx) => (
+                                  <div key={idx} className="flex justify-between w-full">
+                                    <span>{pos.position}</span>
+                                    <span>{pos.dialCode}</span>
+                                  </div>
+                                ))}
+                              </div>
+                            )}
                           </div>
                         </div>
-                        {/* Large grey area positioned next to R/T button in UTIL mode */}
-                        <div className="bg-stone-500 vscs-empty absolute -top-[105px] left-[0px] w-[335px] h-[80px] mt-2"></div>
+                        {/* VDM Message Display Area in UTIL mode - normal view */}
+                        <div 
+                          className="absolute -top-[105px] left-[0px] w-[335px] h-[80px] mt-2 flex items-center px-3"
+                          style={{ backgroundColor: vdmMessage ? '#FFB6C1' : '#78716c' }}
+                        >
+                          {vdmMessage && (
+                            <>
+                              {vdmMessage.type === 'error' && (
+                                <svg width="40" height="40" viewBox="0 0 40 40" style={{ marginRight: '8px' }}>
+                                  <polygon points="20,5 38,35 2,35" fill="none" stroke="black" strokeWidth="2" />
+                                  <text x="20" y="30" textAnchor="middle" fontSize="20" fontWeight="bold">!</text>
+                                </svg>
+                              )}
+                              <div style={{ flex: 1, textAlign: 'left' }}>
+                                <div style={{ fontSize: '14px', fontWeight: 'bold', color: 'black' }}>{vdmMessage.text}</div>
+                                {vdmMessage.line2 && <div style={{ fontSize: '13px', color: 'black' }}>{vdmMessage.line2}</div>}
+                              </div>
+                            </>
+                          )}
+                        </div>
                               </>
                     )
                   ) : null}
@@ -1997,9 +2451,9 @@ function VscsPanel(props: VscsProps & { panelId?: string; defaultScreenMode?: st
           {!screenMode.startsWith('AG') && screenMode !== 'UTIL' && (
             <div className="bg-stone-500 vscs-empty row-span-2 w-40 mt-2 vscs-large-square-button"></div>
           )}
-          {/* Large grey area - hide when in UTIL mode since it's included in UTIL component */}
+          {/* VDM Message Display Area - shows error/status/warning messages in pink */}
           {screenMode !== 'UTIL' && (
-            <div className="bg-stone-500 vscs-empty col-start-1 col-end-5 w-[335px] h-[80px] mt-2"></div>
+            <VdmMessageDisplay message={vdmMessage} />
           )}
           {/* R/T button section - hide in UTIL mode since it's in overlay, show on other pages */}
           {screenMode !== 'UTIL' && (
@@ -2010,10 +2464,43 @@ function VscsPanel(props: VscsProps & { panelId?: string; defaultScreenMode?: st
                   {rtEnabled ? 'R/T ON' : 'R/T OFF'}
                 </div>
               </div>
+              {/* R/T Auxiliary Message Area Button - changes color and shows content based on state */}
               <div 
-                className="vscs-static-button w-[165px] h-20 bg-[#40e0d0] cursor-pointer mt-2"
+                className="vscs-static-button w-[165px] h-20 cursor-pointer mt-2 flex flex-col justify-start items-start p-2 text-left"
+                style={{ 
+                  backgroundColor: overridingPositions.length > 0 ? '#008000' : '#40e0d0',
+                  color: 'black'
+                }}
                 onClick={() => setRtEnabled(!rtEnabled)}
               >
+                {/* Call Forwarding Display (when active) */}
+                {callForwardInfo && (
+                  <div className="text-sm leading-tight">
+                    {callForwardInfo.type === 'DA' ? (
+                      <>
+                        <div>CALLS FWD TO:</div>
+                        <div>{callForwardInfo.positionLetter} {callForwardInfo.sectorNumber}</div>
+                      </>
+                    ) : (
+                      <>
+                        <div>CALLS FWD TO:</div>
+                        <div>{callForwardInfo.dialCode}</div>
+                      </>
+                    )}
+                  </div>
+                )}
+                
+                {/* Overriding Positions Display (always shown when being overridden) */}
+                {overridingPositions.length > 0 && (
+                  <div className="text-sm w-full leading-tight">
+                    {overridingPositions.map((pos, idx) => (
+                      <div key={idx} className="flex justify-between w-full">
+                        <span>{pos.position}</span>
+                        <span>{pos.dialCode}</span>
+                      </div>
+                    ))}
+                  </div>
+                )}
               </div>
             </div>
           )}

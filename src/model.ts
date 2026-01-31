@@ -76,6 +76,10 @@ interface CoreState {
     gg_status: any[],
     vscs_status: any[],
     
+    // Override tracking for R/T functionality
+    overrideStatus: any[], // Tracks OV_ prefixed calls (incoming overrides)
+    isBeingOverridden: boolean, // True when there's an active incoming override
+    
     // Dial call state for type 3 lines
     activeDialLine: { trunkName: string; lineType: number } | null;
     dialCallStatus: 'idle' | 'dialing' | 'ringback' | 'connected' | 'busy' | 'error';
@@ -320,6 +324,8 @@ export const useCoreStore = create<CoreState>((set: any, get: any) => {
     ag_status: [],
     gg_status: [],
     vscs_status: [],
+    overrideStatus: [], // Track OV_ calls
+    isBeingOverridden: false, // Track if position is being overridden
     sendMessageNow: () => {},
     // VSCS-specific props (default implementations)
     activeLandlines: [],
@@ -550,6 +556,9 @@ export const useCoreStore = create<CoreState>((set: any, get: any) => {
 
     let ringback_interval: any = null;
         socket.onmessage = (event) => {
+            // Log all incoming WebSocket messages for debugging
+            console.log('[WebSocket RAW]', event.data);
+            
             if (event.data === 'PttOpen') {
                 set({ ptt: true })
                 return
@@ -561,6 +570,8 @@ export const useCoreStore = create<CoreState>((set: any, get: any) => {
             }
             try {
                 const data = JSON.parse(event.data)
+                // Log parsed JSON messages with type info
+                console.log('[WebSocket MSG]', data.type, data);
                 if (data.type === 'message') {
                     // document.getElementById('chatLog').innerHTML += `<div>${data.cmd1}</div>`;
                 } else if (data.type === 'version') {
@@ -579,6 +590,7 @@ export const useCoreStore = create<CoreState>((set: any, get: any) => {
                     const new_ag: any[] = []
                     const new_gg: any[] = []
                     const new_vscs: any[] = []
+                    const new_override: any[] = [] // Track OV_ prefixed calls
             cns.map((k: any) => {
                         if (k.call === 'A/G') {
                             new_ag.push({ ...k })
@@ -586,6 +598,13 @@ export const useCoreStore = create<CoreState>((set: any, get: any) => {
                             // Handle VSCS buttons - similar to G/G processing
                             k.call_name = call_table[k.call?.substring(5)]?.[0] || k.call?.substring(5)
                             new_vscs.push({ ...k })
+                        } else if (k.call?.startsWith('OV_')) {
+                            // Handle incoming override calls - OV_ prefix indicates this position is being overridden
+                            console.log('[WebSocket] Override call detected:', k);
+                            k.call_name = call_table[k.call?.substring(3)]?.[0] || k.call?.substring(3)
+                            new_override.push({ ...k })
+                            // Also add to G/G list for button display
+                            new_gg.push({ ...k })
                         } else {
                 k.call_name = call_table[k.call?.substring(3)]?.[0]
                             new_gg.push({ ...k })
@@ -602,10 +621,18 @@ export const useCoreStore = create<CoreState>((set: any, get: any) => {
                             }
                         }
                     })
+                    
+                    // Check if there's an active override (OV_ call with status 'ok' or 'active')
+                    const hasActiveOverride = new_override.some((ov: any) => 
+                        ov.status === 'ok' || ov.status === 'active'
+                    );
+                    
                     debounce_set({
                         ag_status: new_ag,
                         gg_status: new_gg,
                         vscs_status: new_vscs,
+                        overrideStatus: new_override,
+                        isBeingOverridden: hasActiveOverride,
                     })
                 } else if (data.type === 'call_sign') {
             console.log('[WebSocket] Received call_sign:', data.cmd1, 'CID:', data.dbl1);

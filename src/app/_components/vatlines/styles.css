@@ -45,6 +45,10 @@
     font-style: normal;
 }
 
+:root {
+    --vscs-font: 'VSCS', 'Courier New', Courier, monospace;
+}
+
 @tailwind utilities;
 
 @layer utilities {
@@ -490,10 +494,10 @@
     }
 }
 
-/* ===== VSCS BUTTON STYLES - Based on Manual Pages 68-74 ===== */
+/* ===== VSCS BUTTON STYLES ===== */
 
 .vscs-panel {
-    font-family: 'VSCS', 'Courier New', Courier, monospace;
+    font-family: var(--vscs-font);
     color: black;
     width: 780px !important;
     height: 585px !important;
@@ -532,7 +536,7 @@
 }
 
 
-/* VSCS Button States - Based on Manual Table 3-6 */
+/* VSCS Button States */
 
 /* Unselected frequency/Idle DA call/Idle test state */
 .ag-frequency-container .vscs-button.state-unselected {
@@ -748,7 +752,7 @@
     animation: wink-1s 1s infinite;
 }
 
-/* ===== A/G 3-BUTTON LAYOUT STYLES (Manual Pages 15-16) ===== */
+/* ===== A/G 3-BUTTON LAYOUT STYLES ===== */
 
 .ag-frequency-container {
     width: 100% !important;
@@ -950,7 +954,7 @@
 /* Remove the old custom active styling since we're using .vscs-static-button.active */
 /* .ag-sub-button.active styles are handled by .vscs-static-button.active */
 
-/* G/G Button 5-Line Layout - Based on Manual Page 27 */
+/* G/G Button 5-Line Layout */
 .gg-button-content {
     display: flex;
     flex-direction: column;
@@ -1159,7 +1163,7 @@
     z-index: 0;
 }
 
-/* Button Border Types - Based on Manual Figure 3-8 */
+/* Button Border Types */
 
 /* No Border - for DA buttons */
 .vscs-button.border-none {
@@ -1198,7 +1202,7 @@
     border: 3px solid #333333;
 }
 
-/* Guard frequency unselected buttons - thick red border per Manual Page 13 */
+/* Guard frequency unselected buttons - thick red border */
 .ag-frequency-container .vscs-button.guard-frequency-unselected,
 .vscs-button.guard-frequency-unselected {
     border: 7px solid #FF0000 !important; /* Thick red border for guard frequencies */
@@ -1214,13 +1218,13 @@
     bottom: 9px !important;
 }
 
-/* Regular transmitting buttons - rgb(255, 123, 0) inner border only per Manual Page 13 */
+/* Regular transmitting buttons - rgb(255, 123, 0) inner border only */
 .ag-frequency-container .vscs-button.transmitting::before,
 .vscs-button.transmitting::before {
     border: 3px solid rgb(255, 123, 0) !important; /* rgb(255, 123, 0) inner border for transmitting buttons */
 }
 
-/* Regular transmitting with flutter - rgb(255, 123, 0) inner border with flutter animation per Manual Page 13 */
+/* Regular transmitting with flutter - rgb(255, 123, 0) inner border with flutter animation */
 .ag-frequency-container .vscs-button.transmitting-flutter::before,
 .vscs-button.transmitting-flutter::before {
     border: 3px solid rgb(255, 123, 0) !important; /* rgb(255, 123, 0) inner border for transmitting buttons */
@@ -1334,7 +1338,7 @@
     opacity: 0.8;
 }
 
-/* Animations - Based on Manual Specifications */
+/* Animations */
 
 /* Flashing text - 1 cycle per second, 50% duty cycle - text color only */
 @keyframes flash-text-1s {
