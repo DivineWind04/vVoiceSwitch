@@ -1,0 +1,891 @@
+{
+  "positions": [
+    {
+      "cs": "ENA_FSS",
+      "pos": "90 - Kenai AFSS",
+      "freq": 122650000,
+      "rn": "ANI,BET,DLG,GKN,HOM,ILI,ENA,SVW,TKA,BTT,EGE,AQT,GAL,GAM,UNK,GST,YAK,ANN,OME,OTZ,BRWA,SCC,ORT",
+      "ui": "vscs",
+      "lines": []
+    },
+    {
+      "cs": "FAI_FSS",
+      "pos": "91 - Fairbanks AFSS",
+      "freq": 122300000,
+      "rn": "BTT,EGE,AQT,GAL,GAM,UNK,SCC,BRWA,OME,OTZ,ORT",
+      "ui": "vscs",
+      "lines": []
+    },
+    {
+      "cs": "JNU_FSS",
+      "pos": "92 - Juneau AFSS",
+      "freq": 122250000,
+      "rn": "GST,YAK,GKN,ANN",
+      "ui": "vscs",
+      "lines": []
+    },
+    {
+      "cs": "ANC_03_CTR",
+      "pos": "R03",
+      "freq": 133300000,
+      "rn": "ANI,GAL,OME,GAM,UNK,OTZ",
+      "ui": "vscs",
+      "lines": [
+        ["9070003", 0, "D-06"],
+        ["9070015", 0, "D-13"],
+        ["9070026", 0, "D-69"],
+        ["9070037", 0, "D-04"],
+        ["9070038", 0, "D-05"],
+        ["9070039", 0, "D-07"],
+        ["9070040", 0, "D-08"],
+        ["9070041", 0, "D-09"],
+        ["9070042", 0, "D-14"],
+        ["9070043", 0, "D-15"],
+        ["9070044", 0, "D-16"],
+        ["9070045", 0, "D-63"],
+        ["9070046", 0, "D-68"],
+        ["9999", 3, "MULTI,DIAL"],
+        ["8111000", 2, "A11"],
+        ["8111017", 2, "FAI"]
+      ]
+    },
+    {
+      "cs": "ANC_04_CTR",
+      "pos": "R04",
+      "freq": 135300000,
+      "rn": "BTT,AQT,SCC,BRWA,OTZ",
+      "ui": "vscs",
+      "lines": [
+        ["9070004", 0, "D-06"],
+        ["9070016", 0, "D-13"],
+        ["9070027", 0, "D-69"],
+        ["9070037", 0, "D-03"],
+        ["9070047", 0, "D-05"],
+        ["9070048", 0, "D-07"],
+        ["9070049", 0, "D-08"],
+        ["9070050", 0, "D-09"],
+        ["9070051", 0, "D-14"],
+        ["9070052", 0, "D-15"],
+        ["9070053", 0, "D-16"],
+        ["9070054", 0, "D-63"],
+        ["9070055", 0, "D-68"],
+        ["9999", 3, "MULTI,DIAL"],
+        ["8111000", 2, "A11"],
+        ["8111017", 2, "FAI"]
+      ]
+    },
+    {
+      "cs": "ANC_05_CTR",
+      "pos": "R05",
+      "freq": 125700000,
+      "rn": "TKA,HOM,SVW,ENA",
+      "ui": "vscs",
+      "lines": [
+        ["9070005", 0, "D-06"],
+        ["9070017", 0, "D-13"],
+        ["9070028", 0, "D-69"],
+        ["9070038", 0, "D-03"],
+        ["9070047", 0, "D-04"],
+        ["9070056", 0, "D-07"],
+        ["9070057", 0, "D-08"],
+        ["9070058", 0, "D-09"],
+        ["9070059", 0, "D-14"],
+        ["9070060", 0, "D-15"],
+        ["9070061", 0, "D-16"],
+        ["9070062", 0, "D-63"],
+        ["9070063", 0, "D-68"],
+        ["9999", 3, "MULTI,DIAL"],
+        ["8111000", 2, "A11"],
+        ["8111017", 2, "FAI"]
+      ]
+    },
+    {
+      "cs": "ANC_06_CTR",
+      "pos": "R06",
+      "freq": 132300000,
+      "rn": "TKA,ZANZ,ENA,HOM,SVW,GKN,ORT,YAK,BET,ANI,GAL,OME,GAM,UNK,OTZ,BTT,AQT,SCC,BRWA,DLG,ILI,EGE,GST,ANN",
+      "ui": "vscs",
+      "lines": [
+        ["9070001", 0, "D-13"],
+        ["9070002", 0, "D-69"],
+        ["9070003", 0, "D-03"],
+        ["9070004", 0, "D-04"],
+        ["9070005", 0, "D-05"],
+        ["9070006", 0, "D-07"],
+        ["9070007", 0, "D-08"],
+        ["9070008", 0, "D-09"],
+        ["9070009", 0, "D-14"],
+        ["9070010", 0, "D-15"],
+        ["9070011", 0, "D-16"],
+        ["9070012", 0, "D-63"],
+        ["9070013", 0, "D-68"],
+        ["9999", 3, "MULTI,DIAL"],
+        ["8111000", 2, "A11"],
+        ["8111017", 2, "FAI"]
+      ]
+    },
+    {
+      "cs": "ANC_07_CTR",
+      "pos": "R07",
+      "freq": 119500000,
+      "rn": "GKN,ORT,YAK",
+      "ui": "vscs",
+      "lines": [
+        ["9070006", 0, "D-06"],
+        ["9070018", 0, "D-13"],
+        ["9070029", 0, "D-69"],
+        ["9070039", 0, "D-03"],
+        ["9070048", 0, "D-04"],
+        ["9070056", 0, "D-05"],
+        ["9070064", 0, "D-08"],
+        ["9070065", 0, "D-09"],
+        ["9070066", 0, "D-14"],
+        ["9070067", 0, "D-15"],
+        ["9070068", 0, "D-16"],
+        ["9070069", 0, "D-63"],
+        ["9070070", 0, "D-68"],
+        ["9999", 3, "MULTI,DIAL"],
+        ["8111000", 2, "A11"],
+        ["8111017", 2, "FAI"]
+      ]
+    },
+    {
+      "cs": "ANC_08_CTR",
+      "pos": "R08",
+      "freq": 126100000,
+      "rn": "GST,YAK,ANN",
+      "ui": "vscs",
+      "lines": [
+        ["9070007", 0, "D-06"],
+        ["9070019", 0, "D-13"],
+        ["9070030", 0, "D-69"],
+        ["9070040", 0, "D-03"],
+        ["9070049", 0, "D-04"],
+        ["9070057", 0, "D-05"],
+        ["9070064", 0, "D-07"],
+        ["9070071", 0, "D-09"],
+        ["9070072", 0, "D-14"],
+        ["9070073", 0, "D-15"],
+        ["9070074", 0, "D-16"],
+        ["9070075", 0, "D-63"],
+        ["9070076", 0, "D-68"],
+        ["9999", 3, "MULTI,DIAL"],
+        ["8111000", 2, "A11"],
+        ["8111017", 2, "FAI"]
+      ]
+    },
+    {
+      "cs": "ANC_09_CTR",
+      "pos": "R09",
+      "freq": 124800000,
+      "rn": "BET,HOM,DLG,SVW,ENA,ILI",
+      "ui": "vscs",
+      "lines": [
+        ["9070008", 0, "D-06"],
+        ["9070020", 0, "D-13"],
+        ["9070031", 0, "D-69"],
+        ["9070041", 0, "D-03"],
+        ["9070050", 0, "D-04"],
+        ["9070058", 0, "D-05"],
+        ["9070065", 0, "D-07"],
+        ["9070071", 0, "D-08"],
+        ["9070077", 0, "D-14"],
+        ["9070078", 0, "D-15"],
+        ["9070079", 0, "D-16"],
+        ["9070080", 0, "D-63"],
+        ["9070081", 0, "D-68"],
+        ["9999", 3, "MULTI,DIAL"],
+        ["8111000", 2, "A11"],
+        ["8111017", 2, "FAI"]
+      ]
+    },
+    {
+      "cs": "ANC_13_CTR",
+      "pos": "R13",
+      "freq": 125200000,
+      "rn": "BET,ANI,GAL,OME,GAM,UNK,OTZ,BTT,AQT,SCC,BRWA,HOM,DLG,SVW,ENA,ILI,EGE,ORT",
+      "ui": "vscs",
+      "lines": [
+        ["9070001", 0, "D-06"],
+        ["9070014", 0, "D-69"],
+        ["9070015", 0, "D-03"],
+        ["9070016", 0, "D-04"],
+        ["9070017", 0, "D-05"],
+        ["9070018", 0, "D-07"],
+        ["9070019", 0, "D-08"],
+        ["9070020", 0, "D-09"],
+        ["9070021", 0, "D-14"],
+        ["9070022", 0, "D-15"],
+        ["9070023", 0, "D-16"],
+        ["9070024", 0, "D-63"],
+        ["9070025", 0, "D-68"],
+        ["9999", 3, "MULTI,DIAL"],
+        ["8111000", 2, "A11"],
+        ["8111017", 2, "FAI"]
+      ]
+    },
+    {
+      "cs": "ANC_14_CTR",
+      "pos": "R14",
+      "freq": 119300000,
+      "rn": "Anchorage Center",
+      "ui": "vscs",
+      "lines": [
+        ["9070009", 0, "D-06"],
+        ["9070021", 0, "D-13"],
+        ["9070032", 0, "D-69"],
+        ["9070042", 0, "D-03"],
+        ["9070051", 0, "D-04"],
+        ["9070059", 0, "D-05"],
+        ["9070066", 0, "D-07"],
+        ["9070072", 0, "D-08"],
+        ["9070077", 0, "D-09"],
+        ["9070082", 0, "D-15"],
+        ["9070083", 0, "D-16"],
+        ["9070084", 0, "D-63"],
+        ["9070085", 0, "D-68"],
+        ["9999", 3, "MULTI,DIAL"],
+        ["8111000", 2, "A11"],
+        ["8111017", 2, "FAI"]
+      ]
+    },
+    {
+      "cs": "ANC_15_CTR",
+      "pos": "R15",
+      "freq": 120900000,
+      "rn": "BTT,GAL,EGE,ORT",
+      "ui": "vscs",
+      "lines": [
+        ["9070010", 0, "D-06"],
+        ["9070022", 0, "D-13"],
+        ["9070033", 0, "D-69"],
+        ["9070043", 0, "D-03"],
+        ["9070052", 0, "D-04"],
+        ["9070060", 0, "D-05"],
+        ["9070067", 0, "D-07"],
+        ["9070073", 0, "D-08"],
+        ["9070078", 0, "D-09"],
+        ["9070082", 0, "D-14"],
+        ["9070086", 0, "D-16"],
+        ["9070087", 0, "D-63"],
+        ["9070088", 0, "D-68"],
+        ["9999", 3, "MULTI,DIAL"],
+        ["8111000", 2, "A11"],
+        ["8111017", 2, "FAI"]
+      ]
+    },
+    {
+      "cs": "ANC_16_CTR",
+      "pos": "R16",
+      "freq": 132700000,
+      "rn": "EGE,ORT",
+      "ui": "vscs",
+      "lines": [
+        ["9070011", 0, "D-06"],
+        ["9070023", 0, "D-13"],
+        ["9070034", 0, "D-69"],
+        ["9070044", 0, "D-03"],
+        ["9070053", 0, "D-04"],
+        ["9070061", 0, "D-05"],
+        ["9070068", 0, "D-07"],
+        ["9070074", 0, "D-08"],
+        ["9070079", 0, "D-09"],
+        ["9070083", 0, "D-14"],
+        ["9070086", 0, "D-15"],
+        ["9070089", 0, "D-63"],
+        ["9070090", 0, "D-68"],
+        ["9999", 3, "MULTI,DIAL"],
+        ["8111000", 2, "A11"],
+        ["8111017", 2, "FAI"]
+      ]
+    },
+    {
+      "cs": "ANC_63_CTR",
+      "pos": "R63",
+      "freq": 126950000,
+      "rn": "BET,OME,GAM,OTZ",
+      "ui": "vscs",
+      "lines": [
+        ["9070012", 0, "D-06"],
+        ["9070024", 0, "D-13"],
+        ["9070035", 0, "D-69"],
+        ["9070045", 0, "D-03"],
+        ["9070054", 0, "D-04"],
+        ["9070062", 0, "D-05"],
+        ["9070069", 0, "D-07"],
+        ["9070075", 0, "D-08"],
+        ["9070080", 0, "D-09"],
+        ["9070084", 0, "D-14"],
+        ["9070087", 0, "D-15"],
+        ["9070089", 0, "D-16"],
+        ["9070091", 0, "D-68"],
+        ["9999", 3, "MULTI,DIAL"],
+        ["8111000", 2, "A11"],
+        ["8111017", 2, "FAI"]
+      ]
+    },
+    {
+      "cs": "ANC_68_CTR",
+      "pos": "R68",
+      "freq": 127300000,
+      "rn": "YAK,ANN,GST",
+      "ui": "vscs",
+      "lines": [
+        ["9070013", 0, "D-06"],
+        ["9070025", 0, "D-13"],
+        ["9070036", 0, "D-69"],
+        ["9070046", 0, "D-03"],
+        ["9070055", 0, "D-04"],
+        ["9070063", 0, "D-05"],
+        ["9070070", 0, "D-07"],
+        ["9070076", 0, "D-08"],
+        ["9070081", 0, "D-09"],
+        ["9070085", 0, "D-14"],
+        ["9070088", 0, "D-15"],
+        ["9070090", 0, "D-16"],
+        ["9070091", 0, "D-63"],
+        ["9999", 3, "MULTI,DIAL"],
+        ["8111000", 2, "A11"],
+        ["8111017", 2, "FAI"]
+      ]
+    },
+    {
+      "cs": "ANC_69_CTR",
+      "pos": "R69",
+      "freq": 133800000,
+      "rn": "YAK,ANN,GST,BET,OME,GAM,OTZ,HOM,DLG,SVW,ENA,ILI",
+      "ui": "vscs",
+      "lines": [
+        ["9070002", 0, "D-06"],
+        ["9070014", 0, "D-13"],
+        ["9070026", 0, "D-03"],
+        ["9070027", 0, "D-04"],
+        ["9070028", 0, "D-05"],
+        ["9070029", 0, "D-07"],
+        ["9070030", 0, "D-08"],
+        ["9070031", 0, "D-09"],
+        ["9070032", 0, "D-14"],
+        ["9070033", 0, "D-15"],
+        ["9070034", 0, "D-16"],
+        ["9070035", 0, "D-63"],
+        ["9070036", 0, "D-68"],
+        ["9999", 3, "MULTI,DIAL"],
+        ["8111000", 2, "A11"],
+        ["8111017", 2, "FAI"]
+      ]
+    }
+  ],
+  "childFacilities": [
+    {
+      "positions": [
+        {
+          "cs": "ANC_F_APP",
+          "pos": "Final Radar",
+          "freq": 135150000,
+          "rn": "ZANZ",
+          "ui": "rdvs",
+          "lines": [
+            ["8080092", 0, "North Ra"],
+            ["8080094", 0, "South Ra"],
+            ["8111000", 2, "ZAN"],
+            ["9999", 3, "MULTI,DIAL"]
+          ]
+        },
+        {
+          "cs": "ANC_N_APP",
+          "pos": "North Radar",
+          "freq": 118600000,
+          "rn": "ZANZ,ENA",
+          "ui": "rdvs",
+          "lines": [
+            ["8080092", 0, "Final Ra"],
+            ["8080093", 0, "South Ra"],
+            ["8111000", 2, "ZAN"],
+            ["9999", 3, "MULTI,DIAL"]
+          ]
+        },
+        {
+          "cs": "ANC_S_APP",
+          "pos": "South Radar",
+          "freq": 126400000,
+          "rn": "ZANZ,ENA",
+          "ui": "rdvs",
+          "lines": [
+            ["8080093", 0, "North Ra"],
+            ["8080094", 0, "Final Ra"],
+            ["8111000", 2, "ZAN"],
+            ["9999", 3, "MULTI,DIAL"]
+          ]
+        }
+      ],
+      "childFacilities": [
+        {
+          "positions": [
+            {
+              "cs": "EDF_DEL",
+              "pos": "Delivery",
+              "freq": 128800000,
+              "rn": "Elmendorf Clearance",
+              "ui": "stvs",
+              "lines": [
+                ["8111002", 0, "Elmendorf"],
+                ["8111003", 0, "Elmendorf"]
+              ]
+            },
+            {
+              "cs": "EDF_GND",
+              "pos": "Ground",
+              "freq": 121800000,
+              "rn": "Elmendorf Ground",
+              "ui": "stvs",
+              "lines": [
+                ["8111001", 0, "Elmendorf"],
+                ["8111003", 0, "Elmendorf"]
+              ]
+            },
+            {
+              "cs": "EDF_TWR",
+              "pos": "Local Control",
+              "freq": 127200000,
+              "rn": "Elmendorf Tower",
+              "ui": "stvs",
+              "lines": [
+                ["8111001", 0, "Elmendorf"],
+                ["8111002", 0, "Elmendorf"],
+                ["9999", 3, "MULTI,DIAL"]
+              ]
+            }
+          ],
+          "childFacilities": [],
+          "name": "Elmendorf ATCT",
+          "id": "EDF"
+        },
+        {
+          "positions": [
+            {
+              "cs": "MRI_GND",
+              "pos": "Ground",
+              "freq": 121700000,
+              "rn": "Merrill Ground",
+              "ui": "stvs",
+              "lines": [
+                ["8111004", 0, "Merrill"]
+              ]
+            },
+            {
+              "cs": "MRI_TWR",
+              "pos": "Local Control ",
+              "freq": 126000000,
+              "rn": "ZANZ",
+              "ui": "stvs",
+              "lines": [
+                ["8111004", 0, "Merrill"],
+                ["9999", 3, "MULTI,DIAL"]
+              ]
+            }
+          ],
+          "childFacilities": [],
+          "name": "Merrill ATCT",
+          "id": "MRI"
+        },
+        {
+          "positions": [
+            {
+              "cs": "FRN_TWR",
+              "pos": "Local Control",
+              "freq": 125000000,
+              "rn": "Bryant Tower",
+              "ui": "stvs",
+              "lines": [
+                ["9999", 3, "MULTI,DIAL"]
+              ]
+            }
+          ],
+          "childFacilities": [],
+          "name": "Bryant Army Airfield ATCT",
+          "id": "FRN"
+        },
+        {
+          "positions": [
+            {
+              "cs": "ANC_DEL",
+              "pos": "Delivery",
+              "freq": 119400000,
+              "rn": "ZANZ",
+              "ui": "stvs",
+              "lines": [
+                ["8111007", 0, "Hood"],
+                ["8111009", 0, "Anchorage"],
+                ["8111010", 0, "Anchorage"]
+              ]
+            },
+            {
+              "cs": "ANC_GND",
+              "pos": "Ground",
+              "freq": 121900000,
+              "rn": "ZANZ",
+              "ui": "stvs",
+              "lines": [
+                ["8111006", 0, "Hood"],
+                ["8111008", 0, "Anchorage"],
+                ["8111010", 0, "Anchorage"]
+              ]
+            },
+            {
+              "cs": "LHD_TWR",
+              "pos": "Lake Hood Local Control",
+              "freq": 126800000,
+              "rn": "ZANZ",
+              "ui": "stvs",
+              "lines": [
+                ["8111005", 0, "Anchorage"],
+                ["8111006", 0, "Anchorage"],
+                ["8111007", 0, "Anchorage"],
+                ["9999", 3, "MULTI,DIAL"]
+              ]
+            },
+            {
+              "cs": "ANC_TWR",
+              "pos": "Local Control",
+              "freq": 118300000,
+              "rn": "ZANZ",
+              "ui": "stvs",
+              "lines": [
+                ["8111005", 0, "Hood"],
+                ["8111008", 0, "Anchorage"],
+                ["8111009", 0, "Anchorage"]
+              ]
+            }
+          ],
+          "childFacilities": [],
+          "name": "Anchorage ATCT",
+          "id": "ANC"
+        }
+      ],
+      "name": "Anchorage TRACON",
+      "id": "A11"
+    },
+    {
+      "positions": [
+        {
+          "cs": "FAI_DEL",
+          "pos": "Delivery",
+          "freq": 127600000,
+          "rn": "Fairbanks Clearance",
+          "ui": "ivsr",
+          "lines": [
+            ["8111013", 0, "Fairbanks"],
+            ["8111015", 0, "Fairbanks"],
+            ["8111016", 0, ""]
+          ]
+        },
+        {
+          "cs": "FAI_E_APP",
+          "pos": "East Radar",
+          "freq": 126500000,
+          "rn": "Fairbanks Approach",
+          "ui": "ivsr",
+          "lines": [
+            ["8000095", 0, "West Rad"],
+            ["8000097", 0, "TRACAB R"],
+            ["8111011", 0, "Fairbanks"],
+            ["8111012", 0, ""],
+            ["8111013", 0, "Fairbanks"],
+            ["8111017", 2, "ZAN"]
+          ]
+        },
+        {
+          "cs": "FAI_GND",
+          "pos": "Ground",
+          "freq": 121900000,
+          "rn": "Fairbanks Ground ",
+          "ui": "ivsr",
+          "lines": [
+            ["8111012", 0, "Fairbanks"],
+            ["8111014", 0, "Fairbanks"],
+            ["8111016", 0, "Fairbanks"]
+          ]
+        },
+        {
+          "cs": "FAI_TWR",
+          "pos": "Local Control",
+          "freq": 118300000,
+          "rn": "Fairbanks Tower",
+          "ui": "ivsr",
+          "lines": [
+            ["8111011", 0, "Fairbanks"],
+            ["8111014", 0, ""],
+            ["8111015", 0, "Fairbanks"],
+            ["9999", 3, "MULTI,DIAL"]
+          ]
+        },
+        {
+          "cs": "FAI_W_APP",
+          "pos": "TRACAB Radar",
+          "freq": 125350000,
+          "rn": "Fairbanks Approach",
+          "ui": "ivsr",
+          "lines": [
+            ["8000096", 0, "West Rad"],
+            ["8000097", 0, "East Rad"],
+            ["8111011", 0, "Fairbanks"],
+            ["8111012", 0, ""],
+            ["8111013", 0, "Fairbanks"],
+            ["8111017", 2, "ZAN"]
+          ]
+        },
+        {
+          "cs": "FAI_W_APP",
+          "pos": "West Radar",
+          "freq": 125350000,
+          "rn": "Fairbanks Approach",
+          "ui": "ivsr",
+          "lines": [
+            ["8000095", 0, "East Rad"],
+            ["8000096", 0, "TRACAB R"],
+            ["8111011", 0, "Fairbanks"],
+            ["8111012", 0, ""],
+            ["8111013", 0, "Fairbanks"],
+            ["8111017", 2, "ZAN"]
+          ]
+        }
+      ],
+      "childFacilities": [
+        {
+          "positions": [
+            {
+              "cs": "EIL_GND",
+              "pos": "Ground",
+              "freq": 121800000,
+              "rn": "Eielson Ground",
+              "ui": "stvs",
+              "lines": [
+                ["8111018", 0, "Eielson"]
+              ]
+            },
+            {
+              "cs": "EIL_TWR",
+              "pos": "Local Control",
+              "freq": 127200000,
+              "rn": "Eielson Tower",
+              "ui": "stvs",
+              "lines": [
+                ["8111018", 0, "Eielson"],
+                ["9999", 3, "MULTI,DIAL"]
+              ]
+            }
+          ],
+          "childFacilities": [],
+          "name": "Eielson ATCT",
+          "id": "EIL"
+        },
+        {
+          "positions": [
+            {
+              "cs": "FBK_GND",
+              "pos": "Ground",
+              "freq": 121700000,
+              "rn": "Ladd Ground",
+              "ui": "stvs",
+              "lines": [
+                ["8111019", 0, "Ladd"]
+              ]
+            },
+            {
+              "cs": "FBK_TWR",
+              "pos": "Local Control",
+              "freq": 125000000,
+              "rn": "Ladd Tower",
+              "ui": "stvs",
+              "lines": [
+                ["8111019", 0, "Ladd"],
+                ["9999", 3, "MULTI,DIAL"]
+              ]
+            }
+          ],
+          "childFacilities": [],
+          "name": "Ladd Army Airfield ATCT",
+          "id": "FBK"
+        }
+      ],
+      "name": "Fairbanks ATCT/TRACON",
+      "id": "FAI"
+    },
+    {
+      "positions": [
+        {
+          "cs": "JNU_GND",
+          "pos": "Ground",
+          "freq": 121900000,
+          "rn": "Juneau Ground",
+          "ui": "stvs",
+          "lines": [
+            ["8111020", 0, "Juneau"]
+          ]
+        },
+        {
+          "cs": "JNU_TWR",
+          "pos": "Local Control",
+          "freq": 118700000,
+          "rn": "Juneau Tower",
+          "ui": "stvs",
+          "lines": [
+            ["8111020", 0, "Juneau"],
+            ["9999", 3, "MULTI,DIAL"]
+          ]
+        }
+      ],
+      "childFacilities": [],
+      "name": "Juneau ATCT",
+      "id": "JNU"
+    },
+    {
+      "positions": [
+        {
+          "cs": "BET_GND",
+          "pos": "Ground",
+          "freq": 121700000,
+          "rn": "BET",
+          "ui": "stvs",
+          "lines": [
+            ["8111021", 0, "Bethel"]
+          ]
+        },
+        {
+          "cs": "BET_TWR",
+          "pos": "Local Control",
+          "freq": 118700000,
+          "rn": "BET",
+          "ui": "stvs",
+          "lines": [
+            ["8111021", 0, "Bethel"],
+            ["9999", 3, "MULTI,DIAL"]
+          ]
+        }
+      ],
+      "childFacilities": [],
+      "name": "Bethel ATCT",
+      "id": "BET"
+    },
+    {
+      "positions": [
+        {
+          "cs": "ENA_GND",
+          "pos": "Ground",
+          "freq": 121900000,
+          "rn": "ENA",
+          "ui": "stvs",
+          "lines": [
+            ["8111022", 0, "Kenai"]
+          ]
+        },
+        {
+          "cs": "ENA_TWR",
+          "pos": "Local Control",
+          "freq": 121300000,
+          "rn": "ENA",
+          "ui": "stvs",
+          "lines": [
+            ["8111022", 0, "Kenai"],
+            ["9999", 3, "MULTI,DIAL"]
+          ]
+        }
+      ],
+      "childFacilities": [],
+      "name": "Kenai ATCT",
+      "id": "ENA"
+    },
+    {
+      "positions": [
+        {
+          "cs": "AKN_GND",
+          "pos": "Ground",
+          "freq": 121900000,
+          "rn": "King Salmon Ground",
+          "ui": "stvs",
+          "lines": [
+            ["8111023", 0, "Salmon"]
+          ]
+        },
+        {
+          "cs": "AKN_TWR",
+          "pos": "Local Control",
+          "freq": 118300000,
+          "rn": "King Salmon Tower",
+          "ui": "stvs",
+          "lines": [
+            ["8111023", 0, "Salmon"],
+            ["9999", 3, "MULTI,DIAL"]
+          ]
+        }
+      ],
+      "childFacilities": [],
+      "name": "King Salmon ATCT",
+      "id": "AKN"
+    },
+    {
+      "positions": [
+        {
+          "cs": "ADQ_GND",
+          "pos": "Ground",
+          "freq": 121900000,
+          "rn": "Kodiak Ground",
+          "ui": "stvs",
+          "lines": [
+            ["8111024", 0, "Kodiak"]
+          ]
+        },
+        {
+          "cs": "ADQ_TWR",
+          "pos": "Local Control",
+          "freq": 119800000,
+          "rn": "Kodiak Tower",
+          "ui": "stvs",
+          "lines": [
+            ["8111024", 0, "Kodiak"],
+            ["9999", 3, "MULTI,DIAL"]
+          ]
+        }
+      ],
+      "childFacilities": [],
+      "name": "Kodiak ATCT",
+      "id": "ADQ"
+    },
+    {
+      "positions": [
+        {
+          "cs": "BIG_GND",
+          "pos": "Ground",
+          "freq": 118225000,
+          "rn": "Allen Ground",
+          "ui": "stvs",
+          "lines": [
+            ["8111025", 0, "Allen"]
+          ]
+        },
+        {
+          "cs": "BIG_TWR",
+          "pos": "Local Control",
+          "freq": 119800000,
+          "rn": "Allen Tower",
+          "ui": "stvs",
+          "lines": [
+            ["8111025", 0, "Allen"],
+            ["9999", 3, "MULTI,DIAL"]
+          ]
+        }
+      ],
+      "childFacilities": [],
+      "name": "Allen Army Airfield ATCT",
+      "id": "BIG"
+    },
+    {
+      "positions": [],
+      "childFacilities": [],
+      "name": "Iliamna FSS",
+      "id": "ILI"
+    }
+  ],
+  "name": "Anchorage ARTCC",
+  "id": "ZAN"
+}

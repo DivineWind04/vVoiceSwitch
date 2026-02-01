@@ -1,0 +1,149 @@
+{
+  "positions": [
+    {
+      "cs": "GUM_R5_CTR",
+      "pos": "Domestic Radar",
+      "freq": 118900000,
+      "rn": "Guam Radar",
+      "ui": "vscs",
+      "lines": [
+        ["6710001", 0, "Oceanic "],
+        ["6710002", 0, "Terminal"]
+      ]
+    },
+    {
+      "cs": "GUM_R1_CTR",
+      "pos": "Oceanic Radar",
+      "freq": 118700000,
+      "rn": "Guam Radar",
+      "ui": "vscs",
+      "lines": [
+        ["6710001", 0, "Domestic"],
+        ["6710003", 0, "Terminal"]
+      ]
+    },
+    {
+      "cs": "GUM_R6_CTR",
+      "pos": "Terminal Radar",
+      "freq": 120500000,
+      "rn": "Guam Radar",
+      "ui": "vscs",
+      "lines": [
+        ["6710002", 0, "Domestic"],
+        ["6710003", 0, "Oceanic "]
+      ]
+    }
+  ],
+  "childFacilities": [
+    {
+      "positions": [
+        {
+          "cs": "GUM_GND",
+          "pos": "Ground",
+          "freq": 121900000,
+          "rn": "Guam Ground",
+          "ui": "ivsr",
+          "lines": [
+            ["8111001", 0, "Ramp"],
+            ["8111002", 0, "Guam"]
+          ]
+        },
+        {
+          "cs": "GUM_RMP",
+          "pos": "Ramp",
+          "freq": 121600000,
+          "rn": "Guam Ramp",
+          "ui": "ivsr",
+          "lines": [
+            ["8111000", 0, "Guam"],
+            ["8111001", 0, "Guam"]
+          ]
+        },
+        {
+          "cs": "GUM_TWR",
+          "pos": "Tower",
+          "freq": 118100000,
+          "rn": "Guam Tower",
+          "ui": "ivsr",
+          "lines": [
+            ["8111000", 0, "Ramp"],
+            ["8111002", 0, "Guam"]
+          ]
+        }
+      ],
+      "childFacilities": [
+        {
+          "positions": [
+            {
+              "cs": "GSN_GND",
+              "pos": "Ground",
+              "freq": 121800000,
+              "rn": "Saipan Ground",
+              "ui": "stvs",
+              "lines": [
+                ["8111003", 0, "Saipan"]
+              ]
+            },
+            {
+              "cs": "GSN_TWR",
+              "pos": "Local",
+              "freq": 125700000,
+              "rn": "Saipan Tower",
+              "ui": "stvs",
+              "lines": [
+                ["8111003", 0, "Saipan"]
+              ]
+            }
+          ],
+          "childFacilities": [],
+          "name": "Saipan Airport",
+          "id": "GSN"
+        },
+        {
+          "positions": [
+            {
+              "cs": "UAM_DEL",
+              "pos": "Delivery",
+              "freq": 126725000,
+              "rn": "Andersen Delivery",
+              "ui": "stvs",
+              "lines": [
+                ["8111005", 0, "Andersen"],
+                ["8111006", 0, "Andersen"]
+              ]
+            },
+            {
+              "cs": "UAM_GND",
+              "pos": "Ground",
+              "freq": 121700000,
+              "rn": "Andersen Ground",
+              "ui": "stvs",
+              "lines": [
+                ["8111004", 0, "Andersen"],
+                ["8111006", 0, "Andersen"]
+              ]
+            },
+            {
+              "cs": "UAM_TWR",
+              "pos": "Local",
+              "freq": 126200000,
+              "rn": "Andersen Tower",
+              "ui": "stvs",
+              "lines": [
+                ["8111004", 0, "Andersen"],
+                ["8111005", 0, "Andersen"]
+              ]
+            }
+          ],
+          "childFacilities": [],
+          "name": "Andersen Air Force Base",
+          "id": "UAM"
+        }
+      ],
+      "name": "Guam International",
+      "id": "GUM"
+    }
+  ],
+  "name": "Guam CERAP",
+  "id": "ZUA"
+}

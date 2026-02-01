@@ -1,0 +1,745 @@
+{
+  "positions": [
+    {
+      "cs": "HNL_05_CTR",
+      "pos": "Big Island",
+      "freq": 118450000,
+      "rn": "HCF Center",
+      "ui": "rdvs",
+      "lines": [
+        ["8000001", 0, "Kauai"],
+        ["8000006", 0, "East"],
+        ["8000007", 0, "Lanai"],
+        ["8000008", 0, "Molokai"],
+        ["8000009", 0, "West Sec"],
+        ["9999", 3, "MULTI,DIAL"],
+        ["8111015", 2, "HNL"],
+        ["8111028", 2, "OGG"],
+        ["8111034", 2, "ITO"],
+        ["8111041", 2, "NGF"]
+      ]
+    },
+    {
+      "cs": "HNL_07_CTR",
+      "pos": "East",
+      "freq": 126600000,
+      "rn": "HCF Center",
+      "ui": "rdvs",
+      "lines": [
+        ["8000002", 0, "Kauai"],
+        ["8000006", 0, "Big Isla"],
+        ["8000010", 0, "Lanai"],
+        ["8000011", 0, "Molokai"],
+        ["8000012", 0, "West Sec"],
+        ["9999", 3, "MULTI,DIAL"],
+        ["8111015", 2, "HNL"],
+        ["8111028", 2, "OGG"],
+        ["8111034", 2, "ITO"],
+        ["8111041", 2, "NGF"]
+      ]
+    },
+    {
+      "cs": "HNL_02_CTR",
+      "pos": "Kauai",
+      "freq": 126500000,
+      "rn": "HCF Center",
+      "ui": "rdvs",
+      "lines": [
+        ["8000001", 0, "Big Isla"],
+        ["8000002", 0, "East"],
+        ["8000003", 0, "Lanai"],
+        ["8000004", 0, "Molokai"],
+        ["8000005", 0, "West Sec"],
+        ["9999", 3, "MULTI,DIAL"],
+        ["8111015", 2, "HNL"],
+        ["8111028", 2, "OGG"],
+        ["8111034", 2, "ITO"],
+        ["8111041", 2, "NGF"]
+      ]
+    },
+    {
+      "cs": "HNL_04_CTR",
+      "pos": "Lanai",
+      "freq": 119300000,
+      "rn": "HCF Center",
+      "ui": "rdvs",
+      "lines": [
+        ["8000003", 0, "Kauai"],
+        ["8000007", 0, "Big Isla"],
+        ["8000010", 0, "East"],
+        ["8000013", 0, "Molokai"],
+        ["8000014", 0, "West Sec"],
+        ["9999", 3, "MULTI,DIAL"],
+        ["8111015", 2, "HNL"],
+        ["8111028", 2, "OGG"],
+        ["8111034", 2, "ITO"],
+        ["8111041", 2, "NGF"]
+      ]
+    },
+    {
+      "cs": "HNL_03_CTR",
+      "pos": "Molokai",
+      "freq": 124100000,
+      "rn": "HCF Center",
+      "ui": "rdvs",
+      "lines": [
+        ["8000004", 0, "Kauai"],
+        ["8000008", 0, "Big Isla"],
+        ["8000011", 0, "East"],
+        ["8000013", 0, "Lanai"],
+        ["8000015", 0, "West Sec"],
+        ["9999", 3, "MULTI,DIAL"],
+        ["8111015", 2, "HNL"],
+        ["8111028", 2, "OGG"],
+        ["8111034", 2, "ITO"],
+        ["8111041", 2, "NGF"]
+      ]
+    },
+    {
+      "cs": "HNL_06_CTR",
+      "pos": "West Sector",
+      "freq": 119900000,
+      "rn": "HCF Center",
+      "ui": "rdvs",
+      "lines": [
+        ["8000005", 0, "Kauai"],
+        ["8000009", 0, "Big Isla"],
+        ["8000012", 0, "East"],
+        ["8000014", 0, "Lanai"],
+        ["8000015", 0, "Molokai"],
+        ["9999", 3, "MULTI,DIAL"],
+        ["8111015", 2, "HNL"],
+        ["8111028", 2, "OGG"],
+        ["8111034", 2, "ITO"],
+        ["8111041", 2, "NGF"]
+      ]
+    }
+  ],
+  "childFacilities": [
+    {
+      "positions": [
+        {
+          "cs": "HNL_DEL",
+          "pos": "Delivery",
+          "freq": 121400000,
+          "rn": "Honolulu Clearance",
+          "ui": "rdvs",
+          "lines": [
+            ["8111004", 0, "HCF"],
+            ["8111008", 0, "Honolulu"],
+            ["8111011", 0, "Ramp"],
+            ["8111013", 0, "Ramp"],
+            ["8111014", 0, "Honolulu"]
+          ]
+        },
+        {
+          "cs": "HNL_GND",
+          "pos": "Ground",
+          "freq": 121900000,
+          "rn": "Honolulu Ground",
+          "ui": "rdvs",
+          "lines": [
+            ["8111003", 0, "HCF"],
+            ["8111007", 0, "Honolulu"],
+            ["8111010", 0, "Ramp"],
+            ["8111012", 0, "Ramp"],
+            ["8111014", 0, "Honolulu"]
+          ]
+        },
+        {
+          "cs": "HNL_H_APP",
+          "pos": "H Arrival",
+          "freq": 118300000,
+          "rn": "HCF Approach",
+          "ui": "rdvs",
+          "lines": [
+            ["8000016", 0, "L Depart"],
+            ["8000017", 0, "V Arriva"],
+            ["8000018", 0, "South Ap"],
+            ["8000019", 0, "North Ap"],
+            ["8000020", 0, "Hilo App"],
+            ["8111000", 0, "Honolulu"],
+            ["8111001", 0, "Ramp"],
+            ["8111002", 0, "Ramp"],
+            ["8111003", 0, "Honolulu"],
+            ["8111004", 0, "Honolulu"],
+            ["8111015", 2, "ZHN"],
+            ["8111016", 2, "NGF"],
+            ["8111017", 2, "OGG"],
+            ["8111022", 0, "Maui"],
+            ["8111023", 0, "Maui"],
+            ["8111024", 0, "Maui"],
+            ["8111028", 2, "ZHN"],
+            ["8111029", 2, "HNL"],
+            ["8111030", 2, "NGF"],
+            ["8111031", 0, "Hilo"],
+            ["8111032", 0, "Hilo"],
+            ["8111034", 2, "ZHN"],
+            ["8111042", 2, "NGF"],
+            ["8111043", 2, "NGF"]
+          ]
+        },
+        {
+          "cs": "HIK_RMP",
+          "pos": "Hickam Ramp (DO NOT USE YET)",
+          "freq": 133600000,
+          "rn": "Hickam Ramp",
+          "ui": "rdvs",
+          "lines": [
+            ["8111001", 0, "HCF"],
+            ["8111005", 0, "Honolulu"],
+            ["8111009", 0, "Ramp"],
+            ["8111010", 0, "Honolulu"],
+            ["8111011", 0, "Honolulu"]
+          ]
+        },
+        {
+          "cs": "HNL_RMP",
+          "pos": "Honolulu Ramp (DO NOT USE YET)",
+          "freq": 121800000,
+          "rn": "Honolulu Ramp",
+          "ui": "rdvs",
+          "lines": [
+            ["8111002", 0, "HCF"],
+            ["8111006", 0, "Honolulu"],
+            ["8111009", 0, "Ramp"],
+            ["8111012", 0, "Honolulu"],
+            ["8111013", 0, "Honolulu"]
+          ]
+        },
+        {
+          "cs": "HNL_L_APP",
+          "pos": "L Departure",
+          "freq": 124800000,
+          "rn": "HCF Approach",
+          "ui": "rdvs",
+          "lines": [
+            ["8000016", 0, "H Arriva"],
+            ["8000021", 0, "V Arriva"],
+            ["8000022", 0, "South Ap"],
+            ["8000023", 0, "North Ap"],
+            ["8000024", 0, "Hilo App"],
+            ["8111000", 0, "Honolulu"],
+            ["8111001", 0, "Ramp"],
+            ["8111002", 0, "Ramp"],
+            ["8111003", 0, "Honolulu"],
+            ["8111004", 0, "Honolulu"],
+            ["8111015", 2, "ZHN"],
+            ["8111016", 2, "NGF"],
+            ["8111017", 2, "HNL"],
+            ["8111022", 0, "Maui"],
+            ["8111023", 0, "Maui"],
+            ["8111024", 0, "Maui"],
+            ["8111028", 2, "ZHN"],
+            ["8111029", 2, "OGG"],
+            ["8111030", 2, "NGF"],
+            ["8111031", 0, "Hilo"],
+            ["8111032", 0, "Hilo"],
+            ["8111034", 2, "ZHN"],
+            ["8111042", 2, "NGF"],
+            ["8111043", 2, "NGF"]
+          ]
+        },
+        {
+          "cs": "HNL_N_TWR",
+          "pos": "North Tower",
+          "freq": 118100000,
+          "rn": "Honolulu Tower",
+          "ui": "rdvs",
+          "lines": [
+            ["8080031", 0, "South To"],
+            ["8111000", 0, "HCF"],
+            ["8111005", 0, "Ramp"],
+            ["8111006", 0, "Ramp"],
+            ["8111007", 0, "Honolulu"],
+            ["8111008", 0, "Honolulu"],
+            ["9999", 3, "MULTI,DIAL"]
+          ]
+        },
+        {
+          "cs": "HNL_S_TWR",
+          "pos": "South Tower",
+          "freq": 123900000,
+          "rn": "Honolulu Tower",
+          "ui": "rdvs",
+          "lines": [
+            ["8080031", 0, "North To"],
+            ["8111000", 0, "HCF"],
+            ["8111005", 0, "Ramp"],
+            ["8111006", 0, "Ramp"],
+            ["8111007", 0, "Honolulu"],
+            ["8111008", 0, "Honolulu"],
+            ["9999", 3, "MULTI,DIAL"]
+          ]
+        },
+        {
+          "cs": "HNL_V_APP",
+          "pos": "V Arrival",
+          "freq": 119100000,
+          "rn": "HCF Approach",
+          "ui": "rdvs",
+          "lines": [
+            ["8000017", 0, "H Arriva"],
+            ["8000021", 0, "L Depart"],
+            ["8000025", 0, "South Ap"],
+            ["8000026", 0, "North Ap"],
+            ["8000027", 0, "Hilo App"],
+            ["8111000", 0, "Honolulu"],
+            ["8111001", 0, "Ramp"],
+            ["8111002", 0, "Ramp"],
+            ["8111003", 0, "Honolulu"],
+            ["8111004", 0, "Honolulu"],
+            ["8111015", 2, "ZHN"],
+            ["8111016", 2, "NGF"],
+            ["8111017", 2, "HNL"],
+            ["8111022", 0, "Maui"],
+            ["8111023", 0, "Maui"],
+            ["8111024", 0, "Maui"],
+            ["8111028", 2, "ZHN"],
+            ["8111029", 2, "OGG"],
+            ["8111030", 2, "NGF"],
+            ["8111031", 0, "Hilo"],
+            ["8111032", 0, "Hilo"],
+            ["8111034", 2, "ZHN"],
+            ["8111042", 2, "NGF"],
+            ["8111043", 2, "NGF"]
+          ]
+        }
+      ],
+      "childFacilities": [
+        {
+          "positions": [
+            {
+              "cs": "HHI_GND",
+              "pos": "Ground",
+              "freq": 121850000,
+              "rn": "WHeeler Ground",
+              "ui": "rdvs",
+              "lines": [
+                ["8111018", 0, "Wheeler"]
+              ]
+            },
+            {
+              "cs": "HHI_TWR",
+              "pos": "Local",
+              "freq": 126300000,
+              "rn": "Wheeler Tower",
+              "ui": "rdvs",
+              "lines": [
+                ["8111018", 0, "WHeeler"],
+                ["9999", 3, "MULTI,DIAL"]
+              ]
+            }
+          ],
+          "childFacilities": [],
+          "name": "Wheeler ATCT",
+          "id": "HHI"
+        },
+        {
+          "positions": [
+            {
+              "cs": "JRF_DEL",
+              "pos": "Delivery",
+              "freq": 121700000,
+              "rn": "Kalaeloa Delivery",
+              "ui": "rdvs",
+              "lines": [
+                ["8111020", 0, "Kalaeloa"],
+                ["8111021", 0, "Kalaeloa"]
+              ]
+            },
+            {
+              "cs": "JRF_GND",
+              "pos": "Ground",
+              "freq": 123800000,
+              "rn": "Kalaeloa Ground",
+              "ui": "rdvs",
+              "lines": [
+                ["8111019", 0, "Kalaeloa"],
+                ["8111021", 0, "Kalaeloa"]
+              ]
+            },
+            {
+              "cs": "JRF_TWR",
+              "pos": "Local",
+              "freq": 132600000,
+              "rn": "Kalaeloa Tower",
+              "ui": "rdvs",
+              "lines": [
+                ["8111019", 0, "Kalaeloa"],
+                ["8111020", 0, "Kalaeloa"],
+                ["9999", 3, "MULTI,DIAL"]
+              ]
+            }
+          ],
+          "childFacilities": [],
+          "name": "Kalaeloa ATCT",
+          "id": "JRF"
+        }
+      ],
+      "name": "Honolulu ATCT",
+      "id": "HNL"
+    },
+    {
+      "positions": [
+        {
+          "cs": "OGG_DEL",
+          "pos": "Delivery",
+          "freq": 120600000,
+          "rn": "Maui Clearance",
+          "ui": "rdvs",
+          "lines": [
+            ["8111024", 0, "HCF"],
+            ["8111026", 0, "Maui"],
+            ["8111027", 0, "Maui"]
+          ]
+        },
+        {
+          "cs": "OGG_GND",
+          "pos": "Ground",
+          "freq": 121900000,
+          "rn": "Maui Ground",
+          "ui": "rdvs",
+          "lines": [
+            ["8111023", 0, "HCF"],
+            ["8111025", 0, "Maui"],
+            ["8111027", 0, "Maui"]
+          ]
+        },
+        {
+          "cs": "OGG_TWR",
+          "pos": "Local",
+          "freq": 118700000,
+          "rn": "Maui Tower",
+          "ui": "rdvs",
+          "lines": [
+            ["8111022", 0, "HCF"],
+            ["8111025", 0, "Maui"],
+            ["8111026", 0, "Maui"],
+            ["9999", 3, "MULTI,DIAL"]
+          ]
+        },
+        {
+          "cs": "OGG_N_APP",
+          "pos": "North Approach",
+          "freq": 120200000,
+          "rn": "HCF Approach",
+          "ui": "rdvs",
+          "lines": [
+            ["8000019", 0, "H Arriva"],
+            ["8000023", 0, "L Depart"],
+            ["8000026", 0, "V Arriva"],
+            ["8000028", 0, "South Ap"],
+            ["8000030", 0, "Hilo App"],
+            ["8111000", 0, "Honolulu"],
+            ["8111001", 0, "Ramp"],
+            ["8111002", 0, "Ramp"],
+            ["8111003", 0, "Honolulu"],
+            ["8111004", 0, "Honolulu"],
+            ["8111015", 2, "ZHN"],
+            ["8111016", 2, "NGF"],
+            ["8111017", 2, "HNL"],
+            ["8111022", 0, "Maui"],
+            ["8111023", 0, "Maui"],
+            ["8111024", 0, "Maui"],
+            ["8111028", 2, "ZHN"],
+            ["8111029", 2, "OGG"],
+            ["8111030", 2, "NGF"],
+            ["8111031", 0, "Hilo"],
+            ["8111032", 0, "Hilo"],
+            ["8111034", 2, "ZHN"],
+            ["8111042", 2, "NGF"],
+            ["8111043", 2, "NGF"]
+          ]
+        },
+        {
+          "cs": "OGG_S_APP",
+          "pos": "South Approach",
+          "freq": 119500000,
+          "rn": "HCF Approach",
+          "ui": "rdvs",
+          "lines": [
+            ["8000018", 0, "H Arriva"],
+            ["8000022", 0, "L Depart"],
+            ["8000025", 0, "V Arriva"],
+            ["8000028", 0, "North Ap"],
+            ["8000029", 0, "Hilo App"],
+            ["8111000", 0, "Honolulu"],
+            ["8111001", 0, "Ramp"],
+            ["8111002", 0, "Ramp"],
+            ["8111003", 0, "Honolulu"],
+            ["8111004", 0, "Honolulu"],
+            ["8111015", 2, "ZHN"],
+            ["8111016", 2, "NGF"],
+            ["8111017", 2, "HNL"],
+            ["8111022", 0, "Maui"],
+            ["8111023", 0, "Maui"],
+            ["8111024", 0, "Maui"],
+            ["8111028", 2, "ZHN"],
+            ["8111029", 2, "OGG"],
+            ["8111030", 2, "NGF"],
+            ["8111031", 0, "Hilo"],
+            ["8111032", 0, "Hilo"],
+            ["8111034", 2, "ZHN"],
+            ["8111042", 2, "NGF"],
+            ["8111043", 2, "NGF"]
+          ]
+        }
+      ],
+      "childFacilities": [],
+      "name": "Kahului ATCT",
+      "id": "OGG"
+    },
+    {
+      "positions": [
+        {
+          "cs": "ITO_GND",
+          "pos": "Ground",
+          "freq": 121900000,
+          "rn": "Hilo Ground",
+          "ui": "rdvs",
+          "lines": [
+            ["8111032", 0, "HCF"],
+            ["8111033", 0, "Hilo"]
+          ]
+        },
+        {
+          "cs": "ITO_APP",
+          "pos": "Hilo Approach",
+          "freq": 119700000,
+          "rn": "HCF Approach",
+          "ui": "rdvs",
+          "lines": [
+            ["8000020", 0, "H Arriva"],
+            ["8000024", 0, "L Depart"],
+            ["8000027", 0, "V Arriva"],
+            ["8000029", 0, "South Ap"],
+            ["8000030", 0, "North Ap"],
+            ["8111000", 0, "Honolulu"],
+            ["8111001", 0, "Ramp"],
+            ["8111002", 0, "Ramp"],
+            ["8111003", 0, "Honolulu"],
+            ["8111004", 0, "Honolulu"],
+            ["8111015", 2, "ZHN"],
+            ["8111016", 2, "NGF"],
+            ["8111017", 2, "HNL"],
+            ["8111022", 0, "Maui"],
+            ["8111023", 0, "Maui"],
+            ["8111024", 0, "Maui"],
+            ["8111028", 2, "ZHN"],
+            ["8111029", 2, "OGG"],
+            ["8111030", 2, "NGF"],
+            ["8111031", 0, "Hilo"],
+            ["8111032", 0, "Hilo"],
+            ["8111034", 2, "ZHN"],
+            ["8111042", 2, "NGF"],
+            ["8111043", 2, "NGF"]
+          ]
+        },
+        {
+          "cs": "ITO_TWR",
+          "pos": "Local",
+          "freq": 118100000,
+          "rn": "Hilo Tower",
+          "ui": "rdvs",
+          "lines": [
+            ["8111031", 0, "HCF"],
+            ["8111033", 0, "Hilo"],
+            ["9999", 3, "MULTI,DIAL"]
+          ]
+        }
+      ],
+      "childFacilities": [],
+      "name": "Hilo TRACAB",
+      "id": "ITO"
+    },
+    {
+      "positions": [
+        {
+          "cs": "LIH_GND",
+          "pos": "Ground",
+          "freq": 121900000,
+          "rn": "Lihue Ground",
+          "ui": "rdvs",
+          "lines": [
+            ["8111035", 0, "Lihue"]
+          ]
+        },
+        {
+          "cs": "LIH_TWR",
+          "pos": "Tower",
+          "freq": 118900000,
+          "rn": "Lihue Tower",
+          "ui": "rdvs",
+          "lines": [
+            ["8111035", 0, "Lihue"],
+            ["9999", 3, "MULTI,DIAL"]
+          ]
+        }
+      ],
+      "childFacilities": [],
+      "name": "Lihue FCT",
+      "id": "LIH"
+    },
+    {
+      "positions": [
+        {
+          "cs": "MKK_GND",
+          "pos": "Ground",
+          "freq": 121900000,
+          "rn": "Molokai Ground",
+          "ui": "rdvs",
+          "lines": [
+            ["8111036", 0, "Molokai"]
+          ]
+        },
+        {
+          "cs": "MKK_TWR",
+          "pos": "Local",
+          "freq": 125700000,
+          "rn": "Molokai Tower",
+          "ui": "rdvs",
+          "lines": [
+            ["8111036", 0, "Molokai"],
+            ["9999", 3, "MULTI,DIAL"]
+          ]
+        }
+      ],
+      "childFacilities": [],
+      "name": "Molokai FCT",
+      "id": "MKK"
+    },
+    {
+      "positions": [
+        {
+          "cs": "KOA_DEL",
+          "pos": "Delivery",
+          "freq": 118600000,
+          "rn": "Kona Clearance",
+          "ui": "rdvs",
+          "lines": [
+            ["8111038", 0, "Kona"],
+            ["8111039", 0, "Kona"]
+          ]
+        },
+        {
+          "cs": "KOA_GND",
+          "pos": "Ground",
+          "freq": 121900000,
+          "rn": "Kona Ground",
+          "ui": "rdvs",
+          "lines": [
+            ["8111037", 0, "Kona"],
+            ["8111039", 0, "Kona"]
+          ]
+        },
+        {
+          "cs": "KOA_TWR",
+          "pos": "Local",
+          "freq": 120300000,
+          "rn": "Kona Tower",
+          "ui": "rdvs",
+          "lines": [
+            ["8111037", 0, "Kona"],
+            ["8111038", 0, "Kona"],
+            ["9999", 3, "MULTI,DIAL"]
+          ]
+        }
+      ],
+      "childFacilities": [],
+      "name": "Kona FCT",
+      "id": "KOA"
+    },
+    {
+      "positions": [
+        {
+          "cs": "NGF_TWR",
+          "pos": "Local",
+          "freq": 120700000,
+          "rn": "Marine Kaneohe Tower",
+          "ui": "etvs",
+          "lines": [
+            ["8111040", 0, "Kaneohe"],
+            ["9999", 3, "MULTI,DIAL"]
+          ]
+        },
+        {
+          "cs": "NGF_APP",
+          "pos": "Radar",
+          "freq": 125000000,
+          "rn": "Kaneohe Approach",
+          "ui": "etvs",
+          "lines": [
+            ["8111016", 2, "HNL"],
+            ["8111030", 2, "OGG"],
+            ["8111040", 0, "Kaneohe"],
+            ["8111041", 2, "ZHN"],
+            ["8111042", 2, "HNL"],
+            ["8111043", 2, "OGG"]
+          ]
+        }
+      ],
+      "childFacilities": [],
+      "name": "Kaneohe Bay ATCT/RAPCON",
+      "id": "NGF"
+    },
+    {
+      "positions": [
+        {
+          "cs": "BKH_GND",
+          "pos": "Ground",
+          "freq": 124200000,
+          "rn": "Barking Sands Ground",
+          "ui": "rdvs",
+          "lines": [
+            ["8111044", 0, "Sands"]
+          ]
+        },
+        {
+          "cs": "BKH_TWR",
+          "pos": "Local",
+          "freq": 126200000,
+          "rn": "Barking Sands Tower",
+          "ui": "rdvs",
+          "lines": [
+            ["8111044", 0, "Sands"],
+            ["9999", 3, "MULTI,DIAL"]
+          ]
+        }
+      ],
+      "childFacilities": [],
+      "name": "Barking Sands ATCT",
+      "id": "BKH"
+    },
+    {
+      "positions": [
+        {
+          "cs": "BSF_GND",
+          "pos": "Ground",
+          "freq": 121700000,
+          "rn": "Bradshaw Ground",
+          "ui": "rdvs",
+          "lines": [
+            ["8111045", 0, "Bradshaw"]
+          ]
+        },
+        {
+          "cs": "BSF_TWR",
+          "pos": "Local",
+          "freq": 119275000,
+          "rn": "Bradshaw Tower",
+          "ui": "rdvs",
+          "lines": [
+            ["8111045", 0, "Bradshaw"],
+            ["9999", 3, "MULTI,DIAL"]
+          ]
+        }
+      ],
+      "childFacilities": [],
+      "name": "Bradshaw Army Airfield",
+      "id": "BSF"
+    }
+  ],
+  "name": "Honolulu Control Facility",
+  "id": "ZHN"
+}

@@ -7,23 +7,32 @@
 
 import { Facility } from '../model';
 
-// List of supported facilities - add more as needed
+// List of supported facilities - all 24 ARTCCs
 export const SUPPORTED_FACILITIES = [
-  'zoa',
-  'zlc', 
-  'zse',
-  'zla',
+  'zab',
+  'zan',
+  'zau',
+  'zbw',
+  'zdc',
   'zdv',
+  'zfw',
+  'zhn',
+  'zhu',
+  'zid',
+  'zjx',
+  'zkc',
+  'zla',
+  'zlc',
+  'zma',
   'zme',
+  'zmp',
+  'zny',
+  'zoa',
+  'zob',
+  'zse',
   'zsu',
   'ztl',
-  'zab',
-  'zjx',
-  'zma',
-  'zmp',
-  'zob',
-  'zny',
-  // Add more facilities here as you create their JSON files
+  'zua',
 ] as const;
 
 export type FacilityCode = typeof SUPPORTED_FACILITIES[number];

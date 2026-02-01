@@ -108,10 +108,18 @@ const GroundGroundPage: React.FC<GroundGroundPageProps> = ({ onGG3Toggle }) => {
         }
       }
 
+      // Split call_name by comma for 2-line label support
+      const callNameStr = data.call_name || data.call || '';
+      const callNameParts = callNameStr.includes(',') 
+        ? callNameStr.split(',').map((part: string) => part.trim()) 
+        : [callNameStr];
+      
       buttons.push(
         <DAButton
           key={index}
-          topLine={data.call_name || data.call}
+          topLine={callNameParts[0] || ''}
+          middleLine={callNameParts[1]}
+          bottomLine={callNameParts[2]}
           latching={false}
           onClick={onClick}
           controlledIndicator={indicator}
