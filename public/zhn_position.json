@@ -5,7 +5,7 @@
       "pos": "Big Island",
       "freq": 118450000,
       "rn": "HCF Center",
-      "ui": "rdvs",
+      "ui": "vscs",
       "lines": [
         ["8000001", 0, "Kauai"],
         ["8000006", 0, "East"],
@@ -24,7 +24,7 @@
       "pos": "East",
       "freq": 126600000,
       "rn": "HCF Center",
-      "ui": "rdvs",
+      "ui": "vscs",
       "lines": [
         ["8000002", 0, "Kauai"],
         ["8000006", 0, "Big Isla"],
@@ -43,7 +43,7 @@
       "pos": "Kauai",
       "freq": 126500000,
       "rn": "HCF Center",
-      "ui": "rdvs",
+      "ui": "vscs",
       "lines": [
         ["8000001", 0, "Big Isla"],
         ["8000002", 0, "East"],
@@ -62,7 +62,7 @@
       "pos": "Lanai",
       "freq": 119300000,
       "rn": "HCF Center",
-      "ui": "rdvs",
+      "ui": "vscs",
       "lines": [
         ["8000003", 0, "Kauai"],
         ["8000007", 0, "Big Isla"],
@@ -81,7 +81,7 @@
       "pos": "Molokai",
       "freq": 124100000,
       "rn": "HCF Center",
-      "ui": "rdvs",
+      "ui": "vscs",
       "lines": [
         ["8000004", 0, "Kauai"],
         ["8000008", 0, "Big Isla"],
@@ -100,7 +100,7 @@
       "pos": "West Sector",
       "freq": 119900000,
       "rn": "HCF Center",
-      "ui": "rdvs",
+      "ui": "vscs",
       "lines": [
         ["8000005", 0, "Kauai"],
         ["8000009", 0, "Big Isla"],
@@ -123,7 +123,7 @@
           "pos": "Delivery",
           "freq": 121400000,
           "rn": "Honolulu Clearance",
-          "ui": "rdvs",
+          "ui": "ivsr",
           "lines": [
             ["8111004", 0, "HCF"],
             ["8111008", 0, "Honolulu"],
@@ -137,7 +137,7 @@
           "pos": "Ground",
           "freq": 121900000,
           "rn": "Honolulu Ground",
-          "ui": "rdvs",
+          "ui": "ivsr",
           "lines": [
             ["8111003", 0, "HCF"],
             ["8111007", 0, "Honolulu"],
@@ -151,7 +151,7 @@
           "pos": "H Arrival",
           "freq": 118300000,
           "rn": "HCF Approach",
-          "ui": "rdvs",
+          "ui": "ivsr",
           "lines": [
             ["8000016", 0, "L Depart"],
             ["8000017", 0, "V Arriva"],
@@ -184,7 +184,7 @@
           "pos": "Hickam Ramp (DO NOT USE YET)",
           "freq": 133600000,
           "rn": "Hickam Ramp",
-          "ui": "rdvs",
+          "ui": "ivsr",
           "lines": [
             ["8111001", 0, "HCF"],
             ["8111005", 0, "Honolulu"],
@@ -198,7 +198,7 @@
           "pos": "Honolulu Ramp (DO NOT USE YET)",
           "freq": 121800000,
           "rn": "Honolulu Ramp",
-          "ui": "rdvs",
+          "ui": "ivsr",
           "lines": [
             ["8111002", 0, "HCF"],
             ["8111006", 0, "Honolulu"],
@@ -212,7 +212,7 @@
           "pos": "L Departure",
           "freq": 124800000,
           "rn": "HCF Approach",
-          "ui": "rdvs",
+          "ui": "ivsr",
           "lines": [
             ["8000016", 0, "H Arriva"],
             ["8000021", 0, "V Arriva"],
@@ -245,7 +245,7 @@
           "pos": "North Tower",
           "freq": 118100000,
           "rn": "Honolulu Tower",
-          "ui": "rdvs",
+          "ui": "ivsr",
           "lines": [
             ["8080031", 0, "South To"],
             ["8111000", 0, "HCF"],
@@ -261,7 +261,7 @@
           "pos": "South Tower",
           "freq": 123900000,
           "rn": "Honolulu Tower",
-          "ui": "rdvs",
+          "ui": "ivsr",
           "lines": [
             ["8080031", 0, "North To"],
             ["8111000", 0, "HCF"],
@@ -277,7 +277,7 @@
           "pos": "V Arrival",
           "freq": 119100000,
           "rn": "HCF Approach",
-          "ui": "rdvs",
+          "ui": "ivsr",
           "lines": [
             ["8000017", 0, "H Arriva"],
             ["8000021", 0, "L Depart"],
@@ -314,7 +314,7 @@
               "pos": "Ground",
               "freq": 121850000,
               "rn": "WHeeler Ground",
-              "ui": "rdvs",
+              "ui": "stvs",
               "lines": [
                 ["8111018", 0, "Wheeler"]
               ]
@@ -324,7 +324,7 @@
               "pos": "Local",
               "freq": 126300000,
               "rn": "Wheeler Tower",
-              "ui": "rdvs",
+              "ui": "stvs",
               "lines": [
                 ["8111018", 0, "WHeeler"],
                 ["9999", 3, "MULTI,DIAL"]
@@ -342,7 +342,7 @@
               "pos": "Delivery",
               "freq": 121700000,
               "rn": "Kalaeloa Delivery",
-              "ui": "rdvs",
+              "ui": "stvs",
               "lines": [
                 ["8111020", 0, "Kalaeloa"],
                 ["8111021", 0, "Kalaeloa"]
@@ -353,7 +353,7 @@
               "pos": "Ground",
               "freq": 123800000,
               "rn": "Kalaeloa Ground",
-              "ui": "rdvs",
+              "ui": "stvs",
               "lines": [
                 ["8111019", 0, "Kalaeloa"],
                 ["8111021", 0, "Kalaeloa"]
@@ -364,7 +364,7 @@
               "pos": "Local",
               "freq": 132600000,
               "rn": "Kalaeloa Tower",
-              "ui": "rdvs",
+              "ui": "stvs",
               "lines": [
                 ["8111019", 0, "Kalaeloa"],
                 ["8111020", 0, "Kalaeloa"],
@@ -387,7 +387,7 @@
           "pos": "Delivery",
           "freq": 120600000,
           "rn": "Maui Clearance",
-          "ui": "rdvs",
+          "ui": "ivsr",
           "lines": [
             ["8111024", 0, "HCF"],
             ["8111026", 0, "Maui"],
@@ -399,7 +399,7 @@
           "pos": "Ground",
           "freq": 121900000,
           "rn": "Maui Ground",
-          "ui": "rdvs",
+          "ui": "ivsr",
           "lines": [
             ["8111023", 0, "HCF"],
             ["8111025", 0, "Maui"],
@@ -411,7 +411,7 @@
           "pos": "Local",
           "freq": 118700000,
           "rn": "Maui Tower",
-          "ui": "rdvs",
+          "ui": "ivsr",
           "lines": [
             ["8111022", 0, "HCF"],
             ["8111025", 0, "Maui"],
@@ -424,7 +424,7 @@
           "pos": "North Approach",
           "freq": 120200000,
           "rn": "HCF Approach",
-          "ui": "rdvs",
+          "ui": "ivsr",
           "lines": [
             ["8000019", 0, "H Arriva"],
             ["8000023", 0, "L Depart"],
@@ -457,7 +457,7 @@
           "pos": "South Approach",
           "freq": 119500000,
           "rn": "HCF Approach",
-          "ui": "rdvs",
+          "ui": "ivsr",
           "lines": [
             ["8000018", 0, "H Arriva"],
             ["8000022", 0, "L Depart"],
@@ -497,7 +497,7 @@
           "pos": "Ground",
           "freq": 121900000,
           "rn": "Hilo Ground",
-          "ui": "rdvs",
+          "ui": "ivsr",
           "lines": [
             ["8111032", 0, "HCF"],
             ["8111033", 0, "Hilo"]
@@ -508,7 +508,7 @@
           "pos": "Hilo Approach",
           "freq": 119700000,
           "rn": "HCF Approach",
-          "ui": "rdvs",
+          "ui": "ivsr",
           "lines": [
             ["8000020", 0, "H Arriva"],
             ["8000024", 0, "L Depart"],
@@ -541,7 +541,7 @@
           "pos": "Local",
           "freq": 118100000,
           "rn": "Hilo Tower",
-          "ui": "rdvs",
+          "ui": "ivsr",
           "lines": [
             ["8111031", 0, "HCF"],
             ["8111033", 0, "Hilo"],
@@ -560,7 +560,7 @@
           "pos": "Ground",
           "freq": 121900000,
           "rn": "Lihue Ground",
-          "ui": "rdvs",
+          "ui": "stvs",
           "lines": [
             ["8111035", 0, "Lihue"]
           ]
@@ -570,7 +570,7 @@
           "pos": "Tower",
           "freq": 118900000,
           "rn": "Lihue Tower",
-          "ui": "rdvs",
+          "ui": "stvs",
           "lines": [
             ["8111035", 0, "Lihue"],
             ["9999", 3, "MULTI,DIAL"]
@@ -588,7 +588,7 @@
           "pos": "Ground",
           "freq": 121900000,
           "rn": "Molokai Ground",
-          "ui": "rdvs",
+          "ui": "stvs",
           "lines": [
             ["8111036", 0, "Molokai"]
           ]
@@ -598,7 +598,7 @@
           "pos": "Local",
           "freq": 125700000,
           "rn": "Molokai Tower",
-          "ui": "rdvs",
+          "ui": "stvs",
           "lines": [
             ["8111036", 0, "Molokai"],
             ["9999", 3, "MULTI,DIAL"]
@@ -616,7 +616,7 @@
           "pos": "Delivery",
           "freq": 118600000,
           "rn": "Kona Clearance",
-          "ui": "rdvs",
+          "ui": "stvs",
           "lines": [
             ["8111038", 0, "Kona"],
             ["8111039", 0, "Kona"]
@@ -627,7 +627,7 @@
           "pos": "Ground",
           "freq": 121900000,
           "rn": "Kona Ground",
-          "ui": "rdvs",
+          "ui": "stvs",
           "lines": [
             ["8111037", 0, "Kona"],
             ["8111039", 0, "Kona"]
@@ -638,7 +638,7 @@
           "pos": "Local",
           "freq": 120300000,
           "rn": "Kona Tower",
-          "ui": "rdvs",
+          "ui": "stvs",
           "lines": [
             ["8111037", 0, "Kona"],
             ["8111038", 0, "Kona"],
@@ -690,7 +690,7 @@
           "pos": "Ground",
           "freq": 124200000,
           "rn": "Barking Sands Ground",
-          "ui": "rdvs",
+          "ui": "stvs",
           "lines": [
             ["8111044", 0, "Sands"]
           ]
@@ -700,7 +700,7 @@
           "pos": "Local",
           "freq": 126200000,
           "rn": "Barking Sands Tower",
-          "ui": "rdvs",
+          "ui": "stvs",
           "lines": [
             ["8111044", 0, "Sands"],
             ["9999", 3, "MULTI,DIAL"]
@@ -718,7 +718,7 @@
           "pos": "Ground",
           "freq": 121700000,
           "rn": "Bradshaw Ground",
-          "ui": "rdvs",
+          "ui": "stvs",
           "lines": [
             ["8111045", 0, "Bradshaw"]
           ]
@@ -728,7 +728,7 @@
           "pos": "Local",
           "freq": 119275000,
           "rn": "Bradshaw Tower",
-          "ui": "rdvs",
+          "ui": "stvs",
           "lines": [
             ["8111045", 0, "Bradshaw"],
             ["9999", 3, "MULTI,DIAL"]
