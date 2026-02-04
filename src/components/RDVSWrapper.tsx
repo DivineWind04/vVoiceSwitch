@@ -1,755 +1,550 @@
-  // Type guard for StandardButtonProps
-  function isStandardButton(btn: RdvsButtonComponentProps): btn is StandardButtonProps {
-    return btn && typeof (btn as any).config === 'object' && typeof (btn as any).callback === 'function';
-  }
 // NOTE: This wrapper should only be used via the main UI switch in src/app/page.tsx
-import React, { useEffect, useState } from 'react';
-import { ButtonType } from '../app/_components/vatlines/types';
-import type { RdvsButtonComponentProps, StandardButtonProps } from '../app/_components/vatlines/rdvs_button';
+// RDVS 3080 Interface - Industrial-Retro ATC aesthetic (800x600 display)
+import React, { useState, useMemo } from 'react';
 import { useCoreStore } from '../model';
-import RdvsButtonComponent from '../app/_components/vatlines/rdvs_button'; // Import the RdvsButtonComponent
-import RdvsKeypad from '../app/_components/vatlines/rdvs_keypad'; // Unified keypad component
-import { rdvsButtonPatterns } from './rdvsButtonPatterns';
-import '../app/_components/vatlines/styles.css'; // Import styles for RDVS font
+import '../app/_components/vatlines/styles.css';
 
-// RDVS Wrapper - placeholder for now due to complex prop requirements
+// Layout: 5x8 station selector grid (left) + 1x8 line control panels (right)
+// Row 8 is function keys (HOLD, REL, etc.)
+const GRID_COLS = 5;
+const GRID_ROWS = 8;
+const BUTTONS_PER_PAGE = 40; // 5 cols x 8 rows
+
+// Button dimensions for SVG (scaled for 800x600)
+const BTN_WIDTH = 78;
+const BTN_HEIGHT = 54;
+
+// Line panel dimensions
+const LINE_PANEL_WIDTH = 370;
+const LINE_PANEL_HEIGHT = 54;
+
+// Color Palette per specification
+const COLORS = {
+  RED: '#FF0000',      // Override buttons
+  BLUE: '#0000FF',     // Call/Intercom buttons
+  GREY: '#666666',     // Function keys
+  CYAN: '#00FFFF',     // Text/Lines
+  GREEN: '#00FF00',    // Selection/Active
+  BLACK: '#000000',    // Background
+  WHITE: '#FFFFFF',    // Text
+  DARK_GREY: '#333333' // Empty cells
+};
 
 export default function RDVSWrapper() {
-  // State for selected radio button (for showing long radio button overlay)
-  const [selectedRadioIndex, setSelectedRadioIndex] = useState<number | null>(null);
-  
-  // State for dialpad toggle (IA dialpad - different from dial line dialpad)
-  const [dialpadActive, setDialpadActive] = useState<boolean>(false);
-  const [dialToneAudio, setDialToneAudio] = useState<HTMLAudioElement | null>(null);
-  
-  // State for keypad toggle
-  const [keypadActive, setKeypadActive] = useState<boolean>(false);
-  
-  // State for dial line dialpad (type 3 lines)
-  const [activeDialLine, setActiveDialLine] = useState<{ trunkName: string; lineType: number } | null>(null);
-  
-  // Get sendMsg from store for WebSocket messaging
-  const sendMsg = useCoreStore((s: any) => s.sendMessageNow);
-  
-  // Function to get button pattern based on line type
-  const getButtonPattern = (lineType: number) => {
-    console.log('Getting pattern for line type:', lineType);
-    switch (lineType) {
-      case 0: 
-        console.log('Using OVERRIDE pattern');
-        return rdvsButtonPatterns.OVERRIDE;
-      case 1: 
-        console.log('Using RING pattern');
-        return rdvsButtonPatterns.RING;
-      case 2: 
-        console.log('Using SHOUT pattern');
-        return rdvsButtonPatterns.SHOUT;
-      case 3:
-        console.log('Using DIAL pattern');
-        return rdvsButtonPatterns.DIAL || rdvsButtonPatterns.DEFAULT; // Fallback to DEFAULT if DIAL not defined
-      default: 
-        console.log('Using DEFAULT pattern');
-        return rdvsButtonPatterns.DEFAULT;
-    }
-  };
+  const [currentPage, setCurrentPage] = useState(1);
+  const [ovrActive, setOvrActive] = useState(false);
 
-  // Use positionData to hydrate buttons for ground-to-ground
-  const setPositionData = useCoreStore((s: any) => s.setPositionData);
-  const positionData = useCoreStore((s: any) => s.positionData);
+  const sendMsg = useCoreStore((s: any) => s.sendMessageNow);
   const selectedPositions = useCoreStore((s: any) => s.selectedPositions);
-  // Map ground-to-ground buttons and cyan box buttons from positionData.positions and their lines
   const gg_status = useCoreStore((s: any) => s.gg_status);
   const ag_status = useCoreStore((s: any) => s.ag_status);
-  const ptt = useCoreStore((s: any) => s.ptt); // Get PTT status from WebSocket
+  const ptt = useCoreStore((s: any) => s.ptt);
 
-  
-  // Use the currently selected position for ground-to-ground rendering (like VSCS)
-  const buttons: RdvsButtonComponentProps[] = [];
-  let currentPosition = null;
-  
-  // Use selectedPositions[0] to get the current position (matches VSCS logic)
-  if (selectedPositions && selectedPositions.length > 0) {
-    currentPosition = selectedPositions[0];
-  }
-  
-  console.log('RDVS currentPosition:', currentPosition);
-  console.log('RDVS gg_status:', gg_status);
-  
-  if (currentPosition && Array.isArray(currentPosition.lines)) {
-    console.log('RDVS processing lines:', currentPosition.lines.length);
-    currentPosition.lines.forEach((line: any, lineIdx: number) => {
-      // Line structure: [id, type, label]
-      const lineType = Array.isArray(line) ? line[1] : line.type;
-      
-      // Get button pattern based on line type
-      const pattern = getButtonPattern(lineType);
-      console.log(`RDVS Line ${lineIdx}: type=${lineType}, pattern=`, pattern);
-      
-      // Cyan box button logic - status-based behavior per DA Pushbutton Status table
-      let typeLetter = '';
-      if (lineType === 0) typeLetter = 'O';  // Override
-      else if (lineType === 1) typeLetter = 'C';  // Ring
-      else if (lineType === 2) typeLetter = 'A';  // Shout
-      else if (lineType === 3) typeLetter = '';  // Dial
-      
-      // Get call type and ID for proper messaging
-      const call_id = Array.isArray(line) ? line[0] : (line.id || line.call?.substring(3) || '');
-      const lineTypeValue = Array.isArray(line) ? line[1] : line.type;
+  const currentPosition = selectedPositions?.[0] || null;
 
-      // Get status for line type indicator behavior from gg_status - match by call_id instead of lineIdx
-      let statusObj: any = {};
-      if (gg_status && Array.isArray(gg_status)) {
-        // Find the status entry that matches this call_id
-        statusObj = gg_status.find((status: any) => {
-          if (!status) return false;
-          // Try different possible ID formats
-          return status.call === call_id || 
-                 status.call?.substring(3) === call_id ||
-                 status.call?.substring(6) === call_id ||
-                 status.id === call_id ||
-                 String(status.call).endsWith(call_id);
-        }) || {};
-      }
-      
-      let indicatorState = 'off';
+  // Build line buttons from position data
+  const lineButtons = useMemo(() => {
+    const btns: any[] = [];
+    if (currentPosition?.lines) {
+      currentPosition.lines.forEach((line: any) => {
+        const lineType = Array.isArray(line) ? line[1] : line.type;
+        const call_id = Array.isArray(line) ? line[0] : (line.id || '');
+        const label = Array.isArray(line) && line[2] ? String(line[2]) : '';
+        const parts = label.split(',');
+        const line1 = parts[0]?.trim() || '';
+        const line2 = parts[1]?.trim() || '';
 
-      // Map call status to indicator animations based on DA Pushbutton Status table
-      const callStatus = statusObj.status || 'off';
-      console.log(`RDVS Line ${lineIdx}: call_id=${call_id}, status=${callStatus}, lineType=${lineType}, statusObj=`, statusObj);
+        let typeLetter = '';
+        if (lineType === 0) typeLetter = 'O';
+        else if (lineType === 1) typeLetter = 'C';
+        else if (lineType === 2) typeLetter = 'A';
 
-      // Match IVSR/VSCS status handling exactly
-      if (lineType === 0) {
-        // Override line behavior
-        if (callStatus === 'off' || callStatus === '' || callStatus === 'idle') {
-          indicatorState = 'off'; // Circuit idle
-        } else if (callStatus === 'ok' || callStatus === 'active') {
-          indicatorState = 'on'; // Connection made (steady-on)
-        } else if (callStatus === 'busy' || callStatus === 'overridden') {
-          indicatorState = 'flutter'; // Circuit busy/overridden
-        } else if (callStatus === 'chime' || callStatus === 'online') {
-          // Incoming override call - matches IVSR 'online' or 'chime' for SO lines
-          indicatorState = 'on'; // Incoming override call (steady-on)
+        let statusObj: any = {};
+        if (gg_status) {
+          statusObj = gg_status.find((s: any) =>
+            s?.call === call_id || String(s?.call).endsWith(call_id)
+          ) || {};
         }
-      } else if (lineType === 1) {
-        // Ring line behavior  
-        if (callStatus === 'off' || callStatus === '' || callStatus === 'idle') {
-          indicatorState = 'off'; // Circuit idle
-        } else if (callStatus === 'chime' || callStatus === 'ringing') {
-          // Incoming ring call - matches IVSR exactly
-          indicatorState = 'flashing'; // Incoming call being received (1 per second, 50/50 on/off)
-        } else if (callStatus === 'hold') {
-          indicatorState = 'winking'; // Call in HOLD condition (1 per second, 95/5 on/off)
-        } else if (callStatus === 'ok' || callStatus === 'active') {
-          indicatorState = 'flutter'; // Connection made (12 per second, 80/20 on/off)
+
+        const callStatus = statusObj.status || 'off';
+        let indicatorState = 'off';
+        if (lineType === 0) {
+          if (callStatus === 'ok' || callStatus === 'active') indicatorState = 'on';
+          else if (callStatus === 'busy') indicatorState = 'flutter';
+        } else if (lineType === 1) {
+          if (callStatus === 'chime') indicatorState = 'flashing';
+          else if (callStatus === 'ok') indicatorState = 'flutter';
+        } else if (lineType === 2) {
+          if (callStatus === 'ok' || callStatus === 'online') indicatorState = 'flutter';
         }
-      } else if (lineType === 2) {
-        // Shout line behavior (SO lines in IVSR)
-        if (callStatus === 'off' || callStatus === '' || callStatus === 'idle') {
-          indicatorState = 'off'; // Circuit idle
-        } else if (callStatus === 'ok' || callStatus === 'active') {
-          indicatorState = 'flutter'; // Connection made (12 per second, 80/20 on/off)
-        } else if (callStatus === 'online' || callStatus === 'chime') {
-          // Incoming shout call - matches IVSR 'online' or 'chime' for SO lines
-          indicatorState = 'flutter'; // Incoming shout call (12 per second, 80/20 on/off)
-        } else if (callStatus === 'busy') {
-          indicatorState = 'on'; // Circuit busy (steady-on)
-        }
-      }
-      
-      console.log(`RDVS Line ${lineIdx}: Final indicatorState=${indicatorState}, typeLetter=${typeLetter}`);
-      
-      // Standard ground-to-ground button for the line with integrated cyan box
-      // Parse two lines separated by a comma in the JSON line data
-      let line1 = '';
-      let line2 = '';
-      if (Array.isArray(line) && line.length >= 3) {
-        const parts = String(line[2]).split(',');
-        line1 = parts[0] ? parts[0].trim() : '';
-        line2 = parts[1] ? parts[1].trim() : '';
-      } else if (typeof line === 'string') {
-        const parts = line.split(',');
-        line1 = parts[0] ? parts[0].trim() : '';
-        line2 = parts[1] ? parts[1].trim() : '';
-      }
-      
-      buttons.push({
-        config: {
-          id: String(line[0]),
-          shortName: line1,
-          label: line1, // For compatibility
-          target: call_id,
-          type: 'NONE',
-        },
-        typeString: typeLetter, // Pass the line type letter to the existing cyan box
-        callback: (target: string, type: any) => {
-          // Implement G/G calling logic matching IVSR/VSCS behavior
-          console.log('RDVS G/G Button clicked:', { target, type, lineType: lineTypeValue, call_id, currentStatus: statusObj.status });
-          
-          // Get current status for this line
-          const currentStatus = statusObj.status || 'off';
-          
-          // Determine action based on line type and current status - matches IVSR exactly
-          if (lineTypeValue === 0) {
-            // Override line - caller can initiate or hang up, receiver cannot
-            if (currentStatus === 'off' || currentStatus === '' || currentStatus === 'idle') {
-              console.log('RDVS: Sending override call');
-              sendMsg({ type: 'call', cmd1: call_id, dbl1: 0 }); // Override call
-            } else if (currentStatus === 'ok' || currentStatus === 'active') {
-              // Caller can hang up their override call
-              console.log('RDVS: Hanging up override call');
-              sendMsg({ type: 'stop', cmd1: call_id, dbl1: 0 }); // Hangup override
-            } else if (currentStatus === 'overridden' || currentStatus === 'terminate') {
-              // Receiver cannot hang up - do nothing
-              console.log('RDVS: Cannot hang up - receiving override or terminated');
-            }
-          } else if (lineTypeValue === 1) {
-            // Ring line - handle ring/pickup logic
-            if (currentStatus === 'off' || currentStatus === '' || currentStatus === 'idle') {
-              console.log('RDVS: Sending ring call');
-              sendMsg({ type: 'call', cmd1: call_id, dbl1: 2 }); // Ring call
-            } else if (currentStatus === 'chime' || currentStatus === 'ringing') {
-              console.log('RDVS: Accepting incoming ring call');
-              sendMsg({ type: 'stop', cmd1: call_id, dbl1: 2 }); // Accept call (matches IVSR)
-            } else if (currentStatus === 'ok' || currentStatus === 'active') {
-              console.log('RDVS: Hanging up active ring call');
-              sendMsg({ type: 'stop', cmd1: call_id, dbl1: 2 }); // Hangup
-            }
-          } else if (lineTypeValue === 2) {
-            // Shout line (SO) - handle shout call/hangup logic
-            if (currentStatus === 'off' || currentStatus === '' || currentStatus === 'idle') {
-              console.log('RDVS: Sending shout call');
-              sendMsg({ type: 'call', cmd1: call_id, dbl1: 2 }); // Shout call
-            } else if (currentStatus === 'online' || currentStatus === 'chime') {
-              console.log('RDVS: Joining incoming shout call');
-              sendMsg({ type: 'call', cmd1: call_id, dbl1: 2 }); // Join shout call (matches IVSR)
-            } else if (currentStatus === 'ok' || currentStatus === 'active') {
-              console.log('RDVS: Hanging up shout call');
-              sendMsg({ type: 'stop', cmd1: call_id, dbl1: 1 }); // Hangup shout call (dbl1: 1 for SO lines)
-            }
-          } else if (lineTypeValue === 3) {
-            // Dial line - toggle the dialpad with the trunk name from the label
-            // The label (line1) contains the trunk name (e.g., "APCH", "S-BAY", "E/W/V")
-            console.log('RDVS: Toggling dialpad for trunk:', line1);
-            // Toggle behavior: if same trunk is clicked, close dialpad; otherwise open with new trunk
-            if (activeDialLine && activeDialLine.trunkName === line1) {
-              setActiveDialLine(null);
-            } else {
-              setActiveDialLine({ trunkName: line1, lineType: lineTypeValue });
-            }
-          }
-          
-          // Log the action for debugging cyan box animations
-          console.log('RDVS: Cyan box should animate based on new call status');
-        },
-        multiLineData: { line1, line2 },
-        buttonPattern: pattern, // Add pattern for text color reference
-        lineTypeInfo: {
-          typeLetter: typeLetter,
-          indicatorState: indicatorState
-        }
-      });
-    });
-  }
-  
-  // Initialize dial tone audio
-  useEffect(() => {
-    const audio = new Audio('/rdvs/DialTone.wav');
-    audio.loop = true;
-    setDialToneAudio(audio);
-    
-    return () => {
-      audio.pause();
-      audio.src = '';
-    };
-  }, []);
-  
-  // Handle IA (Indirect Access) button toggle
-  // Per 2.4.7.1: Press IA pushbutton -> dial tone is heard, keypad appears, IA indicator turns on
-  const handleDialpadToggle = () => {
-    const newState = !dialpadActive;
-    setDialpadActive(newState);
-    setKeypadActive(newState); // IA button also toggles keypad visibility
-    
-    // Close dial line dialpad if open
-    if (newState && activeDialLine) {
-      setActiveDialLine(null);
-    }
-    
-    if (newState) {
-      // Turning IA ON - hang up all active calls and play dial tone
-      if (gg_status && Array.isArray(gg_status)) {
-        gg_status.forEach((status: any) => {
-          if (status && (status.status === 'ok' || status.status === 'active')) {
-            const call_id = status.call?.substring(3) || status.call;
-            const call_type = status.call?.substring(0, 2);
-            
-            // Determine correct dbl1 value based on call type
-            const dbl1 = call_type === 'SO' ? 1 : 2;
-            console.log('RDVS: Hanging up call for IA dialpad:', { call_id, call_type, dbl1 });
-            sendMsg({ type: 'stop', cmd1: call_id, dbl1 });
-          }
+
+        btns.push({
+          call_id,
+          lineType,
+          typeLetter,
+          line1,
+          line2,
+          indicatorState,
+          statusObj
         });
-      }
-      
-      // Play dial tone (per 2.4.7.1: "Dial tone is received to indicate that dialing may proceed")
-      if (dialToneAudio) {
-        dialToneAudio.currentTime = 0;
-        dialToneAudio.play().catch(err => console.error('Failed to play dial tone:', err));
-      }
-    } else {
-      // Turning IA OFF - stop dial tone
-      if (dialToneAudio) {
-        dialToneAudio.pause();
-        dialToneAudio.currentTime = 0;
-      }
-    }
-  };
-  
-  const formatFreq = (freq: number) => {
-    if (!freq) return '';
-    const val = freq / 1_000_000;
-    if (val % 1 === 0) return val.toFixed(1);
-    return val.toString().replace(/0+$/, '').replace(/\.$/, '');
-  };
-
-  // Map first 12 ATG buttons to RadioButtonProps, hydrating frequency from ag_status
-  const airToGroundButtons = Array.from({ length: 12 }).map((_, idx) => {
-    const ag = ag_status && ag_status[idx] ? ag_status[idx] : {};
-    
-    // Debug logging for first button to see available properties
-    if (idx === 0 && ag.freq) {
-      console.log('RDVS ag_status data for button 0:', ag);
-    }
-    
-    const button = {
-      variant: 'radio' as const,
-      radioSize: 'short' as const,
-      label: ag.name,
-      frequency: ag.freq ? formatFreq(ag.freq) : '--------',
-      checked: !!ag.t,
-      pttActive: ptt && !!ag.t, // Pass PTT status when this freq is selected for TX
-      talking: !!ag.talking, // Pass talking status for flutter when others transmit
-      selected: selectedRadioIndex === idx, // Check if this button is selected
-      // Radio module status props from WebSocket data
-      rxSelected: !!ag.r, // RX indicator from ag_status
-      rxHsSelected: !!ag.h, // HS indicator from ag_status
-      rxLsSelected: !!ag.l, // LS indicator from ag_status (if available)
-      txSelected: !!ag.t, // TX indicator from ag_status
-      rxMsMode: ag.rxMsMode || 'M', // RX M/S mode from ag_status
-      txMsMode: ag.txMsMode || 'M', // TX M/S mode from ag_status
-      receiverAudio: !!ag.audio, // Audio present indicator
-      onSelect: () => {
-        console.log(`Radio button ${idx} clicked. Current selected: ${selectedRadioIndex}`);
-        // Toggle selection: if already selected, deselect; otherwise select this one
-        setSelectedRadioIndex(selectedRadioIndex === idx ? null : idx);
-      },
-      // Add TX/RX callback functionality like VSCS
-      onChange: (value: string) => {
-        console.log('RDVS A/G Button changed:', { idx, value, freq: ag.freq });
-      },
-      // Add click handlers for TX/RX functionality
-      onTxClick: () => {
-        if (ag.freq) {
-          console.log('RDVS A/G TX clicked:', { freq: ag.freq, currentTx: ag.t, newTx: !ag.t });
-          sendMsg({ type: 'tx', cmd1: '' + ag.freq, dbl1: !ag.t });
-        }
-      },
-      onRxClick: () => {
-        if (ag.freq) {
-          console.log('RDVS A/G RX clicked:', { freq: ag.freq, currentRx: ag.r, newRx: !ag.r });
-          sendMsg({ type: 'rx', cmd1: '' + ag.freq, dbl1: !ag.r });
-        }
-      },
-      onHsClick: () => {
-        if (ag.freq) {
-          console.log('RDVS A/G HS clicked:', { freq: ag.freq, currentHs: ag.h });
-          sendMsg({ type: 'set_hs', cmd1: '' + ag.freq, dbl1: !ag.h });
-        }
-      },
-      // Radio module control handlers
-      onRxMsClick: () => {
-        if (ag.freq) {
-          console.log('RDVS A/G RX M/S clicked:', { freq: ag.freq, currentMode: ag.rxMsMode });
-          // Toggle between Main and Standby modes
-          sendMsg({ type: 'set_rx_ms', cmd1: '' + ag.freq, dbl1: ag.rxMsMode === 'M' });
-        }
-      },
-      onTxMsClick: () => {
-        if (ag.freq) {
-          console.log('RDVS A/G TX M/S clicked:', { freq: ag.freq, currentMode: ag.txMsMode });
-          // Toggle between Main and Standby modes  
-          sendMsg({ type: 'set_tx_ms', cmd1: '' + ag.freq, dbl1: ag.txMsMode === 'M' });
-        }
-      },
-      onRxHsLsClick: () => {
-        if (ag.freq) {
-          console.log('RDVS A/G HS/LS clicked:', { freq: ag.freq, currentHs: ag.h, currentLs: ag.l });
-          // Toggle between Headset and Loudspeaker - cycle through HS → LS → OFF → HS
-          if (ag.h && !ag.l) {
-            // Currently HS, switch to LS
-            sendMsg({ type: 'set_hs', cmd1: '' + ag.freq, dbl1: false });
-            sendMsg({ type: 'set_ls', cmd1: '' + ag.freq, dbl1: true });
-          } else if (!ag.h && ag.l) {
-            // Currently LS, switch to OFF (both false)
-            sendMsg({ type: 'set_ls', cmd1: '' + ag.freq, dbl1: false });
-          } else {
-            // Currently OFF or both, switch to HS
-            sendMsg({ type: 'set_hs', cmd1: '' + ag.freq, dbl1: true });
-            sendMsg({ type: 'set_ls', cmd1: '' + ag.freq, dbl1: false });
-          }
-        }
-      }
-    };
-    
-    // Debug logging for PTT status
-    if (idx === 0) { // Log for first button to avoid spam
-      console.log('RDVS PTT Debug:', { 
-        ptt, 
-        agT: ag.t, 
-        pttActive: button.pttActive, 
-        talking: button.talking,
-        selected: button.selected 
       });
     }
-    
-    return button;
-  });
+    return btns;
+  }, [currentPosition, gg_status]);
 
-  // Rest are ground-to-ground StandardButtonProps (already included above)
-  const groundToGroundButtons = buttons.filter(isStandardButton);
+  const maxPage = Math.max(1, Math.ceil(lineButtons.length / BUTTONS_PER_PAGE));
+  const pageStartIdx = (currentPage - 1) * BUTTONS_PER_PAGE;
+  const pageButtons = lineButtons.slice(pageStartIdx, pageStartIdx + BUTTONS_PER_PAGE);
 
-  // Main RDVS panel layout
+  const setPage = (p: number) => {
+    if (p < 1) setCurrentPage(1);
+    else if (p > maxPage) setCurrentPage(maxPage);
+    else setCurrentPage(p);
+  };
+
+  const formatFreq = (freq: number) => freq ? (freq / 1_000_000).toFixed(3) : '';
+
+  const handleLineClick = (btn: any) => {
+    const { call_id, lineType, statusObj } = btn;
+    const status = statusObj?.status || 'off';
+
+    if (lineType === 0) {
+      if (status === 'off' || status === 'idle' || !status) sendMsg({ type: 'call', cmd1: call_id, dbl1: 0 });
+      else if (status === 'ok') sendMsg({ type: 'stop', cmd1: call_id, dbl1: 0 });
+    } else if (lineType === 1) {
+      if (status === 'off' || status === 'idle' || !status) sendMsg({ type: 'call', cmd1: call_id, dbl1: 2 });
+      else sendMsg({ type: 'stop', cmd1: call_id, dbl1: 2 });
+    } else if (lineType === 2) {
+      if (status === 'off' || status === 'idle' || !status) sendMsg({ type: 'call', cmd1: call_id, dbl1: 2 });
+      else sendMsg({ type: 'stop', cmd1: call_id, dbl1: 1 });
+    }
+  };
+
+  // Get button color based on line type
+  const getButtonColor = (lineType: number | undefined, typeLetter: string) => {
+    if (typeLetter === 'O' || lineType === 0) return COLORS.RED;   // Override = Red
+    if (typeLetter === 'C' || lineType === 1) return COLORS.BLUE;  // Call/Intercom = Blue
+    if (typeLetter === 'A' || lineType === 2) return COLORS.BLUE;  // Alert/Shout = Blue
+    if (lineType === 3) return COLORS.GREY;                         // Dial = Grey
+    return COLORS.BLACK;                                            // Empty
+  };
+
+  // Render a station selector button using SVG (scaled for 800x600)
+  const renderStationButton = (rowIdx: number, colIdx: number) => {
+    const btnIdx = rowIdx * GRID_COLS + colIdx;
+    const btn = pageButtons[btnIdx];
+    const w = BTN_WIDTH;
+    const h = BTN_HEIGHT;
+
+    // Row 7 (index) is function keys
+    if (rowIdx === 7) {
+      const labels = ['HOLD', 'REL', 'HL', 'OHL', 'RHL'];
+      const label = labels[colIdx] || '';
+      return (
+        <svg
+          key={`ctrl-${rowIdx}-${colIdx}`}
+          width={w}
+          height={h}
+          viewBox={`0 0 ${w} ${h}`}
+          style={{ cursor: 'pointer' }}
+          onClick={() => console.log(`${label} pressed`)}
+        >
+          <rect x="0" y="0" width={w} height={h} fill={COLORS.GREY} stroke={COLORS.BLACK} strokeWidth="1" />
+          <text
+            x={w / 2}
+            y={h / 2 - 4}
+            textAnchor="middle"
+            fill={COLORS.WHITE}
+            fontSize="14"
+            fontFamily="Consolas, monospace"
+            fontWeight="100"
+          >
+            {label}
+          </text>
+          {/* Indicator box */}
+          <rect x={(w - 14) / 2} y={h - 18} width="14" height="14" fill="none" stroke={COLORS.CYAN} strokeWidth="1" />
+        </svg>
+      );
+    }
+
+    if (!btn) {
+      return (
+        <svg
+          key={`empty-${rowIdx}-${colIdx}`}
+          width={w}
+          height={h}
+          viewBox={`0 0 ${w} ${h}`}
+        >
+          <rect x="0" y="0" width={w} height={h} fill={COLORS.BLACK} stroke={COLORS.BLACK} strokeWidth="1" />
+        </svg>
+      );
+    }
+
+    const { typeLetter, line1, line2, indicatorState, lineType } = btn;
+    const bgColor = getButtonColor(lineType, typeLetter);
+    const indicatorFill = indicatorState !== 'off' ? COLORS.GREEN : COLORS.BLACK;
+
+    return (
+      <svg
+        key={`btn-${rowIdx}-${colIdx}`}
+        width={w}
+        height={h}
+        viewBox={`0 0 ${w} ${h}`}
+        style={{ cursor: 'pointer' }}
+        onClick={() => handleLineClick(btn)}
+      >
+        <rect x="0" y="0" width={w} height={h} fill={bgColor} stroke={COLORS.BLACK} strokeWidth="1" />
+        {/* Top Line: Facility ID */}
+        <text
+          x={w / 2}
+          y={16}
+          textAnchor="middle"
+          fill={COLORS.WHITE}
+          fontSize="14"
+          fontFamily="Consolas, monospace"
+          fontWeight="bold"
+        >
+          {line1}
+        </text>
+        {/* Middle Line: Sector/Position ID */}
+        {line2 && (
+          <text
+            x={w / 2}
+            y={30}
+            textAnchor="middle"
+            fill={COLORS.WHITE}
+            fontSize="14"
+            fontFamily="Consolas, monospace"
+            fontWeight="bold"
+          >
+            {line2}
+          </text>
+        )}
+        {/* Bottom: Indicator box with type letter - 3px gap from bottom, centered text */}
+        <rect x={(w - 16) / 2} y={h - 21} width="16" height="16" fill={indicatorFill} stroke={COLORS.WHITE} strokeWidth="1" />
+        <text
+          x={w / 2}
+          y={h - 21 + 8}
+          textAnchor="middle"
+          dominantBaseline="middle"
+          fill={COLORS.WHITE}
+          fontSize="10"
+          fontFamily="Consolas, monospace"
+          fontWeight="100"
+        >
+          {typeLetter}
+        </text>
+      </svg>
+    );
+  };
+
+  // Render line control panel (right side) - scaled for 800x600
+  const renderLineControlPanel = (rowIdx: number) => {
+    const ag = ag_status?.[rowIdx] || {};
+    const freq = ag.freq || 0;
+    const isRx = !!ag.r;
+    const isTx = !!ag.t;
+    const isHs = !!ag.h;
+    const isLs = !!ag.l;
+
+    return (
+      <svg
+        key={`line-${rowIdx}`}
+        width={LINE_PANEL_WIDTH}
+        height={LINE_PANEL_HEIGHT}
+        viewBox={`0 0 ${LINE_PANEL_WIDTH} ${LINE_PANEL_HEIGHT}`}
+        style={{ display: 'block' }}
+      >
+        {/* Background */}
+        <rect x="0" y="0" width={LINE_PANEL_WIDTH} height={LINE_PANEL_HEIGHT} fill={COLORS.BLACK} stroke={COLORS.RED} strokeWidth="1" />
+
+        {/* 5 equal columns: 370px / 5 = 74px each. Dividers at 74, 148, 222, 296 */}
+
+        {/* Column 1: HS/LS Section (0-74) - indicators span from top of HS text to bottom of LS text */}
+        <line x1="74" y1="0" x2="74" y2={LINE_PANEL_HEIGHT} stroke={COLORS.RED} strokeWidth="1" />
+        <text x="8" y="20" fill={isHs ? COLORS.GREEN : COLORS.CYAN} fontSize="16" fontFamily="Consolas, monospace" fontWeight="100">HS</text>
+        <text x="8" y="40" fill={isLs ? COLORS.GREEN : COLORS.CYAN} fontSize="16" fontFamily="Consolas, monospace" fontWeight="100">LS</text>
+        {/* HS indicator box - top half, no bottom border */}
+        <line x1="40" y1="8" x2="56" y2="8" stroke={COLORS.GREEN} strokeWidth="1" />
+        <line x1="40" y1="8" x2="40" y2="27" stroke={COLORS.GREEN} strokeWidth="1" />
+        <line x1="56" y1="8" x2="56" y2="27" stroke={COLORS.GREEN} strokeWidth="1" />
+        <rect x="41" y="9" width="14" height="18" fill={isHs ? COLORS.GREEN : 'none'} stroke="none" />
+        {/* LS indicator box - bottom half, no top border */}
+        <line x1="40" y1="27" x2="40" y2="46" stroke={COLORS.GREEN} strokeWidth="1" />
+        <line x1="56" y1="27" x2="56" y2="46" stroke={COLORS.GREEN} strokeWidth="1" />
+        <line x1="40" y1="46" x2="56" y2="46" stroke={COLORS.GREEN} strokeWidth="1" />
+        <rect x="41" y="27" width="14" height="18" fill={isLs ? COLORS.GREEN : 'none'} stroke="none" />
+
+        {/* Column 2: RX Section (74-148) - 30px wide indicator */}
+        <line x1="148" y1="0" x2="148" y2={LINE_PANEL_HEIGHT} stroke={COLORS.RED} strokeWidth="1" />
+        <text x="82" y="18" fill={COLORS.CYAN} fontSize="16" fontFamily="Consolas, monospace" fontWeight="100">RX</text>
+        <rect x="104" y="6" width="30" height="15" fill={isRx ? COLORS.GREEN : 'none'} stroke={COLORS.GREEN} strokeWidth="1" />
+        <text x="82" y="42" fill={COLORS.CYAN} fontSize="16" fontFamily="Consolas, monospace" fontWeight="100">{formatFreq(freq)}</text>
+
+        {/* Column 3: M/S Section (148-222) - green background with black M text */}
+        <line x1="222" y1="0" x2="222" y2={LINE_PANEL_HEIGHT} stroke={COLORS.RED} strokeWidth="1" />
+        <text x="156" y="18" fill={COLORS.CYAN} fontSize="16" fontFamily="Consolas, monospace" fontWeight="100">M/S</text>
+        <rect x="186" y="6" width="15" height="15" fill={COLORS.GREEN} stroke={COLORS.GREEN} strokeWidth="1" />
+        <text x="193" y="18" textAnchor="middle" fill={COLORS.BLACK} fontSize="15" fontFamily="Consolas, monospace" fontWeight="100">M</text>
+
+        {/* Column 4: TX Section (222-296) - 30px wide indicator, radial selector 7px below (3+4=7) */}
+        <line x1="296" y1="0" x2="296" y2={LINE_PANEL_HEIGHT} stroke={COLORS.RED} strokeWidth="1" />
+        <text x="230" y="18" fill={COLORS.CYAN} fontSize="16" fontFamily="Consolas, monospace" fontWeight="100">TX</text>
+        <rect x="252" y="6" width="30" height="15" fill={isTx ? COLORS.GREEN : 'none'} stroke={COLORS.GREEN} strokeWidth="1" />
+        {/* TX radial selector - centered with indicator (252 + 15 = 267), 7px spacing below indicator (6+15+7=28, center at 28+6=34) */}
+        <circle cx="267" cy="34" r="6" fill={COLORS.BLACK} stroke={COLORS.RED} strokeWidth="1" />
+
+        {/* Column 5: Secondary M/S Section (296-370) - green background with black M text */}
+        <text x="304" y="18" fill={COLORS.CYAN} fontSize="16" fontFamily="Consolas, monospace" fontWeight="100">M/S</text>
+        <rect x="334" y="6" width="15" height="15" fill={COLORS.GREEN} stroke={COLORS.GREEN} strokeWidth="1" />
+        <text x="341" y="18" textAnchor="middle" fill={COLORS.BLACK} fontSize="15" fontFamily="Consolas, monospace" fontWeight="100">M</text>
+      </svg>
+    );
+  };
+
+  // Chamfered tab with aggressive angled cuts on top-left and top-right corners, 3px padding
+  // Active page = grey border/text, inactive = white border/text, always black background
+  const renderPageTab = (pageNum: number, isActive: boolean) => {
+    const w = 80;
+    const h = 22; // 3px top + ~16px text + 3px bottom
+    const chamfer = 12; // More aggressive corner cutoff
+    const tabColor = isActive ? COLORS.GREY : COLORS.WHITE;
+
+    return (
+      <svg
+        key={`tab-${pageNum}`}
+        width={w}
+        height={h}
+        viewBox={`0 0 ${w} ${h}`}
+        style={{ cursor: 'pointer' }}
+        onClick={() => setPage(pageNum)}
+      >
+        <polygon
+          points={`
+            ${chamfer},0
+            ${w - chamfer},0
+            ${w},${chamfer}
+            ${w},${h}
+            0,${h}
+            0,${chamfer}
+          `}
+          fill={COLORS.BLACK}
+          stroke={tabColor}
+          strokeWidth="1"
+        />
+        <text
+          x={w / 2}
+          y={h / 2 + 4}
+          textAnchor="middle"
+          fill={tabColor}
+          fontSize="13"
+          fontFamily="Consolas, monospace"
+          fontWeight="100"
+        >
+          PAGE {pageNum}
+        </text>
+      </svg>
+    );
+  };
+
+  // Hexagonal arrow for pagination (scaled for 800x600)
+  const renderHexArrow = (direction: 'prev' | 'next') => {
+    const w = 65;
+    const h = 24;
+    const isPrev = direction === 'prev';
+
+    return (
+      <svg
+        width={w}
+        height={h}
+        viewBox={`0 0 ${w} ${h}`}
+        style={{ cursor: 'pointer' }}
+        onClick={() => setPage(currentPage + (isPrev ? -1 : 1))}
+      >
+        {isPrev ? (
+          <polygon
+            points={`0,${h/2} 12,0 ${w},0 ${w},${h} 12,${h}`}
+            fill="none"
+            stroke={COLORS.WHITE}
+            strokeWidth="1"
+          />
+        ) : (
+          <polygon
+            points={`0,0 ${w-12},0 ${w},${h/2} ${w-12},${h} 0,${h}`}
+            fill="none"
+            stroke={COLORS.WHITE}
+            strokeWidth="1"
+          />
+        )}
+        <text
+          x={w / 2}
+          y={h / 2 + 4}
+          textAnchor="middle"
+          fill={COLORS.WHITE}
+          fontSize="13"
+          fontFamily="Consolas, monospace"
+          fontWeight="100"
+        >
+          {isPrev ? 'PREV' : 'NEXT'}
+        </text>
+      </svg>
+    );
+  };
+
   return (
     <div
-      className="rdvs-panel select-none p-2 text-white bg-black"
       style={{
-        backgroundImage: 'url(/rdvs.png)',
-        backgroundSize: 'cover',
-        backgroundPosition: 'center',
-        backgroundRepeat: 'no-repeat',
+        backgroundColor: COLORS.BLACK,
+        padding: '20px',
+        display: 'inline-block'
       }}
     >
-      {/* Header spacing */}
-      <div style={{ height: '60px', width: '100%' }}></div>
-      
-      {/* TED Interior Matrix - Independent quadrant positioning for precise control */}
-      <div className="relative">
-        {/* Quadrant 1: Top-left (5×4 grid) - Toggles between buttons, keypad, or dial line dialpad */}
-        {activeDialLine ? (
-          /* Dial Line Dialpad - replaces Quadrant 1 when a dial line is active (same size as keypad) */
-          <div 
-            className="absolute"
-            style={{ 
-              top: '-64px',
-              left: '-74px',
-              width: '383px',
-              height: '255px',
-              zIndex: 100
-            }}
-          >
-            <RdvsKeypad
-              mode="dialline"
-              trunkName={activeDialLine.trunkName}
-              onClose={() => setActiveDialLine(null)}
-              onCallInitiated={(target) => {
-                console.log('RDVS: Dial call initiated to:', target);
-              }}
-              embedded={true}
-            />
+      <div
+        style={{
+          width: '800px',
+          height: '600px',
+          backgroundColor: COLORS.BLACK,
+          color: COLORS.WHITE,
+          fontFamily: 'Consolas, monospace',
+          fontWeight: 100,
+          fontSize: '14px',
+          userSelect: 'none',
+          display: 'flex',
+          flexDirection: 'column',
+          textTransform: 'uppercase',
+        }}
+      >
+      {/* Header Module */}
+      <div
+        style={{
+          height: '64px',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'space-between',
+          padding: '0 12px',
+          borderBottom: `1px solid ${COLORS.BLACK}`
+        }}
+      >
+        {/* Brightness Control - larger circles and +2pt font */}
+        <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+          <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+            <svg width="56" height="44" viewBox="0 0 56 44">
+              <text x="28" y="12" textAnchor="middle" fill={COLORS.WHITE} fontSize="13" fontFamily="Consolas, monospace" fontWeight="100">BRIGHT</text>
+              <circle cx="28" cy="30" r="12" fill={COLORS.BLACK} stroke={COLORS.WHITE} strokeWidth="2" />
+            </svg>
           </div>
-        ) : !keypadActive ? (
-          <div 
-            className="absolute grid grid-cols-5"
-            style={{ 
-              top: '-5px',
-              left: '5px',
-              columnGap: '7px',
-              rowGap: '7px'
-            }}
-          >
-            {(() => {
-              const q1Buttons = [];
-              let q1Idx = 0;
-              for (let row = 0; row < 4; row++) {
-                for (let col = 0; col < 5; col++) {
-                  const btn = groundToGroundButtons[q1Idx];
-                  if (btn && isStandardButton(btn)) {
-                    q1Buttons.push(
-                      <div key={`q1-btn-${row}-${col}`} style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center' }}>
-                        <RdvsButtonComponent {...btn} />
-                      </div>
-                    );
-                    q1Idx++;
-                  } else {
-                    q1Buttons.push(<div key={`q1-empty-${row}-${col}`}></div>);
-                  }
-                }
-              }
-              return q1Buttons;
-            })()}
+          <svg width="36" height="20" viewBox="0 0 36 20">
+            <text x="18" y="14" textAnchor="middle" fill={COLORS.CYAN} fontSize="14" fontFamily="Consolas, monospace" fontWeight="100">47%</text>
+          </svg>
+          <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+            <svg width="40" height="44" viewBox="0 0 40 44">
+              <text x="20" y="12" textAnchor="middle" fill={COLORS.WHITE} fontSize="13" fontFamily="Consolas, monospace" fontWeight="100">DIM</text>
+              <circle cx="20" cy="30" r="12" fill={COLORS.BLACK} stroke={COLORS.WHITE} strokeWidth="2" />
+            </svg>
           </div>
-        ) : (
-          /* IA/Keypad overlay - replaces Quadrant 1 when active */
-          <div 
-            className="absolute"
-            style={{ 
-              top: '-64px',
-              left: '-74px',
-              width: '383px',  // Match Q1 width (5 buttons × 70px + gaps)
-              height: '255px', // Match Q1 height (4 rows × 55px + gaps)
-              zIndex: 100
-            }}
-          >
-            <RdvsKeypad
-              mode="ia"
-              iaActive={dialpadActive}
-              onClose={() => {
-                setKeypadActive(false);
-                setDialpadActive(false);
-                if (dialToneAudio) {
-                  dialToneAudio.pause();
-                  dialToneAudio.currentTime = 0;
-                }
-              }}
-              embedded={true}
-            />
-          </div>
-        )}
-
-        {/* Air-to-ground buttons: Top-center (columns 5-7, rows 0-3) */}
-        <div 
-          className="absolute grid grid-cols-3"
-          style={{ 
-            top: '-5px',
-            left: 'calc(5 * 61px + 5 * 15px + 10px)', // Position after Q1
-            columnGap: '7px',
-            rowGap: '7px'
-          }}
-        >
-          {airToGroundButtons.slice(0, 12).map((atgBtn, atgIdx) => {
-            let labelText = '';
-            if (ag_status && ag_status[atgIdx]) {
-              labelText = ag_status[atgIdx].call_name || ag_status[atgIdx].name || '';
-            }
-            return (
-              <div key={`atg-${atgIdx}`} style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center' }}>
-                {labelText && (
-                  <div className="rdvs-label" style={{ color: '#00FFFF', fontSize: '14px', marginBottom: '2px' }}>{labelText}</div>
-                )}
-                <RdvsButtonComponent {...atgBtn} />
-              </div>
-            );
-          })}
         </div>
 
-        {/* Quadrant 3: Bottom-left (5×4 grid) - Gets remaining buttons after Q1 */}
-        <div 
-          className="absolute grid grid-cols-5"
-          style={{ 
-            top: 'calc(3 * 63px + 4 * 7px + 6px)', // Position below top quadrants
-            left: '5px',
-            columnGap: '7px',
-            rowGap: '7px'
-          }}
-        >
-          {(() => {
-            const q3Buttons = [];
-            let q3Idx = 20; // Start after Q1's 20 slots (5×4 grid)
-            
-            for (let row = 0; row < 4; row++) {
-              for (let col = 0; col < 5; col++) {
-                // Q3 should get buttons starting after Q1's 20 slots
-                const btn = groundToGroundButtons[q3Idx];
-                
-                if (btn && isStandardButton(btn)) {
-                  q3Buttons.push(
-                    <div key={`q3-btn-${row}-${col}`} style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center' }}>
-                      <RdvsButtonComponent {...btn} />
-                    </div>
-                  );
-                } else {
-                  q3Buttons.push(<div key={`q3-empty-${row}-${col}`}></div>);
-                }
-                q3Idx++;
-              }
-            }
-            return q3Buttons;
-          })()}
-        </div>
-
-        {/* Quadrant 4: Bottom-right (5×4 grid) - Gets buttons only after Q3 is full */}
-        <div 
-          className="absolute grid grid-cols-5"
-          style={{ 
-            top: 'calc(4 * 55px + 2 * 1px + 1px)', // Same vertical position as Q3
-            left: 'calc(5 * 70px + 5 * 6px + 10px)', // Position after Q3
-            width: '383px', // Explicit width for proper grid layout
-            columnGap: '0px', // Precise control over Q4 spacing
-            rowGap: '7px'
-          }}
-        >
-          {(() => {
-            const q4Buttons = [];
-            let q4Idx = 40; // Start after Q1 (20) + Q3 (20) = 40 slots
-            
-            for (let row = 0; row < 4; row++) {
-              for (let col = 0; col < 5; col++) {
-                // Q4 gets buttons only after Q1 (20 slots) and Q3 (20 slots) are filled
-                const btn = groundToGroundButtons[q4Idx];
-                
-                if (btn && isStandardButton(btn)) {
-                  q4Buttons.push(
-                    <div key={`q4-btn-${row}-${col}`} style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', width: '70px' }}>
-                      <RdvsButtonComponent {...btn} />
-                    </div>
-                  );
-                } else {
-                  // Empty slot - maintains grid structure for spacing control
-                  q4Buttons.push(<div key={`q4-empty-${row}-${col}`} style={{ width: '70px', minHeight: '50px' }}></div>);
-                }
-                q4Idx++;
-              }
-            }
-            return q4Buttons;
-          })()}
-        </div>
-
-        {/* Long Radio Button Overlay - Shows when a short radio button is selected */}
-        {selectedRadioIndex !== null && (
-          <div 
-            className="absolute"
-            style={{ 
-              top: '445px', 
-              right: '20px',  // Position in bottom-right area
-              zIndex: 1000    // Ensure it's on top
-            }}
-          >
-            <RdvsButtonComponent 
-              variant="radio"
-              radioSize="long"
-              label={airToGroundButtons[selectedRadioIndex]?.label || `ATG ${selectedRadioIndex + 1}`}
-              frequency={airToGroundButtons[selectedRadioIndex]?.frequency}
-              checked={airToGroundButtons[selectedRadioIndex]?.checked}
-              pttActive={airToGroundButtons[selectedRadioIndex]?.pttActive}
-              talking={airToGroundButtons[selectedRadioIndex]?.talking}
-              rxSelected={airToGroundButtons[selectedRadioIndex]?.rxSelected}
-              rxHsSelected={airToGroundButtons[selectedRadioIndex]?.rxHsSelected}
-              rxLsSelected={airToGroundButtons[selectedRadioIndex]?.rxLsSelected}
-              txSelected={airToGroundButtons[selectedRadioIndex]?.txSelected}
-              rxMsMode={airToGroundButtons[selectedRadioIndex]?.rxMsMode}
-              txMsMode={airToGroundButtons[selectedRadioIndex]?.txMsMode}
-              receiverAudio={airToGroundButtons[selectedRadioIndex]?.receiverAudio}
-              onRxClick={airToGroundButtons[selectedRadioIndex]?.onRxClick}
-              onTxClick={airToGroundButtons[selectedRadioIndex]?.onTxClick}
-              onRxMsClick={airToGroundButtons[selectedRadioIndex]?.onRxMsClick}
-              onTxMsClick={airToGroundButtons[selectedRadioIndex]?.onTxMsClick}
-              onRxHsLsClick={airToGroundButtons[selectedRadioIndex]?.onRxHsLsClick}
-            />
+        {/* Pagination Control */}
+        <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+          <svg width="80" height="16" viewBox="0 0 80 16">
+            <text x="40" y="12" textAnchor="middle" fill={COLORS.WHITE} fontSize="12" fontFamily="Consolas, monospace" fontWeight="100">PAGE {currentPage}</text>
+          </svg>
+          <div style={{ display: 'flex', gap: '4px' }}>
+            {renderHexArrow('prev')}
+            {renderHexArrow('next')}
           </div>
-        )}
-        
-        {/* IA Dialpad Toggle Button - Square beneath the IA text */}
-        <div 
-          className="absolute cursor-pointer"
-          style={{ 
-            top: '-39px',  // Position below IA text (adjust as needed)
-            left: '258px',  // Left side of panel
-            width: '25px',
-            height: '25px',
-            zIndex: 1000
-          }}
-          onClick={handleDialpadToggle}
-        >
-          {dialpadActive && (
-            <img 
-              src="/rdvs/SVG/IAIndicator.png" 
-              alt="IA Active"
-              style={{ 
-                width: '25px', 
-                height: '25px'
-              }}
-            />
-          )}
+          <svg width="50" height="16" viewBox="0 0 50 16">
+            <text x="25" y="12" textAnchor="middle" fill={COLORS.WHITE} fontSize="12" fontFamily="Consolas, monospace" fontWeight="100">OF {maxPage}</text>
+          </svg>
         </div>
-        
-        {/* Keypad Indicator Toggle Button - Shows KeypadIndicator and toggles keypad overlay */}
-        <div 
-          className="absolute cursor-pointer"
-          style={{ 
-            top: '-54px',  // Position for keypad indicator (adjust as needed)
-            left: '393px',
-            width: '60px',
-            height: '40px',
-            zIndex: 1000,
-          }}
-          onClick={() => {
-            const newKeypadState = !keypadActive;
-            setKeypadActive(newKeypadState);
-            // If turning off keypad and IA was active, also turn off IA
-            if (!newKeypadState && dialpadActive) {
-              setDialpadActive(false);
-              if (dialToneAudio) {
-                dialToneAudio.pause();
-                dialToneAudio.currentTime = 0;
-              }
-            }
-            // Close dial line dialpad if opening keypad
-            if (newKeypadState && activeDialLine) {
-              setActiveDialLine(null);
-            }
-          }}
-        >
-          {keypadActive && (
-            <img 
-              src="/rdvs/SVG/KeypadIndicator.png" 
-              alt="Keypad Active"
-              style={{ 
-                width: '59px', 
-                height: '40px'
-              }}
-            />
-          )}
+
+        {/* Status Indicators: IA, OVR, CA */}
+        <div style={{ display: 'flex', gap: '10px' }}>
+          <svg width="26" height="36" viewBox="0 0 26 36">
+            <text x="13" y="12" textAnchor="middle" fill={COLORS.WHITE} fontSize="11" fontFamily="Consolas, monospace" fontWeight="100">IA</text>
+            <rect x="4" y="16" width="18" height="18" fill="none" stroke={COLORS.WHITE} strokeWidth="1" />
+          </svg>
+          <svg width="30" height="36" viewBox="0 0 30 36">
+            <text x="15" y="12" textAnchor="middle" fill={COLORS.WHITE} fontSize="11" fontFamily="Consolas, monospace" fontWeight="100">OVR</text>
+            <rect x="6" y="16" width="18" height="18" fill={ovrActive ? COLORS.GREEN : 'none'} stroke={COLORS.GREEN} strokeWidth="1" />
+          </svg>
+          <svg width="26" height="36" viewBox="0 0 26 36">
+            <text x="13" y="12" textAnchor="middle" fill={COLORS.WHITE} fontSize="11" fontFamily="Consolas, monospace" fontWeight="100">CA</text>
+            <rect x="4" y="16" width="18" height="18" fill="none" stroke={COLORS.WHITE} strokeWidth="1" />
+          </svg>
         </div>
-        
-        {/* Green fluttering box for override calls - position it yourself */}
-        {(() => {
-          // Check if any override call is active
-          const hasActiveOverride = gg_status && Array.isArray(gg_status) && gg_status.some((status: any) => {
-            if (!status) return false;
-            // Find the corresponding line in currentPosition to check if it's an override (type 0)
-            if (currentPosition && currentPosition.lines) {
-              const lineIndex = currentPosition.lines.findIndex((line: any) => {
-                const lineId = Array.isArray(line) ? line[0] : line?.id;
-                return status.call === lineId || 
-                       status.call?.substring(3) === lineId ||
-                       status.call?.substring(6) === lineId ||
-                       String(status.call).endsWith(lineId);
-              });
-              if (lineIndex >= 0) {
-                const line = currentPosition.lines[lineIndex];
-                const lineType = Array.isArray(line) ? line[1] : line?.type;
-                // Type 0 = Override, and status is active
-                return lineType === 0 && (status.status === 'ok' || status.status === 'active');
-              }
-            }
-            return false;
-          });
-          
-          return hasActiveOverride ? (
-            <div 
-              className="absolute w-2.5 h-6 rdvs-flutter-green"
-              style={{ 
-                top: '-38px',
-                left: '303px',
-                zIndex: 1000
-              }}
-            ></div>
-          ) : null;
-        })()}
-        
+
+        {/* Readout Display */}
+        <svg width="120" height="40" viewBox="0 0 120 40">
+          <rect x="0" y="0" width="120" height="40" fill={COLORS.BLACK} stroke={COLORS.WHITE} strokeWidth="1" />
+        </svg>
       </div>
-      {/* Footer spacing */}
-      <div style={{ height: '48px', width: '100%' }}></div>
+
+      {/* Main Communication Matrix - 5x8 grid + 8 line panels */}
+      <div style={{ display: 'flex', gap: '6px' }}>
+        {/* Left Column: Station Selector (5x8 grid) */}
+        <div
+          style={{
+            display: 'grid',
+            gridTemplateColumns: `repeat(${GRID_COLS}, ${BTN_WIDTH}px)`,
+            gridTemplateRows: `repeat(${GRID_ROWS}, ${BTN_HEIGHT}px)`,
+            gap: '6px',
+            backgroundColor: COLORS.BLACK,
+          }}
+        >
+          {Array.from({ length: GRID_ROWS }).map((_, rowIdx) =>
+            Array.from({ length: GRID_COLS }).map((_, colIdx) =>
+              renderStationButton(rowIdx, colIdx)
+            )
+          )}
+        </div>
+
+        {/* Right Column: Line Control Panels (1x8) */}
+        <div
+          style={{
+            display: 'flex',
+            flexDirection: 'column',
+            gap: '6px',
+          }}
+        >
+          {Array.from({ length: GRID_ROWS }).map((_, rowIdx) =>
+            renderLineControlPanel(rowIdx)
+          )}
+        </div>
+      </div>
+
+      {/* Footer Module */}
+      <div
+        style={{
+          flex: 1,
+          display: 'flex',
+          alignItems: 'flex-end',
+          justifyContent: 'space-between',
+          padding: '0 12px 6px 12px'
+        }}
+      >
+        {/* Page Tabs */}
+        <div style={{ display: 'flex', alignItems: 'flex-end', gap: '4px' }}>
+          {Array.from({ length: Math.min(maxPage, 3) }).map((_, idx) =>
+            renderPageTab(idx + 1, currentPage === idx + 1)
+          )}
+        </div>
+
+        {/* Master Audio Status - global HS/LS radial selectors with black backgrounds */}
+        <div style={{ display: 'flex', gap: '12px', paddingBottom: '4px' }}>
+          <svg width="56" height="22" viewBox="0 0 56 22">
+            <rect x="0" y="2" width="30" height="18" fill="none" stroke={COLORS.GREEN} strokeWidth="1" />
+            <text x="15" y="15" textAnchor="middle" fill={COLORS.WHITE} fontSize="12" fontFamily="Consolas, monospace" fontWeight="100">HS</text>
+            <circle cx="46" cy="11" r="6" fill={COLORS.BLACK} stroke={COLORS.RED} strokeWidth="1" />
+          </svg>
+          <svg width="56" height="22" viewBox="0 0 56 22">
+            <rect x="0" y="2" width="30" height="18" fill="none" stroke={COLORS.GREEN} strokeWidth="1" />
+            <text x="15" y="15" textAnchor="middle" fill={COLORS.WHITE} fontSize="12" fontFamily="Consolas, monospace" fontWeight="100">LS</text>
+            <circle cx="46" cy="11" r="6" fill={COLORS.BLACK} stroke={COLORS.RED} strokeWidth="1" />
+          </svg>
+        </div>
+      </div>
+      </div>
     </div>
   );
 }
