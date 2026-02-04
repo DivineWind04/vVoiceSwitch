@@ -24,22 +24,24 @@ const AreaThree: React.FC<{ setSettingModal: (v: boolean) => void }> = ({ setSet
       // Extract call ID - handle different formats (SO_, gg_, etc.)
       let call_id;
       const fullCall = call.call;
+      const lineType = call.lineType ?? 2; // Use line type from data, default to 2 (regular)
       
       if (fullCall?.startsWith('SO_')) {
         // Shout/Override format: "SO_891" -> "891"
         call_id = fullCall.substring(3);
       } else if (fullCall?.startsWith('gg_')) {
-        // Ground-Ground format: "gg_05_123" -> extract the ID part
-        call_id = fullCall.substring(6);
+        // Ground-Ground format: "gg_123" -> "123"
+        call_id = fullCall.substring(3);
       } else {
-        // Fallback
-        call_id = fullCall?.substring(5) || '';
+        // Fallback - use substring(3) for standard 3-char prefix
+        call_id = fullCall?.substring(3) || '';
       }
       
       if (call_id) {
         const isShoutOverride = fullCall?.startsWith('SO_');
-        console.log('[REL] Stopping call:', call_id, 'isShoutOverride:', isShoutOverride);
-        sendMsg({ type: 'stop', cmd1: call_id, dbl1: isShoutOverride ? 1 : 2 });
+        const dbl1 = isShoutOverride ? 1 : lineType;
+        console.log('[REL] Stopping call:', call_id, 'isShoutOverride:', isShoutOverride, 'dbl1:', dbl1);
+        sendMsg({ type: 'stop', cmd1: call_id, dbl1 });
       }
     });
   };

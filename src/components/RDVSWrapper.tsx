@@ -78,6 +78,25 @@ export default function RDVSWrapper() {
   if (currentPosition && Array.isArray(currentPosition.lines)) {
     console.log('RDVS processing lines:', currentPosition.lines.length);
     currentPosition.lines.forEach((line: any, lineIdx: number) => {
+      // Check for empty placeholder [] in config - render empty button slot
+      if (!line || (Array.isArray(line) && line.length === 0)) {
+        // Push a placeholder button entry with empty callback to pass isStandardButton check
+        buttons.push({
+          config: {
+            id: `placeholder-${lineIdx}`,
+            shortName: '',
+            label: '',
+            target: '',
+            type: 'NONE',
+          },
+          indicatorState: 'off',
+          typeString: '',
+          callback: () => {}, // Empty callback for placeholder
+          isPlaceholder: true
+        } as any);
+        return;
+      }
+      
       // Line structure: [id, type, label]
       const lineType = Array.isArray(line) ? line[1] : line.type;
       
@@ -206,25 +225,25 @@ export default function RDVSWrapper() {
             // Ring line - handle ring/pickup logic
             if (currentStatus === 'off' || currentStatus === '' || currentStatus === 'idle') {
               console.log('RDVS: Sending ring call');
-              sendMsg({ type: 'call', cmd1: call_id, dbl1: 2 }); // Ring call
+              sendMsg({ type: 'call', cmd1: call_id, dbl1: 1 }); // Ring call (use line type 1)
             } else if (currentStatus === 'chime' || currentStatus === 'ringing') {
               console.log('RDVS: Accepting incoming ring call');
-              sendMsg({ type: 'stop', cmd1: call_id, dbl1: 2 }); // Accept call (matches IVSR)
+              sendMsg({ type: 'stop', cmd1: call_id, dbl1: 1 }); // Accept call (use line type 1)
             } else if (currentStatus === 'ok' || currentStatus === 'active') {
               console.log('RDVS: Hanging up active ring call');
-              sendMsg({ type: 'stop', cmd1: call_id, dbl1: 2 }); // Hangup
+              sendMsg({ type: 'stop', cmd1: call_id, dbl1: 1 }); // Hangup (use line type 1)
             }
           } else if (lineTypeValue === 2) {
             // Shout line (SO) - handle shout call/hangup logic
             if (currentStatus === 'off' || currentStatus === '' || currentStatus === 'idle') {
               console.log('RDVS: Sending shout call');
-              sendMsg({ type: 'call', cmd1: call_id, dbl1: 2 }); // Shout call
+              sendMsg({ type: 'call', cmd1: call_id, dbl1: 2 }); // Shout call (use line type 2)
             } else if (currentStatus === 'online' || currentStatus === 'chime') {
               console.log('RDVS: Joining incoming shout call');
-              sendMsg({ type: 'call', cmd1: call_id, dbl1: 2 }); // Join shout call (matches IVSR)
+              sendMsg({ type: 'call', cmd1: call_id, dbl1: 2 }); // Join shout call (use line type 2)
             } else if (currentStatus === 'ok' || currentStatus === 'active') {
               console.log('RDVS: Hanging up shout call');
-              sendMsg({ type: 'stop', cmd1: call_id, dbl1: 1 }); // Hangup shout call (dbl1: 1 for SO lines)
+              sendMsg({ type: 'stop', cmd1: call_id, dbl1: 2 }); // Hangup shout call (use line type 2)
             }
           } else if (lineTypeValue === 3) {
             // Dial line - toggle the dialpad with the trunk name from the label

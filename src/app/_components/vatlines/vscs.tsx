@@ -1605,11 +1605,9 @@ function VscsPanel(props: VscsProps & { panelId?: string; defaultScreenMode?: st
     }, [gg_status, screenMode]);
 
   const btns: Button[] = useMemo(() => {
-    // Calculate offset based on screen mode for correct JSON line type lookup
-    const indexOffset = screenMode === 'GG2' ? ITEMS_PER_PAGE : 0;
-    
     return currentSlice.map((data: any, index: number) => {
-      if (!data) {
+      // Handle empty slots (undefined) or placeholder entries from [] in config
+      if (!data || data.isPlaceholder) {
         // Empty/unavailable button
         return {
           shortName: '',
@@ -1619,13 +1617,23 @@ function VscsPanel(props: VscsProps & { panelId?: string; defaultScreenMode?: st
         };
       }
       
-      // Get line type from JSON based on absolute button index (with offset for page 2)
-      const absoluteIndex = index + indexOffset;
+      // Extract the call ID from WebSocket data (e.g., "gg_08891" -> "891", "SO_811162" -> "811162")
+      const callId = data.call?.substring(3) || ''; // Get everything after "gg_" or "SO_"
+      
+      // Look up line type by matching call ID to the line ID in the JSON
       let lineType = null;
       if (currentPosition && currentPosition.lines && Array.isArray(currentPosition.lines)) {
-        const line = currentPosition.lines[absoluteIndex];
-        if (Array.isArray(line) && line.length >= 2) {
-          lineType = line[1]; // Get line type (0, 1, or 2)
+        // Find the line where the first element (line ID) matches the call ID
+        const matchingLine = currentPosition.lines.find((line: any) => {
+          if (Array.isArray(line) && line.length >= 1) {
+            // Line format: [lineId, lineType, label] e.g., ["811162", 1, "SFO"]
+            return String(line[0]) === callId;
+          }
+          return false;
+        });
+        if (matchingLine && matchingLine.length >= 2) {
+          lineType = matchingLine[1]; // Get line type (0, 1, or 2)
+          console.log('Debug - Found line type', lineType, 'for call ID', callId, 'line:', matchingLine);
         }
       }
       
@@ -1639,13 +1647,14 @@ function VscsPanel(props: VscsProps & { panelId?: string; defaultScreenMode?: st
         type: buttonType,
       };
     });
-  }, [currentSlice, currentPosition, screenMode]);
+  }, [currentSlice, currentPosition]);
 
   // Generate multi-line data for G/G buttons
   const generateGGMultiLineData = (data: any, buttonIndex: number) => {
     if (!data) return undefined;
     
     // Extract meaningful parts from the data
+    const callIdFull = data.call?.substring(3) || ''; // Get everything after "gg_" or "SO_"
     const callId = data.call?.substring(5) || '';
     const callName = data.call_name || callId;
     
@@ -1653,19 +1662,25 @@ function VscsPanel(props: VscsProps & { panelId?: string; defaultScreenMode?: st
     // Don't split on hyphens to avoid breaking "D-42" into "D" and "42"
     const parts = callName.split(/[_\s]/); // Only split on underscore and space, not hyphen
     
-    // Get line type from JSON based on button index
+    // Look up line type by matching call ID to the line ID in the JSON
     let lineType = null;
-    console.log('Debug - Button index:', buttonIndex, 'Call name:', callName);
+    console.log('Debug - Button index:', buttonIndex, 'Call ID:', callIdFull, 'Call name:', callName);
     
     if (currentPosition && currentPosition.lines && Array.isArray(currentPosition.lines)) {
-      const line = currentPosition.lines[buttonIndex];
-      if (Array.isArray(line) && line.length >= 2) {
-        lineType = line[1]; // Get line type (0, 1, or 2)
-        console.log('Debug - Found line type:', lineType, 'for button', buttonIndex, 'line:', line);
+      // Find the line where the first element (line ID) matches the call ID
+      const matchingLine = currentPosition.lines.find((line: any) => {
+        if (Array.isArray(line) && line.length >= 1) {
+          return String(line[0]) === callIdFull;
+        }
+        return false;
+      });
+      if (matchingLine && matchingLine.length >= 2) {
+        lineType = matchingLine[1]; // Get line type (0, 1, or 2)
+        console.log('Debug - Found line type:', lineType, 'for call ID', callIdFull, 'line:', matchingLine);
       }
     }
     
-    console.log('Debug - Final line type for button', buttonIndex, ':', lineType);
+    console.log('Debug - Final line type for call ID', callIdFull, ':', lineType);
     
     // Split callName by commas if it contains them
     const callNameParts = callName.includes(',') ? callName.split(',').map((part: string) => part.trim()) : [callName];
@@ -1738,17 +1753,31 @@ function VscsPanel(props: VscsProps & { panelId?: string; defaultScreenMode?: st
       const fullCall = buttonData.call;
       
       if (fullCall?.startsWith('SO_')) {
-        // Shout/Override format: "SO_891" -> "891"
+        // Shout/Override format: "SO_811162" -> "811162"
         call_id = fullCall.substring(3);
       } else if (fullCall?.startsWith('gg_')) {
-        // Ground-Ground format: "gg_05_123" -> "123" (skip "gg_05_")  
-        call_id = fullCall.substring(6);
+        // Ground-Ground format: "gg_811162" -> "811162"
+        call_id = fullCall.substring(3);
+      } else if (fullCall?.startsWith('OV_')) {
+        // Incoming override format: "OV_811162" -> "811162"
+        call_id = fullCall.substring(3);
       } else {
-        // Fallback to original logic
-        call_id = fullCall?.substring(5) || '';
+        // Fallback - try substring(3) for consistency
+        call_id = fullCall?.substring(3) || '';
       }
       
       console.log('Processing call for ID:', call_id, 'Status:', buttonData.status, 'Full call:', fullCall);
+      
+      // Look up the line type from currentPosition to use the correct dbl1 value
+      let lineType = 2; // Default to shout
+      if (currentPosition && currentPosition.lines && Array.isArray(currentPosition.lines)) {
+        const matchingLine = currentPosition.lines.find((line: any) => 
+          Array.isArray(line) && line.length >= 1 && String(line[0]) === call_id
+        );
+        if (matchingLine && matchingLine.length >= 2) {
+          lineType = matchingLine[1];
+        }
+      }
       
       // Add immediate visual feedback - find the button element
       const buttonIndex = currentSlice.findIndex((data: any) => 
@@ -1759,6 +1788,8 @@ function VscsPanel(props: VscsProps & { panelId?: string; defaultScreenMode?: st
       // Handle different statuses based on IVSR/ETVS implementations
       // Check if this is a Shout/Override line (SO prefix)
       const isShoutOverride = buttonData.call?.startsWith('SO_');
+      // Determine dbl1: SO lines use 1, others use their lineType (0=override, 1=ring, 2=shout)
+      const stopDbl1 = isShoutOverride ? 1 : lineType;
       
       switch (buttonData.status) {
         case 'idle':
@@ -1769,9 +1800,9 @@ function VscsPanel(props: VscsProps & { panelId?: string; defaultScreenMode?: st
             buttonEl.classList.remove('state-active', 'state-busy', 'state-ringing', 'state-hold', 'state-unavailable');
             buttonEl.classList.add('state-ringing'); // Show amber flashing while calling
           }
-          // Connect call
-          console.log('Initiating call to:', call_id);
-          sendMsg({ type: 'call', cmd1: call_id, dbl1: 2 });
+          // Connect call - use lineType for dbl1
+          console.log('Initiating call to:', call_id, 'lineType:', lineType);
+          sendMsg({ type: 'call', cmd1: call_id, dbl1: lineType });
           break;
           
         case 'ok':
@@ -1781,24 +1812,24 @@ function VscsPanel(props: VscsProps & { panelId?: string; defaultScreenMode?: st
             buttonEl.classList.remove('state-active', 'state-busy', 'state-ringing', 'state-hold', 'state-unavailable');
             // Brief flash to show action taken, will be updated by WebSocket response
           }
-          // Disconnect call - use dbl1: 1 for SO lines, dbl1: 2 for others
-          console.log('Disconnecting call from:', call_id, 'isShoutOverride:', isShoutOverride);
-          sendMsg({ type: 'stop', cmd1: call_id, dbl1: isShoutOverride ? 1 : 2 });
+          // Disconnect call - use stopDbl1 which matches the line type
+          console.log('Disconnecting call from:', call_id, 'lineType:', lineType, 'dbl1:', stopDbl1);
+          sendMsg({ type: 'stop', cmd1: call_id, dbl1: stopDbl1 });
           break;
           
         case 'chime':
         case 'ringing':
         case 'online':
-          // Answer/Join incoming call - follow IVSR pattern exactly
-          console.log('Answering incoming call from:', call_id, 'with status:', buttonData.status, 'isShoutOverride:', isShoutOverride);
+          // Answer/Join incoming call
+          console.log('Answering incoming call from:', call_id, 'with status:', buttonData.status, 'lineType:', lineType);
           if (isShoutOverride && (buttonData.status === 'online' || buttonData.status === 'chime')) {
             // For SO lines with online/chime status, use 'call' to join
-            const message = { type: 'call', cmd1: call_id, dbl1: 2 };
+            const message = { type: 'call', cmd1: call_id, dbl1: lineType };
             console.log('Sending message for SO line:', message);
             sendMsg(message);
           } else {
-            // For ALL other incoming calls (chime/ringing/online), use 'stop' with dbl1: 2 (IVSR pattern)
-            const message = { type: 'stop', cmd1: call_id, dbl1: 2 };
+            // For other incoming calls, use 'stop' with the correct lineType
+            const message = { type: 'stop', cmd1: call_id, dbl1: stopDbl1 };
             console.log('Sending message for regular line:', message);
             sendMsg(message);
           }
@@ -1828,7 +1859,7 @@ function VscsPanel(props: VscsProps & { panelId?: string; defaultScreenMode?: st
             buttonEl.classList.remove('state-active', 'state-busy', 'state-ringing', 'state-hold', 'state-unavailable');
             buttonEl.classList.add('state-ringing'); // Show amber flashing while calling
           }
-          sendMsg({ type: 'call', cmd1: call_id, dbl1: 2 });
+          sendMsg({ type: 'call', cmd1: call_id, dbl1: lineType });
           break;
       }
     }

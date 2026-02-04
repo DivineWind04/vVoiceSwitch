@@ -60,12 +60,14 @@ const GroundGroundPage: React.FC<GroundGroundPageProps> = ({ onGG3Toggle }) => {
   const renderButtons = () => {
     const buttons: React.JSX.Element[] = [];
     currentSlice.map((data: any, index: number) => {
-      if (!data) {
+      // Handle empty slots (undefined) or placeholder entries from [] in config
+      if (!data || data.isPlaceholder) {
         buttons.push(<OOSButton key={index} />);
         return;
       }
       const call_type = data?.call?.substring(0, 2);
       const call_id = data.call?.substring(3);
+      const lineType = data.lineType ?? 2; // Use line type from data, default to 2 (regular)
       let onClick: (() => void) | undefined = undefined;
       let indicator = false;
       let indicatorClassName = '';
@@ -88,7 +90,7 @@ const GroundGroundPage: React.FC<GroundGroundPageProps> = ({ onGG3Toggle }) => {
         }
       } else {
         if (data.status === 'off' || data.status === '') {
-          onClick = () => sendMsg({ type: 'call', cmd1: call_id, dbl1: 2 });
+          onClick = () => sendMsg({ type: 'call', cmd1: call_id, dbl1: lineType });
         } else if (data.status === 'busy') {
           onClick = undefined;
           indicatorClassName = 'steady red'; // Solid red for busy lines
@@ -98,11 +100,11 @@ const GroundGroundPage: React.FC<GroundGroundPageProps> = ({ onGG3Toggle }) => {
         } else if (data.status === 'pending' || data.status === 'terminate' || data.status === 'overridden') {
           onClick = undefined;
         } else if (data.status === 'ok' || data.status === 'active') {
-          onClick = () => sendMsg({ type: 'stop', cmd1: call_id, dbl1: 2 });
+          onClick = () => sendMsg({ type: 'stop', cmd1: call_id, dbl1: lineType });
           indicator = ptt || data.status === 'active';
           indicatorClassName = indicator ? 'flutter active' : 'steady green'; // Flutter when active/PTT, steady when connected
         } else if (data.status === 'chime' || data.status === 'ringing') {
-          onClick = () => sendMsg({ type: 'stop', cmd1: call_id, dbl1: 2 });
+          onClick = () => sendMsg({ type: 'stop', cmd1: call_id, dbl1: lineType });
           indicator = true;
           indicatorClassName = 'flutter receive flashing'; // Flash green for incoming calls
         }

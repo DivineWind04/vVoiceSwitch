@@ -22,6 +22,8 @@ interface CoreState {
 }
 
 let call_table: Record<string, [string, number]> = {}
+let line_order: Record<string, number> = {} // Track original line order for sorting
+let placeholder_indices: number[] = [] // Track indices where empty placeholder buttons should appear
 
 // Guard DOM access for Next.js SSR safety
 const ringback_audio: HTMLAudioElement | null =
@@ -128,27 +130,64 @@ export const useCoreStore = create<CoreState>((set: any, get: any) => {
         if (!callsign) {
             return;
         }
-    const lines: Record<string, any[]> = {}
+        // Collect all lines from selected positions, preserving order
+        // Track placeholder indices for empty [] entries
+        const orderedLines: any[] = [];
+        const placeholderPositions: number[] = [];
+        const seenIds = new Set<string>();
         const { selectedPositions: selected_positions } = get();
+        let positionIndex = 0;
+        
+        // First pass: collect lines in order from position config
         Object.values(selected_positions || {}).map((pos: any) => {
             pos.lines?.map((line: any[]) => {
-        (lines[line[0]] ||= []).push(line)
+                // Check if this is an empty placeholder []
+                if (!line || line.length === 0) {
+                    placeholderPositions.push(positionIndex);
+                    positionIndex++;
+                    return;
+                }
+                
+                const lineId = String(line[0]);
+                const lineType = line[1];
+                // For shout lines (type 2), allow duplicates from multiple positions
+                // For other types, only add if not seen before
+                if (lineType === 2 || !seenIds.has(lineId)) {
+                    orderedLines.push({ line, originalIndex: positionIndex });
+                    positionIndex++;
+                    if (lineType !== 2) {
+                        seenIds.add(lineId);
+                    }
+                }
             })
         })
-        const dedup_dest: Record<string, any> = {}
-        const available_lines = Object.values(lines || {}).filter((k: any[]) => {
-            return k.length == 1 || k[0][1] == 2
-        }).map((k: any[]) => {
-            const v = k[0]
-            dedup_dest[v[2]] = v
-        })
+        
+        // Deduplicate while preserving order (keep first occurrence)
+        const dedup_ordered: any[] = [];
+        const dedup_ids = new Set<string>();
+        for (const item of orderedLines) {
+            const lineId = String(item.line[0]);
+            if (!dedup_ids.has(lineId)) {
+                dedup_ordered.push(item);
+                dedup_ids.add(lineId);
+            }
+        }
+        
         call_table = {
             "891": ["TEST", 2],
         }
-        for (const line of Object.values(dedup_dest) as any[]) {
+        // Reset and populate line_order for sorting gg_status later
+        line_order = {};
+        placeholder_indices = placeholderPositions;
+        
+        for (const item of dedup_ordered) {
+            const line = item.line;
             call_table[line[0]] = [line[2], line[1]]
+            line_order[String(line[0])] = item.originalIndex;
             addCall(line[1], '' + line[0])
         }
+        // TEST line comes after all configured lines
+        line_order["891"] = positionIndex++;
         addCall(2, '891')
         cid && addIaCall(1, '' + cid)
         setTimeout(() => {
@@ -220,10 +259,14 @@ export const useCoreStore = create<CoreState>((set: any, get: any) => {
                             new_ag.push({ ...k })
                         } else if (k.call?.startsWith('VSCS_')) {
                             // Handle VSCS buttons - similar to G/G processing
-                            k.call_name = call_table[k.call?.substring(5)]?.[0] || k.call?.substring(5)
+                            const vscs_call_id = k.call?.substring(5);
+                            k.call_name = call_table[vscs_call_id]?.[0] || vscs_call_id
+                            k.lineType = call_table[vscs_call_id]?.[1] ?? 2; // Default to type 2 (regular)
                             new_vscs.push({ ...k })
                         } else {
-                k.call_name = call_table[k.call?.substring(3)]?.[0]
+                            const call_id = k.call?.substring(3);
+                            k.call_name = call_table[call_id]?.[0]
+                            k.lineType = call_table[call_id]?.[1] ?? 2; // Default to type 2 (regular)
                             new_gg.push({ ...k })
                             if (k.call?.startsWith('SO_')) {
 
@@ -238,6 +281,21 @@ export const useCoreStore = create<CoreState>((set: any, get: any) => {
                             }
                         }
                     })
+                    
+                    // Sort gg_status based on original line order from config
+                    new_gg.sort((a: any, b: any) => {
+                        const aId = a.call?.substring(3) || '';
+                        const bId = b.call?.substring(3) || '';
+                        const aOrder = line_order[aId] ?? 9999;
+                        const bOrder = line_order[bId] ?? 9999;
+                        return aOrder - bOrder;
+                    });
+                    
+                    // Insert placeholder objects at the correct indices for empty [] entries
+                    for (const placeholderIdx of placeholder_indices) {
+                        new_gg.splice(placeholderIdx, 0, { isPlaceholder: true });
+                    }
+                    
                     debounce_set({
                         ag_status: new_ag,
                         gg_status: new_gg,

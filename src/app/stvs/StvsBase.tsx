@@ -230,12 +230,33 @@ const StvsBase: React.FC = () => {
           const col = idx % 3;
           const ggItem = ggData[idx]; // Get the corresponding G/G data item
           
+          // Handle placeholder entries from [] in config - render empty button
+          if (ggItem?.isPlaceholder) {
+            return (
+              <StvsButton
+                key={"gg-placeholder-"+idx}
+                label=""
+                brightness={brightness}
+                style={{
+                  left: `${(895 + col*60)/899.16*59}%`,
+                  top: `${(20 + row*38)/164.4*90}%`,
+                  width: `${(40/899.16)*75}%`,
+                  height: `${(40/164.4)*75}%`,
+                  maxWidth: 'none',
+                  maxHeight: 'none',
+                  zIndex: 15,
+                }}
+              />
+            );
+          }
+          
           // Implement click logic matching IVSR/ETVS behavior
           let onClick: (() => void) | undefined = undefined;
           
           if (ggItem && ggItem.call) {
             const call_type = ggItem.call?.substring(0, 2);
             const call_id = ggItem.call?.substring(3);
+            const lineType = ggItem.lineType ?? 2; // Use line type from data, default to 2 (regular)
             
             if (call_type === 'SO') {
               // Special Operator calls
@@ -251,13 +272,13 @@ const StvsBase: React.FC = () => {
             } else {
               // Direct Line calls (DL_xxx) and others
               if (ggItem.status === 'off' || ggItem.status === '' || ggItem.status === 'idle') {
-                onClick = () => sendMsg({ type: 'call', cmd1: call_id, dbl1: 2 }); // Initiate call
+                onClick = () => sendMsg({ type: 'call', cmd1: call_id, dbl1: lineType }); // Initiate call
               } else if (ggItem.status === 'busy' || ggItem.status === 'hold') {
                 onClick = undefined; // No action available
               } else if (ggItem.status === 'pending' || ggItem.status === 'terminate' || ggItem.status === 'overridden') {
                 onClick = undefined; // No action available
               } else if (ggItem.status === 'ok' || ggItem.status === 'active' || ggItem.status === 'chime' || ggItem.status === 'ringing') {
-                onClick = () => sendMsg({ type: 'stop', cmd1: call_id, dbl1: 2 }); // Hangup DL
+                onClick = () => sendMsg({ type: 'stop', cmd1: call_id, dbl1: lineType }); // Hangup DL
               }
             }
           }
