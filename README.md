@@ -3,9 +3,8 @@
 A web-based aviation interface supporting multiple UI types (VSCS, ETVS, STVS, IVSR, RDVS) with position-based automatic switching and dynamic audio systems.
 
 ## 🌐 Live Demo
-- **Main Interface**: [https://your-app.vercel.app](https://your-app.vercel.app)
-- **VSCS**: [https://your-app.vercel.app/vscs](https://your-app.vercel.app/vscs)
-- **ETVS**: [https://your-app.vercel.app/etvs](https://your-app.vercel.app/etvs)
+- **Main Interface**: https://v-voice-switch.vercel.app/
+
 
 ## ✈️ Features
 - **Position-Based UI Selection**: Automatic interface switching based on facility position
