@@ -1,4 +1,6 @@
 import { create } from 'zustand'
+import type { RDVSColorPattern } from './types/ted_pattern_types';
+
 interface Position {
     cs: string;
     pos: string;
@@ -17,6 +19,7 @@ export interface Facility {
     name: string;
     positions: Position[];
     dialCodeTable?: DialCodeTable;
+    rdvsColorPattern?: RDVSColorPattern;
 }
 
 // Helper function to find a dialCodeTable for a given position
@@ -49,6 +52,38 @@ export function findDialCodeTable(positionData: Facility, positionCallsign: stri
     
     const result = searchFacility(positionData);
     return result.dialCodeTable || null;
+}
+
+// Helper function to find the rdvsColorPattern for a given position
+// Searches up the facility tree from the position's parent facility
+export function findRdvsColorPattern(positionData: Facility, positionCallsign: string): RDVSColorPattern | null {
+    // Recursive search through facility tree
+    function searchFacility(facility: Facility): { rdvsColorPattern?: RDVSColorPattern; hasPosition: boolean } {
+        // Check if this facility has the position
+        const hasPosition = facility.positions?.some(p => p.cs === positionCallsign);
+
+        // If this facility has the position, return it with its color pattern (if any)
+        if (hasPosition) {
+            return { rdvsColorPattern: facility.rdvsColorPattern, hasPosition: true };
+        }
+
+        // Search child facilities
+        for (const child of facility.childFacilities || []) {
+            const result = searchFacility(child);
+            if (result.hasPosition) {
+                // Position found in child - return child's rdvsColorPattern if exists, otherwise this facility's
+                return {
+                    rdvsColorPattern: result.rdvsColorPattern || facility.rdvsColorPattern,
+                    hasPosition: true
+                };
+            }
+        }
+
+        return { hasPosition: false };
+    }
+
+    const result = searchFacility(positionData);
+    return result.rdvsColorPattern || null;
 }
 
 // Helper function to resolve a dial code to a target callsign
