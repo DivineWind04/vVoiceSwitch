@@ -3,7 +3,6 @@
 @tailwind utilities;
 
 html {
-  -webkit-text-stroke: 0.6pt;
   -webkit-font-smoothing: antialiased;
   -text-rendering: optimizeLegibility;
 }
