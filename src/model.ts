@@ -373,32 +373,40 @@ export const useCoreStore = create<CoreState>((set: any, get: any) => {
     outgoingLandlines: [],
     heldLandlines: [],
     buttonPress: () => {},
-    holdBtn: () => {},
+    holdBtn: () => {
+        // Hold all active G/G calls
+        const { gg_status, sendMessageNow } = get();
+        const activeCalls = (gg_status || []).filter((call: any) =>
+            call && (call.status === 'ok' || call.status === 'active')
+        );
+
+        console.log('[holdBtn] Holding', activeCalls.length, 'active calls');
+
+        activeCalls.forEach((call: any) => {
+            const fullCall = call.call;
+            // All prefixes (SO_, gg_, OV_) are 3 chars + underscore
+            const call_id = fullCall?.substring(3) || '';
+
+            if (call_id && sendMessageNow) {
+                console.log('[holdBtn] Holding call:', call_id);
+                sendMessageNow({ type: 'hold', cmd1: call_id, dbl1: 0 });
+            }
+        });
+    },
     releaseBtn: () => {
         // Release all active G/G calls
         const { gg_status, sendMessageNow } = get();
-        const activeCalls = (gg_status || []).filter((call: any) => 
+        const activeCalls = (gg_status || []).filter((call: any) =>
             call && (call.status === 'ok' || call.status === 'active')
         );
-        
+
         console.log('[releaseBtn] Releasing', activeCalls.length, 'active calls');
-        
+
         activeCalls.forEach((call: any) => {
-            // Extract call ID - handle different formats (SO_, gg_, etc.)
-            let call_id;
             const fullCall = call.call;
-            
-            if (fullCall?.startsWith('SO_')) {
-                // Shout/Override format: "SO_891" -> "891"
-                call_id = fullCall.substring(3);
-            } else if (fullCall?.startsWith('gg_')) {
-                // Ground-Ground format: "gg_05_123" -> extract the ID part
-                call_id = fullCall.substring(6);
-            } else {
-                // Fallback
-                call_id = fullCall?.substring(5) || '';
-            }
-            
+            // All prefixes (SO_, gg_, OV_) are 3 chars + underscore = substring(3) strips prefix
+            const call_id = fullCall?.substring(3) || '';
+
             if (call_id && sendMessageNow) {
                 const isShoutOverride = fullCall?.startsWith('SO_');
                 console.log('[releaseBtn] Stopping call:', call_id, 'isShoutOverride:', isShoutOverride);

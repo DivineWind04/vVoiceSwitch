@@ -413,7 +413,7 @@ export default function RDVSWrapper({ variant = 'default' }: RDVSWrapperProps) {
     if (currentPosition?.lines) {
       currentPosition.lines.forEach((line: any) => {
         const lineType = Array.isArray(line) ? line[1] : line.type;
-        const call_id = Array.isArray(line) ? line[0] : (line.id || '');
+        const call_id = String(Array.isArray(line) ? line[0] : (line.id || ''));
         const label = Array.isArray(line) && line[2] ? String(line[2]) : '';
         const parts = label.split(',');
         const line1 = parts[0]?.trim() || '';
@@ -427,7 +427,7 @@ export default function RDVSWrapper({ variant = 'default' }: RDVSWrapperProps) {
         let statusObj: any = {};
         if (gg_status) {
           statusObj = gg_status.find((s: any) =>
-            s?.call === call_id || String(s?.call).endsWith(call_id)
+            s?.call === call_id || s?.call?.endsWith('_' + call_id)
           ) || {};
         }
 
@@ -1290,7 +1290,7 @@ export default function RDVSWrapper({ variant = 'default' }: RDVSWrapperProps) {
 
         // Find status
         const statusObj = gg_status?.find((s: any) =>
-          s?.call === call_id || String(s?.call).endsWith(call_id)
+          s?.call === call_id || s?.call?.endsWith('_' + call_id)
         ) || {};
 
         const callStatus = statusObj.status || 'off';
