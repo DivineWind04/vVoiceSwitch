@@ -307,7 +307,7 @@ export default function Page() {
             </p>
             
             {/* Show CID/callsign info if available */}
-            {cid && cid !== 0 && (
+            {cid !== 0 && (
               <p className="text-sm text-zinc-400 mb-4">
                 Connected as: CID {cid}{callsign ? ` (${callsign})` : ''}
               </p>
@@ -316,7 +316,7 @@ export default function Page() {
             {(!selectedPositions || selectedPositions.length === 0) && autoDetectStatus !== 'detecting' && (
               <div className="flex gap-4 justify-center">
                 {/* Retry auto-detect button (only show if we have CID) */}
-                {cid && cid !== 0 && autoDetectStatus === 'failed' && (
+                {cid !== 0 && autoDetectStatus === 'failed' && (
                   <button 
                     onClick={retryAutoDetect}
                     className="bg-green-600 hover:bg-green-700 text-white font-bold py-2 px-4 rounded"
