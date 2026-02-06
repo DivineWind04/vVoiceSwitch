@@ -239,7 +239,7 @@ export function getCurrentUIContext(): string {
 }
 
 // Function to create or get audio element for specific UI
-function getAudioElement(audioType: 'ringback' | 'ggchime'): HTMLAudioElement | null {
+export function getAudioElement(audioType: 'ringback' | 'ggchime'): HTMLAudioElement | null {
     if (typeof document === 'undefined') return null;
     
     const uiContext = getCurrentUIContext();
@@ -303,7 +303,7 @@ export function setUIContextFromPosition(position: any) {
     return detectedUI;
 }
 
-function stopAudio() {
+export function stopAudio() {
     try {
         // Get current audio elements in case UI context changed
         const currentRingback = getAudioElement('ringback');
@@ -335,7 +335,7 @@ const debounce = <T extends (...args: any[]) => void>(callback: T, wait: number)
     };
 }
 
-function chime(audio: HTMLAudioElement | null | undefined) {
+export function chime(audio: HTMLAudioElement | null | undefined) {
     try {
         if (!audio) return;
         if ((audio as any).paused) {
@@ -517,6 +517,14 @@ export const useCoreStore = create<CoreState>((set: any, get: any) => {
         sendMessageNow({ type: 'add_ia', cmd1: cmd1, dbl1: callType })
     }
     function sendMessageNow(message: any) {
+        // Intercept test bench calls (call/stop messages for active test bench lineIds)
+        if (message && (message.type === 'call' || message.type === 'stop')) {
+            const tbHandler = typeof window !== 'undefined' ? (window as any).__TB_HANDLER__ : null;
+            if (tbHandler?.isTestBenchCall(message.cmd1)) {
+                tbHandler.handleMessage(message);
+                return;
+            }
+        }
         if (message && socket?.readyState === WebSocket.OPEN) {
             if (typeof message === "object") {
                 socket.send(JSON.stringify(message));

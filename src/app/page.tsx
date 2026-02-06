@@ -13,6 +13,7 @@ import SettingModal from '../pages/setting';
 import { Alert } from 'antd';
 import { loadAllFacilities, SUPPORTED_FACILITIES } from '../lib/facilityLoader';
 import { autoDetectPosition } from '../lib/vatsimController';
+import TestBenchIcon from '../testbench/TestBenchIcon';
 
 export default function Page() {
   const [settingModal, setSettingModal] = useState(false);
@@ -33,6 +34,16 @@ export default function Page() {
   const updateSelectedPositions = useCoreStore(s => s.updateSelectedPositions);
   const setCurrentUI = useCoreStore(s => s.setCurrentUI);
   const [versionAlert, setVersionAlert] = useState<any>(null);
+  const [isLocalhost, setIsLocalhost] = useState(false);
+
+  // Detect localhost for test bench access
+  useEffect(() => {
+    const hostname = window.location.hostname;
+    setIsLocalhost(
+      hostname === 'localhost' || hostname === '127.0.0.1' ||
+      hostname === '[::1]' || hostname === '0.0.0.0'
+    );
+  }, []);
 
   // Load JSON data and version info on component mount
   useEffect(() => {
@@ -166,17 +177,17 @@ export default function Page() {
 
   // Track when UI should be considered "loaded"
   useEffect(() => {
-    if (connected && selectedPositions && selectedPositions.length > 0 && currentUI) {
+    if ((connected || isLocalhost) && selectedPositions && selectedPositions.length > 0 && currentUI) {
       // Add a small delay to ensure UI components have time to mount
       const timer = setTimeout(() => {
         setUiLoaded(true);
       }, 500); // Half second delay for UI to initialize
-      
+
       return () => clearTimeout(timer);
     } else {
       setUiLoaded(false);
     }
-  }, [connected, selectedPositions, currentUI]);
+  }, [connected, isLocalhost, selectedPositions, currentUI]);
 
   // VSCS Zustand state mapping
   const activeLandlines = useCoreStore(s => s.activeLandlines || []);
@@ -259,7 +270,7 @@ export default function Page() {
         />
       )}
       
-      {!connected ? (
+      {!connected && !isLocalhost ? (
         <div className="flex items-center justify-center min-h-screen">
           <div className="text-center text-white">
             <h2 className="text-2xl font-bold mb-4">AFV Client</h2>
@@ -335,6 +346,7 @@ export default function Page() {
         renderUI()
       )}
       <SettingModal open={settingModal} setModal={setSettingModal} />
+      <TestBenchIcon />
     </div>
   );
 }
