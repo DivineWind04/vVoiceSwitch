@@ -1,4 +1,6 @@
 import { create } from 'zustand'
+import type { RDVSColorPattern } from './types/ted_pattern_types';
+
 interface Position {
     cs: string;
     pos: string;
@@ -17,6 +19,7 @@ export interface Facility {
     name: string;
     positions: Position[];
     dialCodeTable?: DialCodeTable;
+    rdvsColorPattern?: RDVSColorPattern;
 }
 
 // Helper function to find a dialCodeTable for a given position
@@ -51,6 +54,38 @@ export function findDialCodeTable(positionData: Facility, positionCallsign: stri
     return result.dialCodeTable || null;
 }
 
+// Helper function to find the rdvsColorPattern for a given position
+// Searches up the facility tree from the position's parent facility
+export function findRdvsColorPattern(positionData: Facility, positionCallsign: string): RDVSColorPattern | null {
+    // Recursive search through facility tree
+    function searchFacility(facility: Facility): { rdvsColorPattern?: RDVSColorPattern; hasPosition: boolean } {
+        // Check if this facility has the position
+        const hasPosition = facility.positions?.some(p => p.cs === positionCallsign);
+
+        // If this facility has the position, return it with its color pattern (if any)
+        if (hasPosition) {
+            return { rdvsColorPattern: facility.rdvsColorPattern, hasPosition: true };
+        }
+
+        // Search child facilities
+        for (const child of facility.childFacilities || []) {
+            const result = searchFacility(child);
+            if (result.hasPosition) {
+                // Position found in child - return child's rdvsColorPattern if exists, otherwise this facility's
+                return {
+                    rdvsColorPattern: result.rdvsColorPattern || facility.rdvsColorPattern,
+                    hasPosition: true
+                };
+            }
+        }
+
+        return { hasPosition: false };
+    }
+
+    const result = searchFacility(positionData);
+    return result.rdvsColorPattern || null;
+}
+
 // Helper function to resolve a dial code to a target callsign
 // trunkName: The trunk name from the type 3 line label (e.g., "APCH", "S-BAY")
 // dialCode: The 2-digit code entered by the user (e.g., "11", "42")
@@ -79,6 +114,7 @@ interface CoreState {
     // Override tracking for R/T functionality
     overrideStatus: any[], // Tracks OV_ prefixed calls (incoming overrides)
     isBeingOverridden: boolean, // True when there's an active incoming override
+    overrideCallStatus: string, // Status of the override call: 'off', 'ok', 'active', 'hold', etc.
     
     // Dial call state for type 3 lines
     activeDialLine: { trunkName: string; lineType: number } | null;
@@ -320,10 +356,15 @@ function stopAudio() {
 }
 
 const debounce = <T extends (...args: any[]) => void>(callback: T, wait: number) => {
-    let timeoutId: number | null = null;
+    let timeoutId: ReturnType<typeof setTimeout> | null = null;
     return (...args: Parameters<T>) => {
-        if (timeoutId) window.clearTimeout(timeoutId);
-        timeoutId = window.setTimeout(() => {
+        if (typeof window === 'undefined') {
+            // SSR: execute immediately without debouncing
+            callback(...args);
+            return;
+        }
+        if (timeoutId) clearTimeout(timeoutId);
+        timeoutId = setTimeout(() => {
             callback(...args);
         }, wait);
     };
@@ -360,6 +401,7 @@ export const useCoreStore = create<CoreState>((set: any, get: any) => {
     vscs_status: [],
     overrideStatus: [], // Track OV_ calls
     isBeingOverridden: false, // Track if position is being overridden
+    overrideCallStatus: 'off', // Track override call status for OVR lamp animation
     sendMessageNow: () => {},
     // VSCS-specific props (default implementations)
     activeLandlines: [],
@@ -367,21 +409,40 @@ export const useCoreStore = create<CoreState>((set: any, get: any) => {
     outgoingLandlines: [],
     heldLandlines: [],
     buttonPress: () => {},
-    holdBtn: () => {},
+    holdBtn: () => {
+        // Hold all active G/G calls
+        const { gg_status, sendMessageNow } = get();
+        const activeCalls = (gg_status || []).filter((call: any) =>
+            call && (call.status === 'ok' || call.status === 'active')
+        );
+
+        console.log('[holdBtn] Holding', activeCalls.length, 'active calls');
+
+        activeCalls.forEach((call: any) => {
+            const fullCall = call.call;
+            // Strip variable-length prefixes: gg_05_, OV_, SO_, etc.
+            const call_id = fullCall?.replace(/^(?:gg_\d+_|OV_|SO_)/, '') || '';
+
+            if (call_id && sendMessageNow) {
+                console.log('[holdBtn] Holding call:', call_id);
+                sendMessageNow({ type: 'hold', cmd1: call_id, dbl1: 0 });
+            }
+        });
+    },
     releaseBtn: () => {
         // Release all active G/G calls
         const { gg_status, sendMessageNow } = get();
-        const activeCalls = (gg_status || []).filter((call: any) => 
+        const activeCalls = (gg_status || []).filter((call: any) =>
             call && (call.status === 'ok' || call.status === 'active')
         );
-        
+
         console.log('[releaseBtn] Releasing', activeCalls.length, 'active calls');
-        
+
         activeCalls.forEach((call: any) => {
-            // Extract call ID - everything after the 3-char prefix (SO_, gg_, OV_)
             const fullCall = call.call;
-            const call_id = fullCall?.substring(3) || '';
-            
+            // Strip variable-length prefixes: gg_05_, OV_, SO_, etc.
+            const call_id = fullCall?.replace(/^(?:gg_\d+_|OV_|SO_)/, '') || '';
+
             if (call_id && sendMessageNow) {
                 // Look up the original line type from call_table to use matching dbl1 value
                 const lineInfo = call_table[call_id];
@@ -739,47 +800,19 @@ export const useCoreStore = create<CoreState>((set: any, get: any) => {
                         }
                     })
                     
-                    // Sort gg_status based on original line order from config
-                    new_gg.sort((a: any, b: any) => {
-                        const aId = a.call?.substring(3) || '';
-                        const bId = b.call?.substring(3) || '';
-                        const aOrder = line_order[aId] ?? 9999;
-                        const bOrder = line_order[bId] ?? 9999;
-                        return aOrder - bOrder;
-                    });
-                    
-                    // Insert placeholder objects at the correct indices for empty [] entries
-                    for (const placeholderIdx of placeholder_indices) {
-                        new_gg.splice(placeholderIdx, 0, { isPlaceholder: true });
-                    }
-                    
-                    // Check if there's an active override (OV_ call with status 'ok' or 'active')
-                    const hasActiveOverride = new_override.some((ov: any) => 
-                        ov.status === 'ok' || ov.status === 'active'
+                    // Check if there's an active or held override (OV_ call)
+                    const hasActiveOverride = new_override.some((ov: any) =>
+                        ov.status === 'ok' || ov.status === 'active' || ov.status === 'hold'
                     );
-                    
-                    // Check dial call status - if we have a call that just connected, update dialCallStatus
-                    const currentDialStatus = get().dialCallStatus;
-                    if (currentDialStatus === 'ringback' || currentDialStatus === 'dialing') {
-                        // Check if any call just became 'ok' or 'active'
-                        const hasConnectedCall = new_gg.some((call: any) => 
-                            !call.isPlaceholder && (call.status === 'ok' || call.status === 'active')
-                        );
-                        if (hasConnectedCall) {
-                            set({ dialCallStatus: 'connected' });
-                            // Reset after a short delay
-                            setTimeout(() => {
-                                set({ dialCallStatus: 'idle' });
-                            }, 2000);
-                        }
-                    }
-                    
+                    const overrideCallStatus = new_override.length > 0 ? new_override[0].status : 'off';
+
                     debounce_set({
                         ag_status: new_ag,
                         gg_status: new_gg,
                         vscs_status: new_vscs,
                         overrideStatus: new_override,
                         isBeingOverridden: hasActiveOverride,
+                        overrideCallStatus,
                     })
                 } else if (data.type === 'call_sign') {
             console.log('[WebSocket] Received call_sign:', data.cmd1, 'CID:', data.dbl1);

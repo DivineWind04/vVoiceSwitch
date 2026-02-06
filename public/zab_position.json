@@ -1,11 +1,61 @@
 {
+  "rdvsColorPattern": {
+    "patternName": "ZAB_DARK",
+    "description": "Albuquerque ARTCC dark",
+    "screenColors": {
+      "dark": { "text": "#FFFFFF", "background": "#000000" },
+      "bright": { "text": "#FFFFFF", "background": "#404040" }
+    },
+    "colorSets": {
+      "1": {
+        "name": "Normal DA / Normal Radio",
+        "textColor": "#00FFFF",
+        "backgroundColor": "#000000",
+        "borderColor": "#89111D",
+        "fillDesign": "solid"
+      },
+      "2": {
+        "name": "Significant DA (Interphone/Trunk)",
+        "textColor": "#FFFFFF",
+        "backgroundColor": "#26449B",
+        "borderColor": "#26449B",
+        "fillDesign": "solid"
+      },
+      "3": {
+        "name": "Utility (Special Function / Dial)",
+        "textColor": "#FFFFFF",
+        "backgroundColor": "#606666",
+        "borderColor": "#606666",
+        "fillDesign": "solid"
+      },
+      "4": {
+        "name": "Significant Radio (Emergency)",
+        "textColor": "#00FFFF",
+        "backgroundColor": "#000000",
+        "borderColor": "#89111D",
+        "fillDesign": "interleaved"
+      }
+    },
+    "buttonAssignments": {
+      "intercomRingback": "1",
+      "intercomOverride": "1",
+      "controlMonitor": "1",
+      "specialFunction": "3",
+      "interphone": "2",
+      "dialDigit": "3",
+      "normalRadio": "1",
+      "emergencyRadio": "4",
+      "radioWithSidetone": "1",
+      "radioWithPreempt": "1"
+    }
+  },
   "positions": [
     {
       "cs": "ABQ_00_CTR",
       "pos": "P50 Satellite Clearance",
       "freq": 127450000,
       "rn": "PHX Satellite Clearance",
-      "ui": "vscs",
+      "ui": "ivsr",
       "lines": []
     },
     {
@@ -2446,38 +2496,146 @@
   "childFacilities": [
     {
       "positions": [
-        {
-          "cs": "PHX_A_APP",
-          "pos": "APACHE",
-          "freq": 128650000,
-          "rn": "Phoenix Approach",
-          "ui": "rdvs",
-          "lines": [
-            ["6020742", 0, "FREEWAY"],
-            ["6020743", 0, "QUARTZ"],
-            ["6020744", 0, "KACHINA"],
-            ["6020745", 0, "VERDE"],
-            ["6020746", 0, "CROWN"],
-            ["6020747", 0, "JEROME"],
-            ["6020748", 0, "BILTMORE"],
-            ["6020749", 0, "PIMA"],
-            ["6020750", 0, "WILLIE"],
-            ["8111000", 2, "ZAB"],
-            ["9999", 3, "MULTI,DIAL"],
-            ["8111001", 2, "LUF"],
-            ["6025000", 2, "PHX"],
-            ["6025001", 2, "SDL"],
-            ["6025002", 2, "CHD"],
-            ["6025003", 2, "DVT"],
-            ["6025004", 2, "FFZ"],
-            ["6025005", 2, "IWA"],
-            ["6025006", 2, "FLG"],
-            ["6025007", 2, "PRC"],
-            ["8111100", 2, "LUF"]
-          ]
-        },
-        {
-          "cs": "PHX_B_APP",
+    {
+      "cs": "PHX_A_APP",
+      "pos": "APACHE",
+      "freq": 128650000,
+      "rn": "Phoenix Approach",
+      "ui": "rdvs",
+      "lines": [
+        ["6020742", 0, "P50-F"],
+        ["6020743", 0, "P50-Q"],
+        ["6020744", 0, "P50-K"],
+        ["6020745", 0, "P50-V"],
+        ["6020746", 0, "P50-R"],
+        ["6020747", 0, "P50-J"],
+        ["6020748", 0, "P50-B"],
+        ["6020749", 0, "P50-P"],
+        ["6020750", 0, "P50-W"],
+        ["8111000", 2, "ZAB,16"],
+        ["9999", 3, "MULTI,DIAL"],
+        ["8111001", 2, "LUF"],
+        ["6025000", 2, "PHX"],
+        ["6025001", 2, "SDL"],
+        ["6025002", 2, "CHD"],
+        ["6025003", 2, "DVT"],
+        ["6025004", 2, "FFZ"],
+        ["6025005", 2, "IWA"],
+        ["6025006", 2, "FLG"],
+        ["6025007", 2, "PRC"],
+        ["8111100", 2, "LUF,LC"]
+      ],
+      "radios": [
+        { "id": "radio1", "freq": 128650000, "name": "APACHE" },
+        { "id": "radio2", "freq": 121900000, "name": "PHX TWR" },
+        { "id": "radio3", "freq": 119100000, "name": "PHX DEP" },
+        { "id": "radio4", "freq": 125800000, "name": "PHX GND" },
+        { "id": "radio5", "freq": 132450000, "name": "ZAB HIGH" },
+        { "id": "radio6", "freq": 121500000, "name": "GUARD" }
+      ],
+      "tedPattern": {
+        "patternName": "PHX_APACHE_PATTERN",
+		"display": "LEFT",
+        "dimPercent": 50,
+        "pages": [
+          {
+            "pageNumber": 1,
+            "footer": "DRP",
+            "cells": [
+              { "quad": 1, "row": 1, "col": 1, "type": "DA", "lineId": "6020742" },
+              { "quad": 1, "row": 1, "col": 2, "type": "DA", "lineId": "6020743" },
+              { "quad": 1, "row": 1, "col": 3, "type": "DA", "lineId": "6020744" },
+              { "quad": 1, "row": 1, "col": 4, "type": "DA", "lineId": "6020745" },
+              { "quad": 1, "row": 1, "col": 5, "type": "DA", "lineId": "6020746" },
+              { "quad": 1, "row": 2, "col": 1, "type": "DA", "lineId": "6020747" },
+              { "quad": 1, "row": 2, "col": 2, "type": "DA", "lineId": "6020748" },
+              { "quad": 1, "row": 2, "col": 3, "type": "DA", "lineId": "6020749" },
+              { "quad": 1, "row": 2, "col": 4, "type": "DA", "lineId": "6020750" },
+              { "quad": 1, "row": 4, "col": 5, "type": "DA", "lineId": "8111000" },
+
+              { "quad": 2, "row": 1, "col": 1, "type": "RADIO", "radioId": "radio1" },
+              { "quad": 2, "row": 2, "col": 1, "type": "RADIO", "radioId": "radio2" },
+			  { "quad": 2, "row": 3, "col": 1, "type": "RADIO", "radioId": "radio5" },
+              { "quad": 2, "row": 4, "col": 1, "type": "PARTIAL", "radioId": "radio3" },
+              { "quad": 2, "row": 4, "col": 2, "type": "PARTIAL", "radioId": "radio4" },
+			  { "quad": 2, "row": 4, "col": 3, "type": "PARTIAL", "radioId": "radio6" },
+
+              { "quad": 3, "row": 1, "col": 1, "type": "DA", "lineId": "8111001" },
+              { "quad": 3, "row": 1, "col": 2, "type": "DA", "lineId": "6025000" },
+              { "quad": 3, "row": 1, "col": 3, "type": "DA", "lineId": "6025001" },
+              { "quad": 3, "row": 1, "col": 4, "type": "DA", "lineId": "6025002" },
+              { "quad": 3, "row": 1, "col": 5, "type": "DA", "lineId": "6025003" },
+              { "quad": 3, "row": 2, "col": 1, "type": "DA", "lineId": "6025004" },
+              { "quad": 3, "row": 2, "col": 2, "type": "DA", "lineId": "6025005" },
+              { "quad": 3, "row": 2, "col": 3, "type": "DA", "lineId": "6025006" },
+              { "quad": 3, "row": 2, "col": 4, "type": "DA", "lineId": "6025007" },
+              { "quad": 3, "row": 2, "col": 5, "type": "DA", "lineId": "8111100" },
+
+              { "quad": 3, "row": 4, "col": 1, "type": "FUNC", "funcType": "HOLD" },
+              { "quad": 3, "row": 4, "col": 2, "type": "FUNC", "funcType": "REL" },
+              { "quad": 3, "row": 4, "col": 4, "type": "FUNC", "funcType": "RECON" },
+              { "quad": 3, "row": 4, "col": 5, "type": "FUNC", "funcType": "FWD" }
+            ]
+          },
+          {
+            "pageNumber": 2,
+            "footer": "DP",
+            "cells": [
+              { "quad": 1, "row": 1, "col": 1, "type": "DA", "lineId": "6020742" },
+              { "quad": 1, "row": 1, "col": 2, "type": "DA", "lineId": "6020743" },
+              { "quad": 1, "row": 1, "col": 3, "type": "DA", "lineId": "6020744" },
+              { "quad": 1, "row": 1, "col": 4, "type": "DA", "lineId": "6020745" },
+              { "quad": 1, "row": 1, "col": 5, "type": "DA", "lineId": "6020746" },
+
+              { "quad": 2, "row": 1, "col": 1, "type": "RADIO", "radioId": "radio3" },
+              { "quad": 2, "row": 2, "col": 1, "type": "RADIO", "radioId": "radio4" },
+              { "quad": 2, "row": 3, "col": 1, "type": "RADIO", "radioId": "radio5" },
+              { "quad": 2, "row": 4, "col": 1, "type": "RADIO", "radioId": "radio6" },
+
+              { "quad": 3, "row": 4, "col": 1, "type": "FUNC", "funcType": "HOLD" },
+              { "quad": 3, "row": 4, "col": 2, "type": "FUNC", "funcType": "REL" },
+              { "quad": 3, "row": 4, "col": 3, "type": "FUNC", "funcType": "RB" },
+              { "quad": 3, "row": 4, "col": 5, "type": "FUNC", "funcType": "FWD" }
+            ]
+          },
+          {
+            "pageNumber": 3,
+            "display": "NONE",
+            "footer": "NONE",
+            "cells": [
+              { "quad": 1, "row": 1, "col": 1, "type": "DA", "lineId": "8111000" },
+              { "quad": 1, "row": 1, "col": 2, "type": "DA", "lineId": "8111001" },
+              { "quad": 1, "row": 2, "col": 1, "type": "DA", "lineId": "6025000" },
+              { "quad": 1, "row": 2, "col": 2, "type": "DA", "lineId": "6025001" },
+              { "quad": 1, "row": 2, "col": 3, "type": "DA", "lineId": "6025002" },
+
+              { "quad": 2, "row": 1, "col": 1, "type": "PARTIAL", "radioId": "radio1" },
+              { "quad": 2, "row": 1, "col": 3, "type": "PARTIAL", "radioId": "radio2" },
+              { "quad": 2, "row": 2, "col": 1, "type": "PARTIAL", "radioId": "radio3" },
+              { "quad": 2, "row": 2, "col": 3, "type": "PARTIAL", "radioId": "radio4" },
+              { "quad": 2, "row": 3, "col": 1, "type": "PARTIAL", "radioId": "radio5" },
+              { "quad": 2, "row": 3, "col": 3, "type": "PARTIAL", "radioId": "radio6" }
+            ]
+          },
+          {
+            "pageNumber": 4,
+            "display": "LEFT",
+            "footer": "PRD",
+            "cells": [
+              { "quad": 2, "row": 1, "col": 1, "type": "RADIO", "radioId": "radio1" },
+              { "quad": 2, "row": 2, "col": 1, "type": "RADIO", "radioId": "radio2" },
+              { "quad": 2, "row": 3, "col": 1, "type": "RADIO", "radioId": "radio3" },
+              { "quad": 2, "row": 4, "col": 1, "type": "RADIO", "radioId": "radio4" },
+
+              { "quad": 4, "row": 1, "col": 1, "type": "RADIO", "radioId": "radio5" },
+              { "quad": 4, "row": 2, "col": 1, "type": "RADIO", "radioId": "radio6" }
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "cs": "PHX_B_APP",
           "pos": "BILTMORE",
           "freq": 120700000,
           "rn": "Phoenix Approach",

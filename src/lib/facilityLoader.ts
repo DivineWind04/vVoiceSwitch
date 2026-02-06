@@ -99,6 +99,7 @@ export async function loadAllFacilities(): Promise<{
           positions: result.data.positions || [],
           childFacilities: [],
           dialCodeTable: result.data.dialCodeTable,
+          rdvsColorPattern: result.data.rdvsColorPattern,
         };
         merged.childFacilities.push(facilityWrapper);
       } else if (result.data.childFacilities) {

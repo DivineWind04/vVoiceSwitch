@@ -45,6 +45,13 @@
     font-style: normal;
 }
 
+@font-face {
+    font-family: 'RDVSimulated';
+    src: url('/RDVSimulated.ttf') format('truetype');
+    font-weight: normal;
+    font-style: normal;
+}
+
 :root {
     --vscs-font: 'VSCS', 'Courier New', Courier, monospace;
 }

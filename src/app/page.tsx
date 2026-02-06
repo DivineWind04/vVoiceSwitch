@@ -197,6 +197,12 @@ export default function Page() {
   const metadata = useCoreStore(s => s.metadata || { position: '', sector: '', facilityId: '' });
 
   const renderUI = () => {
+    // Handle custom RDVS layouts (any string starting with 'rdvs-')
+    if (currentUI?.startsWith('rdvs-') || currentUI === 'rdvs') {
+      const variant = currentUI === 'rdvs' ? 'default' : currentUI;
+      return <RDVSWrapper variant={variant} />;
+    }
+
     switch (currentUI) {
       case 'etvs':
         return <ETVSWrapper />;
@@ -204,8 +210,6 @@ export default function Page() {
         return <STVSWrapper />;
       case 'ivsr':
         return <IVSRPage />;
-      case 'rdvs':
-        return <RDVSWrapper />;
       case 'lstar':
         return <LSTARWrapper />;
       case 'vscs':

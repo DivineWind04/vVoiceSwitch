@@ -41,10 +41,15 @@ function stopAudio() {
 }
 
 const debounce = <T extends (...args: any[]) => void>(callback: T, wait: number) => {
-    let timeoutId: number | null = null;
+    let timeoutId: ReturnType<typeof setTimeout> | null = null;
     return (...args: Parameters<T>) => {
-        if (timeoutId) window.clearTimeout(timeoutId);
-        timeoutId = window.setTimeout(() => {
+        if (typeof window === 'undefined') {
+            // SSR: execute immediately without debouncing
+            callback(...args);
+            return;
+        }
+        if (timeoutId) clearTimeout(timeoutId);
+        timeoutId = setTimeout(() => {
             callback(...args);
         }, wait);
     };
