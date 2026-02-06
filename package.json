@@ -62,5 +62,8 @@
   "overrides": {
     "rc-util": "^5.44.4"
   },
+  "resolutions": {
+    "rc-util": "^5.44.4"
+  },
   "packageManager": "yarn@1.22.22"
 }
