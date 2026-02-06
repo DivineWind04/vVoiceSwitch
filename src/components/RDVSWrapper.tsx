@@ -335,6 +335,7 @@ export default function RDVSWrapper({ variant = 'default' }: RDVSWrapperProps) {
   const [currentPage, setCurrentPage] = useState(1);
   // OVR state pulled from store (tracks incoming override calls)
   const isBeingOverridden = useCoreStore((s: any) => s.isBeingOverridden);
+  const overrideCallStatus = useCoreStore((s: any) => s.overrideCallStatus || 'off');
 
   // Keypad state - visibility, dial buffer, and IA mode
   const [keypadActive, setKeypadActive] = useState(false);
@@ -1855,9 +1856,15 @@ export default function RDVSWrapper({ variant = 'default' }: RDVSWrapperProps) {
           <text x={iaCenterX} y={textY} textAnchor="middle" fill={COLORS.WHITE} fontSize="13" fontFamily="RDVSimulated, monospace" fontWeight="bold">IA</text>
           <rect x={iaX} y={boxY} width={iaBoxWidth} height={boxHeight} fill={iaActive ? COLORS.WHITE : 'none'} stroke={COLORS.WHITE} strokeWidth="1" />
         </g>
-        {/* OVR */}
+        {/* OVR - steady green when active/ok, winking when hold, off otherwise */}
         <text x={ovrCenterX} y={textY} textAnchor="middle" fill={COLORS.WHITE} fontSize="13" fontFamily="RDVSimulated, monospace" fontWeight="bold">OVR</text>
-        <rect x={ovrX} y={boxY} width={ovrBoxWidth} height={boxHeight} fill={isBeingOverridden ? COLORS.GREEN : 'none'} stroke={COLORS.GREEN} strokeWidth="1" />
+        {overrideCallStatus === 'hold' ? (
+          React.createElement('rect', { x: ovrX, y: boxY, width: ovrBoxWidth, height: boxHeight, fill: COLORS.GREEN, stroke: COLORS.GREEN, strokeWidth: '1' },
+            React.createElement('animate', { attributeName: 'fill', values: `${COLORS.GREEN};${COLORS.GREEN};${COLORS.BLACK}`, keyTimes: '0;0.95;1', dur: '1s', repeatCount: 'indefinite' })
+          )
+        ) : (
+          <rect x={ovrX} y={boxY} width={ovrBoxWidth} height={boxHeight} fill={isBeingOverridden ? COLORS.GREEN : 'none'} stroke={COLORS.GREEN} strokeWidth="1" />
+        )}
         {/* CA */}
         <text x={caCenterX} y={textY} textAnchor="middle" fill={COLORS.WHITE} fontSize="13" fontFamily="RDVSimulated, monospace" fontWeight="bold">CA</text>
         <rect x={caX} y={boxY} width={iaBoxWidth} height={boxHeight} fill="none" stroke={COLORS.WHITE} strokeWidth="1" />

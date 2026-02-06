@@ -114,6 +114,7 @@ interface CoreState {
     // Override tracking for R/T functionality
     overrideStatus: any[], // Tracks OV_ prefixed calls (incoming overrides)
     isBeingOverridden: boolean, // True when there's an active incoming override
+    overrideCallStatus: string, // Status of the override call: 'off', 'ok', 'active', 'hold', etc.
     
     // Dial call state for type 3 lines
     activeDialLine: { trunkName: string; lineType: number } | null;
@@ -366,6 +367,7 @@ export const useCoreStore = create<CoreState>((set: any, get: any) => {
     vscs_status: [],
     overrideStatus: [], // Track OV_ calls
     isBeingOverridden: false, // Track if position is being overridden
+    overrideCallStatus: 'off', // Track override call status for OVR lamp animation
     sendMessageNow: () => {},
     // VSCS-specific props (default implementations)
     activeLandlines: [],
@@ -384,8 +386,8 @@ export const useCoreStore = create<CoreState>((set: any, get: any) => {
 
         activeCalls.forEach((call: any) => {
             const fullCall = call.call;
-            // All prefixes (SO_, gg_, OV_) are 3 chars + underscore
-            const call_id = fullCall?.substring(3) || '';
+            // Strip variable-length prefixes: gg_05_, OV_, SO_, etc.
+            const call_id = fullCall?.replace(/^(?:gg_\d+_|OV_|SO_)/, '') || '';
 
             if (call_id && sendMessageNow) {
                 console.log('[holdBtn] Holding call:', call_id);
@@ -404,8 +406,8 @@ export const useCoreStore = create<CoreState>((set: any, get: any) => {
 
         activeCalls.forEach((call: any) => {
             const fullCall = call.call;
-            // All prefixes (SO_, gg_, OV_) are 3 chars + underscore = substring(3) strips prefix
-            const call_id = fullCall?.substring(3) || '';
+            // Strip variable-length prefixes: gg_05_, OV_, SO_, etc.
+            const call_id = fullCall?.replace(/^(?:gg_\d+_|OV_|SO_)/, '') || '';
 
             if (call_id && sendMessageNow) {
                 const isShoutOverride = fullCall?.startsWith('SO_');
@@ -670,17 +672,19 @@ export const useCoreStore = create<CoreState>((set: any, get: any) => {
                         }
                     })
                     
-                    // Check if there's an active override (OV_ call with status 'ok' or 'active')
-                    const hasActiveOverride = new_override.some((ov: any) => 
-                        ov.status === 'ok' || ov.status === 'active'
+                    // Check if there's an active or held override (OV_ call)
+                    const hasActiveOverride = new_override.some((ov: any) =>
+                        ov.status === 'ok' || ov.status === 'active' || ov.status === 'hold'
                     );
-                    
+                    const overrideCallStatus = new_override.length > 0 ? new_override[0].status : 'off';
+
                     debounce_set({
                         ag_status: new_ag,
                         gg_status: new_gg,
                         vscs_status: new_vscs,
                         overrideStatus: new_override,
                         isBeingOverridden: hasActiveOverride,
+                        overrideCallStatus,
                     })
                 } else if (data.type === 'call_sign') {
             console.log('[WebSocket] Received call_sign:', data.cmd1, 'CID:', data.dbl1);
