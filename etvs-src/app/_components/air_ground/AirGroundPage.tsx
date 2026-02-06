@@ -168,10 +168,7 @@ const AirGroundPage: React.FC<AirGroundPageProps> = ({ isGG3Active = false, curr
             onClick={handlePage1Click}
           />
         ) : isGG3Active ? (
-          <ChiseledSelectorButton
-            topLine="A/G SUM"
-            onClick={handleSummaryToggle}
-          />
+          <SummaryButton onClick={handleSummaryToggle} compact={true} />
         ) : (
           <SummaryButton onClick={handleSummaryToggle} />
         )}

@@ -1,25 +1,34 @@
 // components/SquareSelectorButton.tsx
 
 import React, { useState } from 'react';
+import '../vatlines/styles.css';
 
 type SquareSelectorButtonProps = {
   topLine: string;
   bottomLine?: string;
   onClick?: () => void; // Optional onClick handler
   style?: React.CSSProperties;
+  useRdvsFont?: boolean; // Use RDVS font style (EDSTv302)
+  isActive?: boolean; // External active state (e.g., for keypad active)
 };
 
-const SquareSelectorButton: React.FC<SquareSelectorButtonProps> = ({ topLine, bottomLine, onClick, style }) => {
-  const [isActive, setIsActive] = useState(false);
+const SquareSelectorButton: React.FC<SquareSelectorButtonProps> = ({ topLine, bottomLine, onClick, style, useRdvsFont = false, isActive: externalActive }) => {
+  const [isPressing, setIsPressing] = useState(false);
 
   const handleMouseDown = () => {
-    setIsActive(true);
+    setIsPressing(true);
   };
 
   const handleMouseUp = () => {
-    setIsActive(false);
+    setIsPressing(false);
     if (onClick) onClick();
   };
+
+  // Button is visually active if being pressed OR externally marked active
+  const isActive = isPressing || externalActive;
+
+  // Always use rdvs-label font, but size varies: xl for page selectors, 2xl for others
+  const fontClass = useRdvsFont ? 'text-xl rdvs-label' : 'text-2xl rdvs-label';
 
   return (
     <button
@@ -33,14 +42,14 @@ const SquareSelectorButton: React.FC<SquareSelectorButtonProps> = ({ topLine, bo
       }}
       onMouseDown={handleMouseDown}
       onMouseUp={handleMouseUp}
-      onMouseLeave={() => setIsActive(false)} // Handle case where mouse leaves without release
+      onMouseLeave={() => setIsPressing(false)} // Handle case where mouse leaves without release
     >
       {/* Centered and styled text */}
       <div className={`flex flex-col h-full justify-center ${bottomLine ? '' : 'items-center'}`}>
-        <span className="text-xl font-bold">
+        <span className={fontClass}>
           {topLine}
         </span>
-        {bottomLine && <span className="text-xl font-bold">{bottomLine}</span>}
+        {bottomLine && <span className={fontClass}>{bottomLine}</span>}
       </div>
 
     </button>

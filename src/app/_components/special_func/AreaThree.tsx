@@ -1,16 +1,43 @@
 // components/AreaThree.tsx
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useRef } from "react";
 import { useCoreStore } from '~/model';
 import SquareSelectorButton from "../base_button/SquareSelectorButton";
 import OOSButton from "../base_button/OOSButton";
 
-const AreaThree: React.FC<{ setSettingModal: (v: boolean) => void }> = ({ setSettingModal }) => {
+interface AreaThreeProps {
+  setSettingModal: (v: boolean) => void;
+  onToggleKeypad?: () => void;
+  keypadActive?: boolean;
+}
+
+const AreaThree: React.FC<AreaThreeProps> = ({ setSettingModal, onToggleKeypad, keypadActive }) => {
   const [currentPage, setCurrentPage] = useState(1); // State to track current page
+  const audioRef = useRef<HTMLAudioElement | null>(null);
 
   const sendMsg = useCoreStore((s: any) => s.sendMessageNow);
   const gg_status = useCoreStore((s: any) => s.gg_status);
+  const selectedChime = useCoreStore((s: any) => s.selectedChime);
+  const cycleChime = useCoreStore((s: any) => s.cycleChime);
+
+  // Handle chime type button - cycle and play sample
+  const handleChimeType = () => {
+    cycleChime();
+    const nextChime = selectedChime >= 13 ? 1 : selectedChime + 1;
+    const paddedNum = nextChime.toString().padStart(2, '0');
+    const chimeFile = `/ivsr/IVSRChime-${paddedNum}.wav`;
+    
+    // Stop any currently playing audio
+    if (audioRef.current) {
+      audioRef.current.pause();
+      audioRef.current.currentTime = 0;
+    }
+    
+    // Play the new chime
+    audioRef.current = new Audio(chimeFile);
+    audioRef.current.play().catch(err => console.log('Could not play chime:', err));
+  };
 
   const relAction = () => {
     // Release ALL active G/G calls
@@ -48,13 +75,13 @@ const AreaThree: React.FC<{ setSettingModal: (v: boolean) => void }> = ({ setSet
 
   const buttons = [
     { topLine: "PHBK", action: () => console.log("PHBK clicked") },
+    { topLine: "CHME", bottomLine: "TYPE", action: handleChimeType },
     null,
     null,
     null,
     null,
     null,
-    null,
-    { topLine: "IA", action: () => console.log("IA clicked") },
+    { topLine: "IA", action: onToggleKeypad, isActive: keypadActive },
     { topLine: "CA", action: () => console.log("CA clicked") },
     {
       topLine: "RECN",
@@ -74,7 +101,8 @@ const AreaThree: React.FC<{ setSettingModal: (v: boolean) => void }> = ({ setSet
     {
       topLine: "KEY",
       bottomLine: "PAD",
-      action: () => console.log("KEY PAD clicked"),
+      action: onToggleKeypad,
+      isActive: keypadActive,
     },
     { topLine: "REL", action: relAction },
   ];
@@ -92,6 +120,7 @@ const AreaThree: React.FC<{ setSettingModal: (v: boolean) => void }> = ({ setSet
               topLine={button.topLine}
               bottomLine={button.bottomLine}
               onClick={button.action}
+              isActive={button.isActive}
             />
           ),
         )}

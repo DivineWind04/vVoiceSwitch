@@ -120,6 +120,7 @@ const AirGroundPage: React.FC<AirGroundPageProps> = ({ hideRows = false }) => {
           key={index}
           topLine={`A/G ${page}`}
           onClick={() => handlePageChange(page)}
+          useRdvsFont={true}
         />
       );
     });
@@ -133,20 +134,20 @@ const AirGroundPage: React.FC<AirGroundPageProps> = ({ hideRows = false }) => {
       {/* Render rows */}
       {!hideRows && renderRows()}
       {/* Control row */}
-      <div className="flex gap-0.5">
+      <div className="flex gap-1">
         {!showFreqSummary &&
-        <SummaryButton onClick={handleSumClick} />
+        <SummaryButton onClick={handleSumClick} compact={hideRows} />
         }
         {renderPageButtons()}
       </div>
 
       {/* Selected page */}
       {!hideRows ? (
-        <div className="text-white text-center items-center justify-center font-bold text-sm">
+        <div className="text-white text-center items-center justify-center text-sm rdvs-label">
           A/G PAGE {selectedPage}
         </div>
       ) : (
-        <div className="text-white text-center items-center justify-center font-bold text-sm">
+        <div className="text-white text-center items-center justify-center text-sm rdvs-label">
           G/G PAGE 3
         </div>
       )}

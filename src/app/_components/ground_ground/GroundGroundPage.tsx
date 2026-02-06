@@ -13,9 +13,20 @@ import { useCoreStore } from "~/model";
 interface GroundGroundPageProps {
   currentPage?: number;
   onPageChange?: (page: number) => void;
+  showKeypad?: boolean;
+  dialLineInfo?: { trunkName: string; lineType: number } | null;
+  onCloseKeypad?: () => void;
+  onOpenKeypadForDialLine?: (trunkName: string, lineType: number) => void;
 }
 
-const GroundGroundPage: React.FC<GroundGroundPageProps> = ({ currentPage: externalPage, onPageChange: externalOnPageChange }) => {
+const GroundGroundPage: React.FC<GroundGroundPageProps> = ({ 
+  currentPage: externalPage, 
+  onPageChange: externalOnPageChange,
+  showKeypad = false,
+  dialLineInfo = null,
+  onCloseKeypad,
+  onOpenKeypadForDialLine,
+}) => {
   const [internalPage, setInternalPage] = useState(1); // State to track current page
   
   const currentPage = externalPage !== undefined ? externalPage : internalPage;
@@ -92,7 +103,18 @@ const GroundGroundPage: React.FC<GroundGroundPageProps> = ({ currentPage: extern
           onClick = () => sendMsg({ type: 'stop', cmd1: call_id, dbl1: 1 });
         }
       } else {
-        if (data.status === 'off' || data.status === '') {
+        // Check if this is a dial line (lineType === 3)
+        const isDialLine = lineType === 3;
+        const trunkName = data.call_name || data.call || '';
+        
+        if (isDialLine && (data.status === 'off' || data.status === '' || data.status === 'idle')) {
+          // Dial lines open the keypad when clicked
+          onClick = () => {
+            if (onOpenKeypadForDialLine) {
+              onOpenKeypadForDialLine(trunkName, lineType);
+            }
+          };
+        } else if (data.status === 'off' || data.status === '') {
           onClick = () => sendMsg({ type: 'call', cmd1: call_id, dbl1: lineType });
         } else if (data.status === 'busy') {
           onClick = undefined;
@@ -137,25 +159,35 @@ const GroundGroundPage: React.FC<GroundGroundPageProps> = ({ currentPage: extern
 
   return (
   <div className="pt-4 pb-4 px-4">
-      {/* Render pages of buttons */}
-      <div className="mb-0.5">
-        <div className="flex grid grid-cols-3 gap-1">
-          {renderButtons()}
+      {/* Show Keypad when active, otherwise show buttons */}
+      {showKeypad ? (
+        <div className="mb-0.5">
+          <Keypad dialLineInfo={dialLineInfo} onClose={onCloseKeypad} />
         </div>
-      </div>
+      ) : (
+        <>
+          {/* Render pages of buttons */}
+          <div className="mb-0.5">
+            <div className="flex grid grid-cols-3 gap-1">
+              {renderButtons()}
+            </div>
+          </div>
+        </>
+      )}
       {/* Navigation buttons */}
-      <div className="flex gap-1 mt-1 mb-0.5">
+      <div className={`flex gap-1 mb-0.5 ${showKeypad ? 'mt-[69px] ml-2' : 'mt-1'}`}>
         {[1, 2, 3].map((page) => (
           <SquareSelectorButton
             key={page}
             topLine={`G/G ${page}`}
             onClick={() => handlePageChange(page)}
+            useRdvsFont={true}
           />
         ))}
       </div>
       {/* Selected page */}
-      <div className="text-center text-sm font-bold text-white mt-0.5">
-        G/G PAGE {currentPage}
+      <div className="text-center text-sm text-white mt-0.5 rdvs-label">
+        {showKeypad ? "KEYPAD" : `G/G PAGE ${currentPage}`}
       </div>
     </div>
   );

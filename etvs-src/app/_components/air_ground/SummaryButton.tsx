@@ -5,9 +5,10 @@ import React, { useState } from 'react';
 type SummaryButtonProps = {
   onClick?: () => void; // Optional onClick handler
   style?: React.CSSProperties;
+  compact?: boolean; // When true, sizes to match square buttons
 };
 
-const SummaryButton: React.FC<SummaryButtonProps> = ({ onClick, style }) => {
+const SummaryButton: React.FC<SummaryButtonProps> = ({ onClick, style, compact = false }) => {
   const [isActive, setIsActive] = useState(false);
 
   const handleMouseDown = () => {
@@ -19,9 +20,12 @@ const SummaryButton: React.FC<SummaryButtonProps> = ({ onClick, style }) => {
     if (onClick) onClick();
   };
 
+  // Size classes based on compact mode
+  const sizeClass = compact ? 'w-14 h-14' : 'w-28 h-14';
+
   return (
     <button
-      className={`relative w-28 h-14 bg-customBlue text-customYellow border-b-blue300
+      className={`relative ${sizeClass} bg-customBlue text-customYellow border-b-blue300
     border-4 border-customBlack flex items-center justify-center text-center  clipped-box
     ${isActive ? 'border-black' : 'border-customBlue'}`}
       style={{

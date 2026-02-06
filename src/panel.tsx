@@ -37,7 +37,7 @@ function AGRow({ data }: { data: any }) {
             <div className="button" onClick={() => {
                 sendMsg({ type: 'tx', cmd1: "" + data.freq, dbl1: !data.t })
             }}>
-                <span className="text">TX SEL</span>
+                <span className="text" style={{ lineHeight: '1.1', position: 'absolute', top: '50%', left: '50%', transform: 'translate(-50%, -60%)', textAlign: 'center' }}>TX<br/>SEL</span>
                 <div className={data.t ? ptt ? "flutter active" : "steady green" : ""}>
                     <div className="ct">
                         <div className="inner">
@@ -49,7 +49,7 @@ function AGRow({ data }: { data: any }) {
             <div className={"button"} onClick={() => {
                 sendMsg({ type: 'rx', cmd1: "" + data.freq, dbl1: !data.r })
             }}>
-                <span className="text">RX SEL</span>
+                <span className="text" style={{ lineHeight: '1.1', position: 'absolute', top: '50%', left: '50%', transform: 'translate(-50%, -60%)', textAlign: 'center' }}>RX<br/>SEL</span>
                 <div className={data.r ? data.talking ? "flutter active" : "steady green" : ""}>
                     <div className="ct">
                         <div className="inner">
@@ -61,7 +61,7 @@ function AGRow({ data }: { data: any }) {
             <div className="button" onClick={() => {
 
             }}>
-                <span className="text">TX MAIN</span>
+                <span className="text" style={{ lineHeight: '1.1', position: 'absolute', top: '50%', left: '50%', transform: 'translate(-50%, -60%)', textAlign: 'center' }}>TX<br/>MAIN</span>
                 <div className={"steady green"}>
                     <div className="ct">
                         <div className="inner">
@@ -72,7 +72,7 @@ function AGRow({ data }: { data: any }) {
             <div className="button" onClick={() => {
 
             }}>
-                <span className="text">RX MAIN</span>
+                <span className="text" style={{ lineHeight: '1.1', position: 'absolute', top: '50%', left: '50%', transform: 'translate(-50%, -60%)', textAlign: 'center' }}>RX<br/>MAIN</span>
                 <div className={"steady green"}>
                     <div className="ct">
                         <div className="inner">

@@ -17,9 +17,23 @@ type GroundGroundPageProps = {
 
 const GroundGroundPage: React.FC<GroundGroundPageProps> = ({ onGG3Toggle }) => {
   const [currentPage, setCurrentPage] = useState(1); // State to track current page
+  const [showKeypad, setShowKeypad] = useState(false);
+  const [dialLineInfo, setDialLineInfo] = useState<{ trunkName: string; lineType: number } | null>(null);
 
   const handlePageChange = (page: number) => {
     setCurrentPage(page);
+    setShowKeypad(false);
+    setDialLineInfo(null);
+  };
+  
+  const openKeypadForDialLine = (trunkName: string, lineType: number) => {
+    setDialLineInfo({ trunkName, lineType });
+    setShowKeypad(true);
+  };
+  
+  const closeKeypad = () => {
+    setShowKeypad(false);
+    setDialLineInfo(null);
   };
 
   const sendMsg = useCoreStore((s: any) => s.sendMessageNow);
@@ -89,7 +103,14 @@ const GroundGroundPage: React.FC<GroundGroundPageProps> = ({ onGG3Toggle }) => {
           onClick = () => sendMsg({ type: 'stop', cmd1: call_id, dbl1: 1 });
         }
       } else {
-        if (data.status === 'off' || data.status === '') {
+        // Check if this is a dial line (lineType === 3)
+        const isDialLine = lineType === 3;
+        const trunkName = data.call_name || data.call || '';
+        
+        if (isDialLine && (data.status === 'off' || data.status === '' || data.status === 'idle')) {
+          // Dial lines open the keypad when clicked
+          onClick = () => openKeypadForDialLine(trunkName, lineType);
+        } else if (data.status === 'off' || data.status === '') {
           onClick = () => sendMsg({ type: 'call', cmd1: call_id, dbl1: lineType });
         } else if (data.status === 'busy') {
           onClick = undefined;
@@ -136,10 +157,12 @@ const GroundGroundPage: React.FC<GroundGroundPageProps> = ({ onGG3Toggle }) => {
     <div className="py-2 px-2 p-4">
       {/* Render 3 pages of buttons or keypad */}
       <div className="mb-0.5">
-        {currentPage === 3 ? (
+        {showKeypad ? (
+          <Keypad dialLineInfo={dialLineInfo} onClose={closeKeypad} />
+        ) : currentPage === 3 ? (
           <Keypad />
         ) : (
-          <div className="flex grid grid-cols-3 gap-1">
+          <div className="grid grid-cols-3 gap-1">
             {renderButtons()}
           </div>
         )}
@@ -156,7 +179,7 @@ const GroundGroundPage: React.FC<GroundGroundPageProps> = ({ onGG3Toggle }) => {
       </div>
       {/* Selected page */}
       <div className="text-center text-sm font-bold text-yellow-300 mt-0.5">
-        G/G PAGE {currentPage}
+        {showKeypad ? 'KEYPAD' : `G/G PAGE ${currentPage}`}
       </div>
     </div>
   );

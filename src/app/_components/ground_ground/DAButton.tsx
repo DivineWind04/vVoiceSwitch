@@ -1,6 +1,7 @@
 // components/DAButton.tsx
 
 import React, { useState } from 'react';
+import '../vatlines/styles.css';
 
 type DAButtonProps = {
   topLine: string;
@@ -49,21 +50,21 @@ const DAButton: React.FC<DAButtonProps> = ({ topLine, middleLine, bottomLine, on
       {/* Centered and styled text */}
       {!middleLine && !bottomLine ? (
         // Single line - center vertically
-        <span className="text-lg font-bold break-words">
+        <span className="text-2xl rdvs-label break-words">
           {topLine}
         </span>
       ) : (
         <div className="flex flex-col items-center justify-center">
-          <span className="text-lg font-bold break-words leading-tight">
+          <span className="text-2xl rdvs-label break-words leading-tight">
             {topLine}
           </span>
           {middleLine && (
-            <span className="text-lg font-bold break-words leading-tight">
+            <span className="text-2xl rdvs-label break-words leading-tight">
               {middleLine}
             </span>
           )}
           {bottomLine && (
-            <span className="text-lg font-bold break-words leading-tight">
+            <span className="text-2xl rdvs-label break-words leading-tight">
               {bottomLine}
             </span>
           )}

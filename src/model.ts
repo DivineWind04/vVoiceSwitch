@@ -84,6 +84,25 @@ interface CoreState {
     activeDialLine: { trunkName: string; lineType: number } | null;
     dialCallStatus: 'idle' | 'dialing' | 'ringback' | 'connected' | 'busy' | 'error';
 
+    // IA DISPLAY area state
+    iaDisplayBuffer: string; // Shows dialed digits for outgoing calls
+    callerIdBuffer: string;  // Shows caller ID for incoming calls
+    setIaDisplayBuffer: (buffer: string) => void;
+    setCallerIdBuffer: (buffer: string) => void;
+    appendToIaDisplay: (digit: string) => void;
+    clearIaDisplay: () => void;
+    backspaceIaDisplay: () => void;
+
+    // G/G Chime selection (1-13)
+    selectedChime: number;
+    setSelectedChime: (chime: number) => void;
+    cycleChime: () => void;
+
+    // UI brightness control (0-100, default 100)
+    brightness: number;
+    setBrightness: (brightness: number) => void;
+    adjustBrightness: (delta: number) => void;
+
     // VSCS-specific props
     activeLandlines: any[];
     incomingLandlines: any[];
@@ -214,7 +233,15 @@ function getAudioElement(audioType: 'ringback' | 'ggchime'): HTMLAudioElement | 
     
     // Fallback to VSCS config if current UI config not found
     const defaultConfig = audioConfigs.vscs || { ringback: 'Ringback.wav', ggchime: 'GGChime.mp3' };
-    const audioSrc = config ? config[audioType] : defaultConfig[audioType];
+    let audioSrc = config ? config[audioType] : defaultConfig[audioType];
+    
+    // For IVSR chime, use the selected chime from the store
+    if (uiContext === 'ivsr' && audioType === 'ggchime') {
+        // Access the store to get selectedChime
+        const selectedChime = useCoreStore.getState().selectedChime || 1;
+        const paddedNum = selectedChime.toString().padStart(2, '0');
+        audioSrc = `/ivsr/IVSRChime-${paddedNum}.wav`;
+    }
     
     // Create unique ID for this UI context and audio type
     const audioId = `${uiContext}_${audioType}`;
@@ -229,6 +256,11 @@ function getAudioElement(audioType: 'ringback' | 'ggchime'): HTMLAudioElement | 
         audioElement.src = audioSrc;
         audioElement.preload = 'auto';
         document.body.appendChild(audioElement);
+    } else {
+        // Update src in case chime selection changed
+        if (audioElement.src !== audioSrc && !audioElement.src.endsWith(audioSrc)) {
+            audioElement.src = audioSrc;
+        }
     }
     
     return audioElement;
@@ -376,8 +408,38 @@ export const useCoreStore = create<CoreState>((set: any, get: any) => {
     // Dial call state defaults
     activeDialLine: null,
     dialCallStatus: 'idle' as const,
-    setActiveDialLine: () => {},
-    sendDialCall: () => {},
+
+    // IA DISPLAY area state
+    iaDisplayBuffer: '',
+    callerIdBuffer: '',
+    setIaDisplayBuffer: (buffer: string) => set({ iaDisplayBuffer: buffer }),
+    setCallerIdBuffer: (buffer: string) => set({ callerIdBuffer: buffer }),
+    appendToIaDisplay: (digit: string) => {
+        const current = get().iaDisplayBuffer;
+        set({ iaDisplayBuffer: current + digit });
+    },
+    clearIaDisplay: () => set({ iaDisplayBuffer: '' }),
+    backspaceIaDisplay: () => {
+        const current = get().iaDisplayBuffer;
+        set({ iaDisplayBuffer: current.slice(0, -1) });
+    },
+
+    // G/G Chime selection (1-13)
+    selectedChime: 1,
+    setSelectedChime: (chime: number) => set({ selectedChime: Math.max(1, Math.min(13, chime)) }),
+    cycleChime: () => {
+        const current = get().selectedChime;
+        const next = current >= 13 ? 1 : current + 1;
+        set({ selectedChime: next });
+    },
+
+    // Brightness controls
+    brightness: 100,
+    setBrightness: (brightness: number) => set({ brightness: Math.max(20, Math.min(100, brightness)) }),
+    adjustBrightness: (delta: number) => {
+        const current = get().brightness;
+        set({ brightness: Math.max(20, Math.min(100, current + delta)) });
+    },
     
         setConnected: (status: boolean) => {
             set({
@@ -451,18 +513,24 @@ export const useCoreStore = create<CoreState>((set: any, get: any) => {
             
             console.log('[dial_call] Resolved:', { trunkName, dialCode, target });
             
-            // Set status to dialing
+            // Set status to dialing, then ringback
             set({ dialCallStatus: 'dialing' });
             
-            // Send the dial_call command to the backend
-            // The dial_call type will initiate a call to the resolved target
+            // Send the call command - use type 'call' with the resolved target
+            // dbl1 = 1 for ring-type call (plays chime at destination)
             sendMessageNow({ 
-                type: 'dial_call', 
+                type: 'call', 
                 cmd1: target,           // The resolved target callsign
-                cmd2: trunkName,        // The trunk name for reference
-                cmd3: dialCode,         // The dial code for reference
-                dbl1: 2                 // Call type (2 = ring/shout style call)
+                dbl1: 1                 // Call type 1 = ring call
             });
+            
+            // Set to ringback after a short delay (simulating call routing)
+            setTimeout(() => {
+                const currentStatus = get().dialCallStatus;
+                if (currentStatus === 'dialing') {
+                    set({ dialCallStatus: 'ringback' });
+                }
+            }, 200);
         }
     }
 
@@ -654,10 +722,18 @@ export const useCoreStore = create<CoreState>((set: any, get: any) => {
                             } else {
                                 if (k.status === 'chime') {
                                     chime(getAudioElement('ggchime'));
+                                    // For dial lines (type 3), show caller ID from who's calling us
+                                    if (k.lineType === 3 && k.otherPosition) {
+                                        set({ callerIdBuffer: k.otherPosition });
+                                    }
                                 } else if (k.status == 'ringing') {
                                     chime(getAudioElement('ringback'))
                                 } else {
                                     stopAudio();
+                                    // Clear caller ID when call ends or connects
+                                    if (k.lineType === 3) {
+                                        set({ callerIdBuffer: '' });
+                                    }
                                 }
                             }
                         }
@@ -681,6 +757,22 @@ export const useCoreStore = create<CoreState>((set: any, get: any) => {
                     const hasActiveOverride = new_override.some((ov: any) => 
                         ov.status === 'ok' || ov.status === 'active'
                     );
+                    
+                    // Check dial call status - if we have a call that just connected, update dialCallStatus
+                    const currentDialStatus = get().dialCallStatus;
+                    if (currentDialStatus === 'ringback' || currentDialStatus === 'dialing') {
+                        // Check if any call just became 'ok' or 'active'
+                        const hasConnectedCall = new_gg.some((call: any) => 
+                            !call.isPlaceholder && (call.status === 'ok' || call.status === 'active')
+                        );
+                        if (hasConnectedCall) {
+                            set({ dialCallStatus: 'connected' });
+                            // Reset after a short delay
+                            setTimeout(() => {
+                                set({ dialCallStatus: 'idle' });
+                            }, 2000);
+                        }
+                    }
                     
                     debounce_set({
                         ag_status: new_ag,
