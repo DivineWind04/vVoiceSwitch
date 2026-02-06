@@ -292,8 +292,8 @@ const COLORS = {
   DARK_GREY: '#333333', // Empty cells
   YELLOW: '#FFFF00',   // Alert/Interphone lines (type 2)
   // Default color set colors (ZAB dark pattern as system default)
-  NORMAL_BG: '#26449B',     // Color Set 1 - Normal DA/Radio background
-  INTERPHONE_BORDER: '#C25C2E', // Color Set 2 - Interphone border (significant DA)
+  NORMAL_BORDER: '#89111D', // Color Set 1 - Normal DA/Radio border
+  INTERPHONE_BG: '#26449B', // Color Set 2 - Interphone/Significant DA background & border
   UTILITY_BG: '#606666',    // Color Set 3 - Utility background
 };
 
@@ -590,14 +590,14 @@ export default function RDVSWrapper({ variant = 'default' }: RDVSWrapperProps) {
     }
 
     // Fallback to system default colors (ZAB dark pattern) if no color pattern configured
-    // Color Set 1: Normal DA (intercomOverride, intercomRingback) - cyan text, blue bg, black border
-    // Color Set 2: Interphone - cyan text, black bg, orange border
-    // Color Set 3: Utility (dial) - cyan text, grey bg, black border
-    if (lineType === 0) return { text: COLORS.CYAN, background: COLORS.NORMAL_BG, border: COLORS.BLACK, fillDesign: 'solid' };    // Override = Color Set 1
-    if (lineType === 1) return { text: COLORS.CYAN, background: COLORS.NORMAL_BG, border: COLORS.BLACK, fillDesign: 'solid' };    // Call/Intercom = Color Set 1
-    if (lineType === 2) return { text: COLORS.CYAN, background: COLORS.BLACK, border: COLORS.INTERPHONE_BORDER, fillDesign: 'solid' }; // Interphone = Color Set 2
-    if (lineType === 3) return { text: COLORS.CYAN, background: COLORS.UTILITY_BG, border: COLORS.BLACK, fillDesign: 'solid' };   // Dial = Color Set 3
-    return { text: COLORS.WHITE, background: COLORS.BLACK, border: COLORS.BLACK, fillDesign: 'solid' };                            // Empty
+    // Color Set 1: Normal DA (intercomOverride, intercomRingback) - cyan text, black bg, dark red border
+    // Color Set 2: Significant DA (Interphone) - white text, blue bg, blue border
+    // Color Set 3: Utility (dial) - white text, grey bg, grey border
+    if (lineType === 0) return { text: COLORS.CYAN, background: COLORS.BLACK, border: COLORS.NORMAL_BORDER, fillDesign: 'solid' };       // Override = Color Set 1
+    if (lineType === 1) return { text: COLORS.CYAN, background: COLORS.BLACK, border: COLORS.NORMAL_BORDER, fillDesign: 'solid' };       // Call/Intercom = Color Set 1
+    if (lineType === 2) return { text: COLORS.WHITE, background: COLORS.INTERPHONE_BG, border: COLORS.INTERPHONE_BG, fillDesign: 'solid' }; // Interphone = Color Set 2
+    if (lineType === 3) return { text: COLORS.WHITE, background: COLORS.UTILITY_BG, border: COLORS.UTILITY_BG, fillDesign: 'solid' };    // Dial = Color Set 3
+    return { text: COLORS.WHITE, background: COLORS.BLACK, border: COLORS.BLACK, fillDesign: 'solid' };                                   // Empty
   };
 
   // Get colors for function buttons (special function)
@@ -641,8 +641,8 @@ export default function RDVSWrapper({ variant = 'default' }: RDVSWrapperProps) {
     // Fallback to system default colors
     // Normal radio = Color Set 1, Emergency radio = Color Set 4
     return isEmergency
-      ? { text: COLORS.CYAN, background: COLORS.BLACK, border: COLORS.INTERPHONE_BORDER, fillDesign: 'interleaved' }  // Emergency = Color Set 4
-      : { text: COLORS.CYAN, background: COLORS.NORMAL_BG, border: COLORS.BLACK, fillDesign: 'solid' };               // Normal = Color Set 1
+      ? { text: COLORS.CYAN, background: COLORS.BLACK, border: COLORS.NORMAL_BORDER, fillDesign: 'interleaved' }  // Emergency = Color Set 4
+      : { text: COLORS.CYAN, background: COLORS.BLACK, border: COLORS.NORMAL_BORDER, fillDesign: 'solid' };       // Normal = Color Set 1
   };
 
   // Legacy function for backwards compatibility
