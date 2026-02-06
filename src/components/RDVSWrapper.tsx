@@ -333,7 +333,8 @@ export default function RDVSWrapper({ variant = 'default' }: RDVSWrapperProps) {
     return config;
   }, [variant]);
   const [currentPage, setCurrentPage] = useState(1);
-  const [ovrActive, setOvrActive] = useState(false);
+  // OVR state pulled from store (tracks incoming override calls)
+  const isBeingOverridden = useCoreStore((s: any) => s.isBeingOverridden);
 
   // Keypad state - visibility, dial buffer, and IA mode
   const [keypadActive, setKeypadActive] = useState(false);
@@ -371,6 +372,10 @@ export default function RDVSWrapper({ variant = 'default' }: RDVSWrapperProps) {
   const ag_status = useCoreStore((s: any) => s.ag_status);
   const ptt = useCoreStore((s: any) => s.ptt);
   const positionData = useCoreStore((s: any) => s.positionData);
+  const holdBtn = useCoreStore((s: any) => s.holdBtn);
+  const releaseBtn = useCoreStore((s: any) => s.releaseBtn);
+  const setActiveDialLine = useCoreStore((s: any) => s.setActiveDialLine);
+  const sendDialCall = useCoreStore((s: any) => s.sendDialCall);
 
   const currentPosition = selectedPositions?.[0] || null;
 
@@ -427,15 +432,44 @@ export default function RDVSWrapper({ variant = 'default' }: RDVSWrapperProps) {
         }
 
         const callStatus = statusObj.status || 'off';
+        const callPrefix = statusObj?.call?.substring(0, 2);
         let indicatorState = 'off';
-        if (lineType === 0) {
-          if (callStatus === 'ok' || callStatus === 'active') indicatorState = 'on';
-          else if (callStatus === 'busy') indicatorState = 'flutter';
+
+        // Per TI 6650.58 Table 2-5:
+        // Off = idle | Steady-On = connection made | Flashing = incoming 1/sec 50/50
+        // Winking = HOLD 1/sec 95/5 | Flutter = active at calling party 12/sec 80/20
+        if (callStatus === 'hold') {
+          indicatorState = 'winking';
+        } else if (callStatus === 'busy') {
+          indicatorState = 'on';
+        } else if (lineType === 0) {
+          if (callStatus === 'ok' || callStatus === 'active') {
+            indicatorState = callPrefix === 'OV' ? 'flutter-green' : 'flutter';
+          } else if (callStatus === 'chime' || callStatus === 'online') {
+            indicatorState = 'flutter';
+          }
         } else if (lineType === 1) {
-          if (callStatus === 'chime') indicatorState = 'flashing';
-          else if (callStatus === 'ok') indicatorState = 'flutter';
+          if (callStatus === 'chime' || callStatus === 'ringing') {
+            indicatorState = 'flashing';
+          } else if (callStatus === 'ok' || callStatus === 'active') {
+            indicatorState = 'flutter';
+          } else if (callStatus === 'online') {
+            indicatorState = 'on';
+          }
         } else if (lineType === 2) {
-          if (callStatus === 'ok' || callStatus === 'online') indicatorState = 'flutter';
+          if (callStatus === 'chime' || callStatus === 'ringing') {
+            indicatorState = 'flashing';
+          } else if (callStatus === 'ok' || callStatus === 'active') {
+            indicatorState = 'flutter';
+          } else if (callStatus === 'online') {
+            indicatorState = 'on';
+          }
+        } else if (lineType === 3) {
+          if (callStatus === 'ok' || callStatus === 'active') {
+            indicatorState = 'flutter';
+          } else if (callStatus === 'ringing') {
+            indicatorState = 'flashing';
+          }
         }
 
         btns.push({
@@ -465,6 +499,14 @@ export default function RDVSWrapper({ variant = 'default' }: RDVSWrapperProps) {
   const pageStartIdx = (currentPage - 1) * BUTTONS_PER_PAGE;
   const pageButtons = lineButtons.slice(pageStartIdx, pageStartIdx + BUTTONS_PER_PAGE);
 
+  // DA overflow: buttons from OTHER pages that have active indicators (not 'off')
+  const overflowButtons = useMemo(() => {
+    return lineButtons.filter((btn: any, idx: number) => {
+      const isOnCurrentPage = idx >= pageStartIdx && idx < pageStartIdx + BUTTONS_PER_PAGE;
+      return !isOnCurrentPage && btn.indicatorState !== 'off';
+    });
+  }, [lineButtons, pageStartIdx]);
+
   const setPage = (p: number) => {
     if (p < 1) setCurrentPage(1);
     else if (p > maxPage) setCurrentPage(maxPage);
@@ -473,19 +515,50 @@ export default function RDVSWrapper({ variant = 'default' }: RDVSWrapperProps) {
 
   const formatFreq = (freq: number) => freq ? (freq / 1_000_000).toFixed(3) : '';
 
+  // DA button click handler - per TI 6650.58 call handling spec
+  // Matches state transitions from GroundGroundPage.tsx
   const handleLineClick = (btn: any) => {
     const { call_id, lineType, statusObj } = btn;
     const status = statusObj?.status || 'off';
+    const callPrefix = statusObj?.call?.substring(0, 2);
+
+    // Block clicks for non-actionable states
+    if (['busy', 'hold', 'pending', 'terminate', 'overridden'].includes(status)) return;
 
     if (lineType === 0) {
-      if (status === 'off' || status === 'idle' || !status) sendMsg({ type: 'call', cmd1: call_id, dbl1: 0 });
-      else if (status === 'ok') sendMsg({ type: 'stop', cmd1: call_id, dbl1: 0 });
+      // Override Intercom (2.4.3.1.5): off→flutter (immediate connection), ok→off (terminate)
+      if (!status || status === 'off' || status === 'idle') {
+        sendMsg({ type: 'call', cmd1: call_id, dbl1: 0 });
+      } else if (status === 'ok' || status === 'active') {
+        sendMsg({ type: 'stop', cmd1: call_id, dbl1: 0 });
+      }
     } else if (lineType === 1) {
-      if (status === 'off' || status === 'idle' || !status) sendMsg({ type: 'call', cmd1: call_id, dbl1: 2 });
-      else sendMsg({ type: 'stop', cmd1: call_id, dbl1: 2 });
+      // Ringback/Intercom (2.4.3.1.2): off→steady-on (ringback), chime→flutter (answer), ok→off (terminate)
+      if (!status || status === 'off' || status === 'idle') {
+        sendMsg({ type: 'call', cmd1: call_id, dbl1: 2 });
+      } else if (status === 'chime' || status === 'ringing' || status === 'online') {
+        // Answer incoming call
+        sendMsg({ type: 'call', cmd1: call_id, dbl1: 2 });
+      } else if (status === 'ok' || status === 'active') {
+        sendMsg({ type: 'stop', cmd1: call_id, dbl1: callPrefix === 'SO' ? 1 : 2 });
+      }
     } else if (lineType === 2) {
-      if (status === 'off' || status === 'idle' || !status) sendMsg({ type: 'call', cmd1: call_id, dbl1: 2 });
-      else sendMsg({ type: 'stop', cmd1: call_id, dbl1: 1 });
+      // Interphone/Voice trunk (2.4.3.2): off→flutter (initiate), steady-on→flutter (join conference), flutter→off (terminate)
+      if (!status || status === 'off' || status === 'idle') {
+        sendMsg({ type: 'call', cmd1: call_id, dbl1: 2 });
+      } else if (status === 'chime' || status === 'ringing' || status === 'online') {
+        // Answer or join conference
+        sendMsg({ type: 'call', cmd1: call_id, dbl1: 2 });
+      } else if (status === 'ok' || status === 'active') {
+        sendMsg({ type: 'stop', cmd1: call_id, dbl1: callPrefix === 'SO' ? 1 : 2 });
+      }
+    } else if (lineType === 3) {
+      // PBX/CO Trunk Dial (2.4.3.2.3): press → open keypad for dialing
+      const trunkName = btn.line1 || '';
+      setActiveDialLine({ trunkName, lineType: 3 });
+      setKeypadActive(true);
+      setIaMode(false);
+      setDialBuffer('');
     }
   };
 
@@ -599,6 +672,55 @@ export default function RDVSWrapper({ variant = 'default' }: RDVSWrapperProps) {
     return null;
   };
 
+  // Function key click handler - dispatches to backend store functions
+  const handleFunctionKey = (label: string) => {
+    switch (label) {
+      case 'HOLD': holdBtn(); break;
+      case 'REL': releaseBtn(); break;
+      case 'RECON': {
+        // Reconnect: find first held call and re-connect
+        const heldCall = gg_status?.find((s: any) => s.status === 'hold');
+        if (heldCall) {
+          const heldId = heldCall.call?.substring(3) || '';
+          if (heldId) sendMsg({ type: 'call', cmd1: heldId, dbl1: 2 });
+        }
+        break;
+      }
+      case 'FWD':
+        // Forward: open keypad in IA-like mode for forwarding code entry
+        setIaMode(true);
+        setKeypadActive(true);
+        setDialBuffer('FWD');
+        break;
+      case 'RB':
+        // Ring-back: initiate ring-back call
+        sendMsg({ type: 'call', cmd1: '891', dbl1: 2 });
+        break;
+      case 'HS_LS': {
+        // Toggle HS/LS for currently selected radio
+        if (selectedPartialRadioId) {
+          const radio = currentPosition?.radios?.find((r: any) => r.id === selectedPartialRadioId);
+          const agEntry = ag_status?.find((a: any) => a.freq === radio?.freq);
+          if (agEntry) sendMsg({ type: 'set_hs', cmd1: '' + agEntry.freq, dbl1: !agEntry.h });
+        }
+        break;
+      }
+      case 'HL': holdBtn(); break;  // Hold & Link → best-effort: same as HOLD
+      case 'OHL': holdBtn(); break; // Outgoing Hold Link → best-effort: same as HOLD
+      case 'RHL': {
+        // Reconnect Hold Link → best-effort: reconnect held call
+        const heldCall = gg_status?.find((s: any) => s.status === 'hold');
+        if (heldCall) {
+          const heldId = heldCall.call?.substring(3) || '';
+          if (heldId) sendMsg({ type: 'call', cmd1: heldId, dbl1: 2 });
+        }
+        break;
+      }
+      default:
+        console.warn(`Function key ${label} not implemented`);
+    }
+  };
+
   // Render a function key button
   const renderFunctionButton = (label: string, rowIdx: number, colIdx: number) => {
     const w = BTN_WIDTH;
@@ -617,7 +739,7 @@ export default function RDVSWrapper({ variant = 'default' }: RDVSWrapperProps) {
           height={h}
           viewBox={`0 0 ${w} ${h}`}
           style={{ cursor: 'pointer' }}
-          onClick={() => console.log('HS/LS selector pressed')}
+          onClick={() => handleFunctionKey('HS_LS')}
         >
           <FillPatternDefs color={funcColors.border} />
           <rect x="0" y="0" width={w} height={h} fill={fillValue} stroke={funcColors.border} strokeWidth="4" />
@@ -648,7 +770,7 @@ export default function RDVSWrapper({ variant = 'default' }: RDVSWrapperProps) {
         height={h}
         viewBox={`0 0 ${w} ${h}`}
         style={{ cursor: 'pointer' }}
-        onClick={() => console.log(`${label} pressed`)}
+        onClick={() => handleFunctionKey(label)}
       >
         <FillPatternDefs color={funcColors.border} />
         <rect x="0" y="0" width={w} height={h} fill={fillValue} stroke={funcColors.border} strokeWidth="4" />
@@ -682,6 +804,52 @@ export default function RDVSWrapper({ variant = 'default' }: RDVSWrapperProps) {
       }
     }
     return idx;
+  };
+
+  // SVG SMIL indicator renderer - returns <rect> with optional <animate> for flashing/winking/flutter
+  // Per TI 6650.58 Table 2-5 timing specifications
+  const renderIndicator = (state: string, x: number, y: number, size: number, typeLetter?: string) => {
+    const baseRect = { x, y, width: size, height: size, stroke: COLORS.CYAN, strokeWidth: 1 };
+    const textX = x + size / 2;
+    const textY = y + size / 2 + 4;
+    const letterEl = typeLetter ? (
+      <text x={textX} y={textY} textAnchor="middle" fill={COLORS.WHITE} fontSize={12} fontFamily="RDVSimulated, monospace" fontWeight="100">{typeLetter}</text>
+    ) : null;
+
+    switch (state) {
+      case 'on': // Steady-On: solid green, no animation
+        return <>{React.createElement('rect', { ...baseRect, fill: COLORS.GREEN })}{letterEl}</>;
+      case 'flashing': // Incoming call: 1/sec, 50/50 on/off
+        return <>
+          {React.createElement('rect', { ...baseRect, fill: COLORS.GREEN },
+            React.createElement('animate', { attributeName: 'fill', values: `${COLORS.GREEN};${COLORS.BLACK}`, dur: '1s', repeatCount: 'indefinite' })
+          )}
+          {letterEl}
+        </>;
+      case 'winking': // HOLD: 1/sec, 95/5 on/off
+        return <>
+          {React.createElement('rect', { ...baseRect, fill: COLORS.GREEN },
+            React.createElement('animate', { attributeName: 'fill', values: `${COLORS.GREEN};${COLORS.GREEN};${COLORS.BLACK}`, keyTimes: '0;0.95;1', dur: '1s', repeatCount: 'indefinite' })
+          )}
+          {letterEl}
+        </>;
+      case 'flutter': // Active call: 12/sec (83ms), 80/20 on/off
+        return <>
+          {React.createElement('rect', { ...baseRect, fill: COLORS.GREEN },
+            React.createElement('animate', { attributeName: 'fill', values: `${COLORS.GREEN};${COLORS.BLACK}`, keyTimes: '0;0.8', dur: '0.083s', repeatCount: 'indefinite' })
+          )}
+          {letterEl}
+        </>;
+      case 'flutter-green': // Override active: 12/sec green
+        return <>
+          {React.createElement('rect', { ...baseRect, fill: '#93ca63' },
+            React.createElement('animate', { attributeName: 'fill', values: '#93ca63;#000000', keyTimes: '0;0.8', dur: '0.083s', repeatCount: 'indefinite' })
+          )}
+          {letterEl}
+        </>;
+      default: // Off: black fill
+        return <>{React.createElement('rect', { ...baseRect, fill: COLORS.BLACK })}{letterEl}</>;
+    }
   };
 
   // Render a station selector button using SVG (scaled for 800x600)
@@ -718,7 +886,6 @@ export default function RDVSWrapper({ variant = 'default' }: RDVSWrapperProps) {
     }
 
     const { typeLetter, line1, line2, indicatorState, lineType } = btn;
-    const indicatorFill = indicatorState !== 'off' ? COLORS.GREEN : COLORS.BLACK;
 
     // Get colors from color pattern (or fallback to legacy)
     const daColors = getDAButtonColors(lineType);
@@ -780,25 +947,21 @@ export default function RDVSWrapper({ variant = 'default' }: RDVSWrapperProps) {
             {displayLine2}
           </text>
         )}
-        {/* L/NL indicator box - always cyan per spec */}
-        <rect x={(w - indicatorSize) / 2} y={indicatorY} width={indicatorSize} height={indicatorSize} fill={indicatorFill} stroke={COLORS.CYAN} strokeWidth="1" />
-        <text
-          x={w / 2}
-          y={indicatorY + indicatorSize / 2 + 4}
-          textAnchor="middle"
-          fill={COLORS.WHITE}
-          fontSize={12}
-          fontFamily="RDVSimulated, monospace"
-          fontWeight="100"
-        >
-          {typeLetter}
-        </text>
+        {/* L/NL indicator box with SMIL animation per TI 6650.58 */}
+        {renderIndicator(indicatorState, (w - indicatorSize) / 2, indicatorY, indicatorSize, typeLetter)}
       </svg>
     );
   };
 
   // Render line control panel (right side) - scaled for 800x600
   // Uses 5 equal-width cells matching station button width
+  // Map radioId to ag_status entry by matching frequency
+  const getRadioAgStatus = (radioId: string) => {
+    const radio = currentPosition?.radios?.find((r: any) => r.id === radioId);
+    if (!radio?.freq) return null;
+    return ag_status?.find((a: any) => a.freq === radio.freq) || null;
+  };
+
   const renderLineControlPanel = (rowIdx: number) => {
     const ag = ag_status?.[rowIdx] || {};
     const freq = ag.freq || 0;
@@ -834,9 +997,10 @@ export default function RDVSWrapper({ variant = 'default' }: RDVSWrapperProps) {
           width: '100%',
         }}
       >
-        {/* Cell 1: HS/LS Section - HS/LS labels always white */}
+        {/* Cell 1: HS/LS Section - clickable to toggle headset/loudspeaker */}
         {/* First cell: outer border on left, top, bottom; right edge is internal divider */}
-        <svg width={cellW0} height={cellH} viewBox={`0 0 ${cellW0} ${cellH}`} style={{ display: 'block', flexShrink: 0 }}>
+        <svg width={cellW0} height={cellH} viewBox={`0 0 ${cellW0} ${cellH}`} style={{ display: 'block', flexShrink: 0, cursor: 'pointer' }}
+          onClick={() => freq && sendMsg({ type: 'set_hs', cmd1: '' + freq, dbl1: !isHs })}>
           <FillPatternDefs color={radioColors.border} />
           <rect x="0" y="0" width={cellW0} height={cellH} fill={radioFillValue} stroke="none" />
           {/* Outer borders: left, top, bottom */}
@@ -859,9 +1023,10 @@ export default function RDVSWrapper({ variant = 'default' }: RDVSWrapperProps) {
           <rect x="39" y="28" width="14" height="17" fill={isLs ? COLORS.GREEN : 'none'} stroke="none" />
         </svg>
 
-        {/* Cell 2: RX Section - all radio panel text is white */}
+        {/* Cell 2: RX Section - clickable to toggle RX selection */}
         {/* Middle cells: top, bottom borders; right divider */}
-        <svg width={cellW1} height={cellH} viewBox={`0 0 ${cellW1} ${cellH}`} style={{ display: 'block', flexShrink: 0 }}>
+        <svg width={cellW1} height={cellH} viewBox={`0 0 ${cellW1} ${cellH}`} style={{ display: 'block', flexShrink: 0, cursor: 'pointer' }}
+          onClick={() => freq && sendMsg({ type: 'rx', cmd1: '' + freq, dbl1: !isRx })}>
           <FillPatternDefs color={radioColors.border} />
           <rect x="0" y="0" width={cellW1} height={cellH} fill={radioFillValue} stroke="none" />
           <line x1="0" y1="1" x2={cellW1} y2="1" stroke={radioColors.border} strokeWidth="2" />
@@ -884,8 +1049,9 @@ export default function RDVSWrapper({ variant = 'default' }: RDVSWrapperProps) {
           <text x="51" y="18" textAnchor="middle" fill={COLORS.BLACK} fontSize="15" fontFamily="RDVSimulated, monospace" fontWeight="100">M</text>
         </svg>
 
-        {/* Cell 4: TX Section - all radio panel text is white */}
-        <svg width={cellW3} height={cellH} viewBox={`0 0 ${cellW3} ${cellH}`} style={{ display: 'block', flexShrink: 0 }}>
+        {/* Cell 4: TX Section - clickable to toggle TX selection */}
+        <svg width={cellW3} height={cellH} viewBox={`0 0 ${cellW3} ${cellH}`} style={{ display: 'block', flexShrink: 0, cursor: 'pointer' }}
+          onClick={() => freq && sendMsg({ type: 'tx', cmd1: '' + freq, dbl1: !isTx })}>
           <FillPatternDefs color={radioColors.border} />
           <rect x="0" y="0" width={cellW3} height={cellH} fill={radioFillValue} stroke="none" />
           <line x1="0" y1="1" x2={cellW3} y2="1" stroke={radioColors.border} strokeWidth="2" />
@@ -941,8 +1107,8 @@ export default function RDVSWrapper({ variant = 'default' }: RDVSWrapperProps) {
     const radioColors = getRadioButtonColors(isEmergency);
     const radioFillValue = getFillValue(radioColors.fillDesign, radioColors.background, radioColors.border);
 
-    // Find radio status from ag_status (simplified - would need proper radio index mapping)
-    const radioStatus = ag_status?.[0] || {}; // TODO: Map radioId to proper ag_status index
+    // Map radioId to proper ag_status entry by matching frequency
+    const radioStatus = getRadioAgStatus(radioId) || {};
     const isRx = !!radioStatus.r;
     const isTx = !!radioStatus.t;
     const isPtt = isTx; // PTT indicator matches TX state
@@ -1128,15 +1294,40 @@ export default function RDVSWrapper({ variant = 'default' }: RDVSWrapperProps) {
         ) || {};
 
         const callStatus = statusObj.status || 'off';
+        const callPrefix = statusObj?.call?.substring(0, 2);
         let indicatorState = 'off';
-        if (lineType === 0) {
-          if (callStatus === 'ok' || callStatus === 'active') indicatorState = 'on';
-          else if (callStatus === 'busy') indicatorState = 'flutter';
+        if (callStatus === 'hold') {
+          indicatorState = 'winking';
+        } else if (callStatus === 'busy') {
+          indicatorState = 'on';
+        } else if (lineType === 0) {
+          if (callStatus === 'ok' || callStatus === 'active') {
+            indicatorState = callPrefix === 'OV' ? 'flutter-green' : 'flutter';
+          } else if (callStatus === 'chime' || callStatus === 'online') {
+            indicatorState = 'flutter';
+          }
         } else if (lineType === 1) {
-          if (callStatus === 'chime') indicatorState = 'flashing';
-          else if (callStatus === 'ok') indicatorState = 'flutter';
+          if (callStatus === 'chime' || callStatus === 'ringing') {
+            indicatorState = 'flashing';
+          } else if (callStatus === 'ok' || callStatus === 'active') {
+            indicatorState = 'flutter';
+          } else if (callStatus === 'online') {
+            indicatorState = 'on';
+          }
         } else if (lineType === 2) {
-          if (callStatus === 'ok' || callStatus === 'online') indicatorState = 'flutter';
+          if (callStatus === 'chime' || callStatus === 'ringing') {
+            indicatorState = 'flashing';
+          } else if (callStatus === 'ok' || callStatus === 'active') {
+            indicatorState = 'flutter';
+          } else if (callStatus === 'online') {
+            indicatorState = 'on';
+          }
+        } else if (lineType === 3) {
+          if (callStatus === 'ok' || callStatus === 'active') {
+            indicatorState = 'flutter';
+          } else if (callStatus === 'ringing') {
+            indicatorState = 'flashing';
+          }
         }
 
         const btn = { call_id, lineType, typeLetter, line1, line2, indicatorState, statusObj };
@@ -1149,10 +1340,6 @@ export default function RDVSWrapper({ variant = 'default' }: RDVSWrapperProps) {
         const fillDesign = daColors.fillDesign;
         const fillValue = getFillValue(fillDesign, bgColor, strokeColor);
 
-        let indicatorFill = COLORS.BLACK;
-        if (indicatorState === 'on') indicatorFill = COLORS.GREEN;
-        else if (indicatorState === 'flutter') indicatorFill = COLORS.GREEN;
-        else if (indicatorState === 'flashing') indicatorFill = COLORS.GREEN;
         const displayLine1 = (line1 || '').substring(0, 5);
         const displayLine2 = (line2 || '').substring(0, 2);
 
@@ -1182,11 +1369,8 @@ export default function RDVSWrapper({ variant = 'default' }: RDVSWrapperProps) {
                 {displayLine2}
               </text>
             )}
-            {/* L/NL indicator box - always cyan per spec */}
-            <rect x={(w - indicatorSize) / 2} y={indicatorY} width={indicatorSize} height={indicatorSize} fill={indicatorFill} stroke={COLORS.CYAN} strokeWidth="1" />
-            <text x={w / 2} y={indicatorY + indicatorSize / 2 + 4} textAnchor="middle" fill={COLORS.WHITE} fontSize={12} fontFamily="RDVSimulated, monospace" fontWeight="100">
-              {typeLetter}
-            </text>
+            {/* L/NL indicator box with SMIL animation per TI 6650.58 */}
+            {renderIndicator(indicatorState, (w - indicatorSize) / 2, indicatorY, indicatorSize, typeLetter)}
           </svg>
         );
       }
@@ -1214,7 +1398,7 @@ export default function RDVSWrapper({ variant = 'default' }: RDVSWrapperProps) {
         const radioColors = getRadioButtonColors(isEmergency);
         const radioFillValue = getFillValue(radioColors.fillDesign, radioColors.background, radioColors.border);
 
-        const radioStatus = ag_status?.[0] || {}; // TODO: Map radioId to proper ag_status index
+        const radioStatus = getRadioAgStatus(radioId) || {};
         const isRx = !!radioStatus.r;
         const isTx = !!radioStatus.t;
         const isHs = !!radioStatus.h;
@@ -1235,9 +1419,10 @@ export default function RDVSWrapper({ variant = 'default' }: RDVSWrapperProps) {
 
         return (
           <div key={key} style={{ display: 'flex', gap: '0px', width: '100%' }}>
-            {/* Cell 1: HS/LS Section - HS/LS labels always white */}
+            {/* Cell 1: HS/LS Section - clickable to toggle headset/loudspeaker */}
             {/* First cell: outer border on left, top, bottom; right edge is internal divider */}
-            <svg width={cellW0} height={cellH} viewBox={`0 0 ${cellW0} ${cellH}`} style={{ display: 'block', flexShrink: 0 }}>
+            <svg width={cellW0} height={cellH} viewBox={`0 0 ${cellW0} ${cellH}`} style={{ display: 'block', flexShrink: 0, cursor: 'pointer' }}
+              onClick={() => freq && sendMsg({ type: 'set_hs', cmd1: '' + freq, dbl1: !isHs })}>
               <FillPatternDefs color={radioColors.border} />
               <rect x="0" y="0" width={cellW0} height={cellH} fill={radioFillValue} stroke="none" />
               {/* Outer borders: left, top, bottom */}
@@ -1262,7 +1447,8 @@ export default function RDVSWrapper({ variant = 'default' }: RDVSWrapperProps) {
 
             {/* Cell 2: RX Section - all radio panel text is white */}
             {/* Middle cells: top, bottom borders; right divider */}
-            <svg width={cellW1} height={cellH} viewBox={`0 0 ${cellW1} ${cellH}`} style={{ display: 'block', flexShrink: 0 }}>
+            <svg width={cellW1} height={cellH} viewBox={`0 0 ${cellW1} ${cellH}`} style={{ display: 'block', flexShrink: 0, cursor: 'pointer' }}
+              onClick={() => freq && sendMsg({ type: 'rx', cmd1: '' + freq, dbl1: !isRx })}>
               <FillPatternDefs color={radioColors.border} />
               <rect x="0" y="0" width={cellW1} height={cellH} fill={radioFillValue} stroke="none" />
               <line x1="0" y1="1" x2={cellW1} y2="1" stroke={radioColors.border} strokeWidth="2" />
@@ -1286,7 +1472,8 @@ export default function RDVSWrapper({ variant = 'default' }: RDVSWrapperProps) {
             </svg>
 
             {/* Cell 4: TX Section - all radio panel text is white */}
-            <svg width={cellW3} height={cellH} viewBox={`0 0 ${cellW3} ${cellH}`} style={{ display: 'block', flexShrink: 0 }}>
+            <svg width={cellW3} height={cellH} viewBox={`0 0 ${cellW3} ${cellH}`} style={{ display: 'block', flexShrink: 0, cursor: 'pointer' }}
+              onClick={() => freq && sendMsg({ type: 'tx', cmd1: '' + freq, dbl1: !isTx })}>
               <FillPatternDefs color={radioColors.border} />
               <rect x="0" y="0" width={cellW3} height={cellH} fill={radioFillValue} stroke="none" />
               <line x1="0" y1="1" x2={cellW3} y2="1" stroke={radioColors.border} strokeWidth="2" />
@@ -1359,7 +1546,7 @@ export default function RDVSWrapper({ variant = 'default' }: RDVSWrapperProps) {
         const textY = 22;
 
         return (
-          <svg key={key} width={w} height={h} viewBox={`0 0 ${w} ${h}`} style={{ cursor: 'pointer' }} onClick={() => console.log(`${funcType} pressed`)}>
+          <svg key={key} width={w} height={h} viewBox={`0 0 ${w} ${h}`} style={{ cursor: 'pointer' }} onClick={() => handleFunctionKey(funcType)}>
             <FillPatternDefs color={funcColors.border} />
             <rect x="0" y="0" width={w} height={h} fill={funcFillValue} stroke={funcColors.border} strokeWidth="4" />
             <text x={w / 2} y={textY} textAnchor="middle" fill={funcColors.text} fontSize={16} fontFamily="RDVSimulated, monospace" fontWeight="100">
@@ -1670,7 +1857,7 @@ export default function RDVSWrapper({ variant = 'default' }: RDVSWrapperProps) {
         </g>
         {/* OVR */}
         <text x={ovrCenterX} y={textY} textAnchor="middle" fill={COLORS.WHITE} fontSize="13" fontFamily="RDVSimulated, monospace" fontWeight="bold">OVR</text>
-        <rect x={ovrX} y={boxY} width={ovrBoxWidth} height={boxHeight} fill={ovrActive ? COLORS.GREEN : 'none'} stroke={COLORS.GREEN} strokeWidth="1" />
+        <rect x={ovrX} y={boxY} width={ovrBoxWidth} height={boxHeight} fill={isBeingOverridden ? COLORS.GREEN : 'none'} stroke={COLORS.GREEN} strokeWidth="1" />
         {/* CA */}
         <text x={caCenterX} y={textY} textAnchor="middle" fill={COLORS.WHITE} fontSize="13" fontFamily="RDVSimulated, monospace" fontWeight="bold">CA</text>
         <rect x={caX} y={boxY} width={iaBoxWidth} height={boxHeight} fill="none" stroke={COLORS.WHITE} strokeWidth="1" />
@@ -1775,8 +1962,37 @@ export default function RDVSWrapper({ variant = 'default' }: RDVSWrapperProps) {
     }
   };
 
+  // Handle keypad submit (# key)
+  const handleKeypadSubmit = () => {
+    if (iaMode) {
+      // IA call: strip 'IA' prefix and send the code
+      const iaCode = dialBuffer.replace('IA', '').replace('FWD', '');
+      if (iaCode) sendMsg({ type: 'ia_call', cmd1: iaCode, dbl1: 0 });
+    } else {
+      // Dial call: send via sendDialCall with the active trunk
+      const activeDialLineState = useCoreStore.getState().activeDialLine;
+      if (activeDialLineState && dialBuffer) {
+        sendDialCall(activeDialLineState.trunkName, dialBuffer);
+      }
+    }
+    setKeypadActive(false);
+    setDialBuffer('');
+    setIaMode(false);
+  };
+
   // Handle keypad digit press
   const handleKeypadPress = (digit: string) => {
+    // # submits the dial buffer
+    if (digit === '#') {
+      handleKeypadSubmit();
+      return;
+    }
+    // * clears the dial buffer
+    if (digit === '*') {
+      setDialBuffer(iaMode ? 'IA' : '');
+      return;
+    }
+
     // Play DTMF tone
     playDTMFTone(digit);
 
@@ -2363,25 +2579,49 @@ export default function RDVSWrapper({ variant = 'default' }: RDVSWrapperProps) {
   ): React.ReactNode => {
     switch (type) {
       case 'DA_OVERFLOW': {
-        // Empty cells that show DA buttons from other pages with activity
-        // No border - just black background (will be filled when DA activity occurs)
-        // Render as individual modular cells
+        // Show DA buttons from other pages that have active indicators
         const cellW = CELL_WIDTH;
         const cellH = CELL_HEIGHT;
         const numCells = Math.max(1, Math.round(width / (CELL_WIDTH + GAP)));
         const cells = [];
         for (let i = 0; i < numCells; i++) {
-          cells.push(
-            <svg
-              key={`${key}-${i}`}
-              width={cellW}
-              height={cellH}
-              viewBox={`0 0 ${cellW} ${cellH}`}
-              style={{ display: 'block', flexShrink: 0 }}
-            >
-              <rect x={0} y={0} width={cellW} height={cellH} fill={COLORS.BLACK} />
-            </svg>
-          );
+          const overflowBtn = overflowButtons[i];
+          if (overflowBtn) {
+            // Render a mini DA button with indicator and label
+            const daColors = getDAButtonColors(overflowBtn.lineType);
+            const fillValue = getFillValue(daColors.fillDesign, daColors.background, daColors.border);
+            const indicatorSize = 16;
+            const indicatorY = cellH - indicatorSize - 3;
+            cells.push(
+              <svg
+                key={`${key}-${i}`}
+                width={cellW}
+                height={cellH}
+                viewBox={`0 0 ${cellW} ${cellH}`}
+                style={{ display: 'block', flexShrink: 0, cursor: 'pointer' }}
+                onClick={() => handleLineClick(overflowBtn)}
+              >
+                <FillPatternDefs color={daColors.border} />
+                <rect x="0" y="0" width={cellW} height={cellH} fill={fillValue} stroke={daColors.border} strokeWidth="4" />
+                <text x={cellW / 2} y="16" textAnchor="middle" fill={daColors.text} fontSize="13" fontFamily="RDVSimulated, monospace" fontWeight="bold">{overflowBtn.line1}</text>
+                {overflowBtn.line2 && <text x={cellW / 2} y="30" textAnchor="middle" fill={daColors.text} fontSize="12" fontFamily="RDVSimulated, monospace" fontWeight="100">{overflowBtn.line2}</text>}
+                {renderIndicator(overflowBtn.indicatorState, (cellW - indicatorSize) / 2, indicatorY, indicatorSize, overflowBtn.typeLetter)}
+              </svg>
+            );
+          } else {
+            // Empty placeholder cell
+            cells.push(
+              <svg
+                key={`${key}-${i}`}
+                width={cellW}
+                height={cellH}
+                viewBox={`0 0 ${cellW} ${cellH}`}
+                style={{ display: 'block', flexShrink: 0 }}
+              >
+                <rect x={0} y={0} width={cellW} height={cellH} fill={COLORS.BLACK} />
+              </svg>
+            );
+          }
         }
         return (
           <div key={key} style={{ display: 'flex', gap: `${GAP}px` }}>
@@ -2429,8 +2669,8 @@ export default function RDVSWrapper({ variant = 'default' }: RDVSWrapperProps) {
           ? getFillValue(radioColors.fillDesign, radioColors.background, radioColors.border)
           : COLORS.BLACK;
 
-        // Get radio status from ag_status (simplified - would need proper radio index mapping)
-        const radioStatus = ag_status?.[0] || {}; // TODO: Map radioId to proper ag_status index
+        // Get radio status from ag_status by matching frequency
+        const radioStatus = selectedPartialRadioId ? (getRadioAgStatus(selectedPartialRadioId) || {}) : {};
         const isRx = selectedRadio && !!radioStatus.r;
         const isTx = selectedRadio && !!radioStatus.t;
         const isHs = selectedRadio && !!radioStatus.h;
@@ -2444,7 +2684,8 @@ export default function RDVSWrapper({ variant = 'default' }: RDVSWrapperProps) {
         return (
           <div key={key} style={{ display: 'flex', gap: '0px' }}>
             {/* Cell 1: HS/LS Section */}
-            <svg width={cellW0} height={cellH} viewBox={`0 0 ${cellW0} ${cellH}`} style={{ display: 'block', flexShrink: 0 }}>
+            <svg width={cellW0} height={cellH} viewBox={`0 0 ${cellW0} ${cellH}`} style={{ display: 'block', flexShrink: 0, cursor: selectedRadio ? 'pointer' : 'default' }}
+              onClick={() => selectedRadio && freq && sendMsg({ type: 'set_hs', cmd1: '' + freq, dbl1: !isHs })}>
               <FillPatternDefs color={popupBorderColor} />
               <rect x="0" y="0" width={cellW0} height={cellH} fill={popupFillValue} stroke="none" />
               {/* Outer borders: left, top, bottom */}
@@ -2468,7 +2709,8 @@ export default function RDVSWrapper({ variant = 'default' }: RDVSWrapperProps) {
             </svg>
 
             {/* Cell 2: RX Section */}
-            <svg width={cellW1} height={cellH} viewBox={`0 0 ${cellW1} ${cellH}`} style={{ display: 'block', flexShrink: 0 }}>
+            <svg width={cellW1} height={cellH} viewBox={`0 0 ${cellW1} ${cellH}`} style={{ display: 'block', flexShrink: 0, cursor: selectedRadio ? 'pointer' : 'default' }}
+              onClick={() => selectedRadio && freq && sendMsg({ type: 'rx', cmd1: '' + freq, dbl1: !isRx })}>
               <FillPatternDefs color={popupBorderColor} />
               <rect x="0" y="0" width={cellW1} height={cellH} fill={popupFillValue} stroke="none" />
               <line x1="0" y1="1" x2={cellW1} y2="1" stroke={popupBorderColor} strokeWidth="2" />
@@ -2492,7 +2734,8 @@ export default function RDVSWrapper({ variant = 'default' }: RDVSWrapperProps) {
             </svg>
 
             {/* Cell 4: TX Section */}
-            <svg width={cellW3} height={cellH} viewBox={`0 0 ${cellW3} ${cellH}`} style={{ display: 'block', flexShrink: 0 }}>
+            <svg width={cellW3} height={cellH} viewBox={`0 0 ${cellW3} ${cellH}`} style={{ display: 'block', flexShrink: 0, cursor: selectedRadio ? 'pointer' : 'default' }}
+              onClick={() => selectedRadio && freq && sendMsg({ type: 'tx', cmd1: '' + freq, dbl1: !isTx })}>
               <FillPatternDefs color={popupBorderColor} />
               <rect x="0" y="0" width={cellW3} height={cellH} fill={popupFillValue} stroke="none" />
               <line x1="0" y1="1" x2={cellW3} y2="1" stroke={popupBorderColor} strokeWidth="2" />

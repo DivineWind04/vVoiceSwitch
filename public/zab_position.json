@@ -2535,11 +2535,11 @@
       ],
       "tedPattern": {
         "patternName": "PHX_APACHE_PATTERN",
+		"display": "LEFT",
         "dimPercent": 50,
         "pages": [
           {
             "pageNumber": 1,
-            "display": "LEFT",
             "footer": "DRP",
             "cells": [
               { "quad": 1, "row": 1, "col": 1, "type": "DA", "lineId": "6020742" },
@@ -2579,7 +2579,6 @@
           },
           {
             "pageNumber": 2,
-            "display": "RIGHT",
             "footer": "DP",
             "cells": [
               { "quad": 1, "row": 1, "col": 1, "type": "DA", "lineId": "6020742" },
