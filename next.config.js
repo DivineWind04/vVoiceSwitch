@@ -23,16 +23,10 @@ const config = {
   },
   
   // Turbopack configuration for Next.js 16+
-  turbopack: {
-    rules: {
-      '*.svg': {
-        loaders: ['@svgr/webpack'],
-        as: '*.js',
-      },
-    },
-  },
+  // Empty config to explicitly enable Turbopack and silence warnings
+  turbopack: {},
   
-  // Webpack optimization for audio files (fallback for --webpack flag)
+  // Webpack optimization for audio files and SVG handling
   webpack: (config) => {
     config.module.rules.push({
       test: /\.(wav|mp3|m4a)$/,
