@@ -12,11 +12,6 @@ const config = {
   compress: true,
   poweredByHeader: false,
   
-  // Disable ESLint during builds to prevent deployment failures
-  eslint: {
-    ignoreDuringBuilds: true,
-  },
-  
   // Disable TypeScript checking during builds to prevent deployment failures
   typescript: {
     ignoreBuildErrors: true,
@@ -27,7 +22,11 @@ const config = {
     unoptimized: true, // For static export compatibility
   },
   
-  // Webpack optimization for audio files
+  // Turbopack configuration for Next.js 16+
+  // Empty config to explicitly enable Turbopack and silence warnings
+  turbopack: {},
+  
+  // Webpack optimization for audio files and SVG handling
   webpack: (config) => {
     config.module.rules.push({
       test: /\.(wav|mp3|m4a)$/,
