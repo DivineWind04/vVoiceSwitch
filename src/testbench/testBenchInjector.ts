@@ -86,6 +86,16 @@ function playTestAudio(callId: string): void {
     audioElements.set(callId, audio);
 }
 
+// Play override termination tone on an override call
+function playOverrideAudio(callId: string): void {
+    stopTestAudio(callId);
+
+    const audio = new Audio('/rdvs/Override_Term.wav');
+    audio.loop = false;
+    audio.play().catch(() => {});
+    audioElements.set(callId, audio);
+}
+
 // Stop test audio for a call
 function stopTestAudio(callId: string): void {
     const audio = audioElements.get(callId);
@@ -106,14 +116,19 @@ function clearAutoAdvanceTimer(callId: string): void {
 }
 
 // Handle audio cues when a test call status changes
-function handleTestCallAudio(callId: string, newStatus: string): void {
+function handleTestCallAudio(callId: string, newStatus: string, lineType?: number): void {
     if (newStatus === 'chime') {
         chimeAudio(getAudioElement('ggchime'));
     } else if (newStatus === 'ringing') {
         chimeAudio(getAudioElement('ringback'));
     } else if (newStatus === 'ok' || newStatus === 'active') {
         stopMainAudio();
-        playTestAudio(callId);
+        // Override calls (lineType 0) play Override_Term.wav instead of test audio
+        if (lineType === 0) {
+            playOverrideAudio(callId);
+        } else {
+            playTestAudio(callId);
+        }
     } else if (newStatus === 'hold') {
         // On hold: stop test audio but don't stop system audio
         stopTestAudio(callId);
@@ -129,7 +144,7 @@ function transitionCall(callId: string, newStatus: TestCall['status']): void {
     if (!call) return;
 
     useTestBenchStore.getState().updateTestCall(callId, { status: newStatus });
-    handleTestCallAudio(callId, newStatus);
+    handleTestCallAudio(callId, newStatus, call.lineType);
     injectTestCalls();
 }
 
@@ -154,7 +169,7 @@ export function startIncomingCall(lineId: string, lineType: number, label: strin
     };
 
     useTestBenchStore.getState().addTestCall(testCall);
-    handleTestCallAudio(id, initialStatus);
+    handleTestCallAudio(id, initialStatus, lineType);
     injectTestCalls();
 }
 
@@ -173,7 +188,7 @@ export function startOutgoingCall(lineId: string, lineType: number, label: strin
     };
 
     useTestBenchStore.getState().addTestCall(testCall);
-    handleTestCallAudio(id, 'ringing');
+    handleTestCallAudio(id, 'ringing', lineType);
     injectTestCalls();
 }
 
@@ -212,10 +227,32 @@ export function resumeCall(callId: string): void {
 
 // End a specific test call (any state -> removed)
 export function endTestCall(callId: string): void {
+    // Look up the call's prefixed ID before removing, so we can clean it from gg_status
+    const call = useTestBenchStore.getState().activeTestCalls.find(c => c.id === callId);
+    const prefixedId = call ? buildCallId(call.lineType, call.lineId) : null;
+
     stopTestAudio(callId);
     stopMainAudio();
     clearAutoAdvanceTimer(callId);
     useTestBenchStore.getState().removeTestCall(callId);
+
+    // Explicitly remove the stale entry from gg_status before re-injecting
+    if (prefixedId) {
+        const coreState = useCoreStore.getState();
+        const cleanedGG = (coreState.gg_status || []).filter((g: any) => g.call !== prefixedId);
+        const cleanedOverrides = (coreState.overrideStatus || []).filter((ov: any) => ov.call !== prefixedId);
+        const hasActiveOverride = cleanedOverrides.some(
+            (ov: any) => ov.status === 'ok' || ov.status === 'active' || ov.status === 'hold'
+        );
+        const overrideCallStatus = cleanedOverrides.length > 0 ? cleanedOverrides[0].status : 'off';
+        useCoreStore.setState({
+            gg_status: cleanedGG,
+            overrideStatus: cleanedOverrides,
+            isBeingOverridden: hasActiveOverride,
+            overrideCallStatus,
+        });
+    }
+
     injectTestCalls();
 }
 
@@ -238,13 +275,34 @@ function handleInterceptedMessage(message: any): void {
     const calls = useTestBenchStore.getState().activeTestCalls;
     const call = calls.find(c => c.lineId === lineId && c.status !== 'terminated');
 
-    if (!call) return;
+    if (!call) {
+        // No active call — if this is a 'call' message, it's an outgoing call initiation
+        if (message.type === 'call') {
+            // Look up line info from the configured position
+            const selectedPositions = useCoreStore.getState().selectedPositions;
+            const lines: [string, number, string][] = selectedPositions?.[0]?.lines || [];
+            const lineInfo = lines.find(([id]) => id === lineId);
+            if (lineInfo) {
+                const [, lineType, label] = lineInfo;
+                // Override lines connect immediately (same as incoming overrides)
+                if (lineType === 0) {
+                    startIncomingCall(lineId, lineType, label);
+                } else {
+                    startOutgoingCall(lineId, lineType, label);
+                }
+            }
+        }
+        return;
+    }
 
     if (message.type === 'call') {
         // User is answering/activating a call via the UI button
         if (call.status === 'chime' || call.status === 'ringing') {
             // Answer the call
             clearAutoAdvanceTimer(call.id);
+            transitionCall(call.id, 'ok');
+        } else if (call.status === 'hold') {
+            // Resume a held call (RECON or DA button press)
             transitionCall(call.id, 'ok');
         }
     } else if (message.type === 'hold') {
@@ -258,10 +316,22 @@ function handleInterceptedMessage(message: any): void {
     }
 }
 
-// Check if a lineId belongs to an active test bench call
+// Check if a lineId belongs to an active test bench call or a configured test bench line
 function isTestBenchCall(lineId: string): boolean {
+    // First check active calls
     const activeLineIds = useTestBenchStore.getState().getActiveLineIds();
-    return activeLineIds.has(lineId);
+    if (activeLineIds.has(lineId)) return true;
+
+    // Also check if the test bench panel is open and this line is configured on the position
+    // This allows intercepting outgoing calls initiated by DA button clicks
+    const isOpen = useTestBenchStore.getState().isOpen;
+    if (isOpen) {
+        const selectedPositions = useCoreStore.getState().selectedPositions;
+        const lines: [string, number, string][] = selectedPositions?.[0]?.lines || [];
+        return lines.some(([id]) => id === lineId);
+    }
+
+    return false;
 }
 
 // Register the test bench handler on window for sendMessageNow interception
