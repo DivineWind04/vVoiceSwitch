@@ -524,7 +524,13 @@ export default function RDVSWrapper({ variant = 'default' }: RDVSWrapperProps) {
     const callPrefix = statusObj?.call?.substring(0, 2);
 
     // Block clicks for non-actionable states
-    if (['busy', 'hold', 'pending', 'terminate', 'overridden'].includes(status)) return;
+    if (['busy', 'pending', 'terminate', 'overridden'].includes(status)) return;
+
+    // Per TI 6650.58 2.4.4.1(b): pressing DA on a held line picks up the call
+    if (status === 'hold') {
+      sendMsg({ type: 'call', cmd1: call_id, dbl1: lineType === 0 ? 0 : 2 });
+      return;
+    }
 
     if (lineType === 0) {
       // Override Intercom (2.4.3.1.5): off→flutter (immediate connection), ok→off (terminate)
@@ -682,7 +688,7 @@ export default function RDVSWrapper({ variant = 'default' }: RDVSWrapperProps) {
         // Reconnect: find first held call and re-connect
         const heldCall = gg_status?.find((s: any) => s.status === 'hold');
         if (heldCall) {
-          const heldId = heldCall.call?.substring(3) || '';
+          const heldId = heldCall.call?.replace(/^(?:gg_\d+_|OV_|SO_)/, '') || '';
           if (heldId) sendMsg({ type: 'call', cmd1: heldId, dbl1: 2 });
         }
         break;
