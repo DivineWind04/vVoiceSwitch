@@ -1660,7 +1660,7 @@ export default function RDVSWrapper({ variant = 'default' }: RDVSWrapperProps) {
   // Top sliver: cuts on BOTTOM-left and BOTTOM-right corners
   // Active page = grey border/text, inactive = white border/text, always black background
   const renderPageTab = (pageNum: number, isActive: boolean, position: 'top' | 'bottom') => {
-    const w = 80;
+    const w = 68;
     const h = 22; // 3px top + ~16px text + 3px bottom
     const chamfer = 12; // Aggressive corner cutoff
     const tabColor = isActive ? COLORS.GREY : COLORS.WHITE;
@@ -1685,7 +1685,7 @@ export default function RDVSWrapper({ variant = 'default' }: RDVSWrapperProps) {
           points={polygonPoints}
           fill={COLORS.BLACK}
           stroke={tabColor}
-          strokeWidth="1"
+          strokeWidth="2"
         />
         <text
           x={w / 2}
@@ -2953,7 +2953,7 @@ export default function RDVSWrapper({ variant = 'default' }: RDVSWrapperProps) {
         alignItems: 'center',
         justifyContent: 'flex-start',
         paddingLeft: `${CELL_WIDTH + GAP}px`,
-        gap: '0',
+        gap: '2px',
         marginTop: sliverPosition === 'bottom' ? '4px' : undefined,
         marginBottom: sliverPosition === 'top' ? '4px' : undefined,
       }}
