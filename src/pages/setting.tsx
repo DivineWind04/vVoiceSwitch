@@ -21,6 +21,13 @@ function collectPositions(facility: Facility): Position[] {
     return positions;
 }
 
+const formatFreq = (freq: number) => {
+    if (!freq) return '';
+    const val = freq / 1_000_000;
+    if (val % 1 === 0) return val.toFixed(1);
+    return val.toString().replace(/0+$/, '').replace(/\.$/, '');
+};
+
 interface SettingModalProps {
     open: boolean;
     setModal: (open: boolean) => void;
@@ -142,7 +149,7 @@ function SettingModal({ open, setModal }: SettingModalProps) {
                             >
                                 <div style={{ fontWeight: 500 }}>{pos.pos}</div>
                                 <div style={{ fontSize: 12, opacity: 0.7 }}>
-                                    {pos.cs}{pos.freq ? ` — ${(pos.freq / 1000).toFixed(3)}` : ''}
+                                    {pos.cs}{pos.freq ? ` — ${formatFreq(pos.freq)}` : ''}
                                 </div>
                             </div>
                         );
