@@ -728,6 +728,13 @@ export default function RDVSWrapper({ variant = 'default' }: RDVSWrapperProps) {
     }
   };
 
+  // Check if a special function button is active (for lamp indication)
+  const isFuncActive = (label: string): boolean => {
+    if (label === 'HOLD' || label === 'HL' || label === 'OHL')
+      return gg_status?.some((s: any) => s.status === 'hold') || false;
+    return false;
+  };
+
   // Render a function key button
   const renderFunctionButton = (label: string, rowIdx: number, colIdx: number) => {
     const w = BTN_WIDTH;
@@ -792,7 +799,7 @@ export default function RDVSWrapper({ variant = 'default' }: RDVSWrapperProps) {
         >
           {label}
         </text>
-        <rect x={(w - indicatorSize) / 2} y={indicatorY} width={indicatorSize} height={indicatorSize} fill={COLORS.BLACK} stroke={funcColors.text} strokeWidth="1" />
+        <rect x={(w - indicatorSize) / 2} y={indicatorY} width={indicatorSize} height={indicatorSize} fill={isFuncActive(label) ? COLORS.CYAN : COLORS.BLACK} stroke={COLORS.CYAN} strokeWidth="1" />
       </svg>
     );
   };
@@ -816,41 +823,43 @@ export default function RDVSWrapper({ variant = 'default' }: RDVSWrapperProps) {
   // SVG SMIL indicator renderer - returns <rect> with optional <animate> for flashing/winking/flutter
   // Per TI 6650.58 Table 2-5 timing specifications
   const renderIndicator = (state: string, x: number, y: number, size: number, typeLetter?: string) => {
-    const baseRect = { x, y, width: size, height: size, stroke: COLORS.CYAN, strokeWidth: 1 };
+    const lampColor = COLORS.CYAN;
+    const baseRect = { x, y, width: size, height: size, stroke: lampColor, strokeWidth: 1 };
     const textX = x + size / 2;
     const textY = y + size / 2 + 4;
+    const textFill = (state === 'off' || state === '' || !state) ? COLORS.WHITE : COLORS.BLACK;
     const letterEl = typeLetter ? (
-      <text x={textX} y={textY} textAnchor="middle" fill={COLORS.WHITE} fontSize={12} fontFamily="RDVSimulated, monospace" fontWeight="100">{typeLetter}</text>
+      <text x={textX} y={textY} textAnchor="middle" fill={textFill} fontSize={12} fontFamily="RDVSimulated, monospace" fontWeight="100">{typeLetter}</text>
     ) : null;
 
     switch (state) {
-      case 'on': // Steady-On: solid green, no animation
-        return <>{React.createElement('rect', { ...baseRect, fill: COLORS.GREEN })}{letterEl}</>;
+      case 'on': // Steady-On: solid cyan, no animation
+        return <>{React.createElement('rect', { ...baseRect, fill: lampColor })}{letterEl}</>;
       case 'flashing': // Incoming call: 1/sec, 50/50 on/off
         return <>
-          {React.createElement('rect', { ...baseRect, fill: COLORS.GREEN },
-            React.createElement('animate', { attributeName: 'fill', values: `${COLORS.GREEN};${COLORS.BLACK}`, dur: '1s', repeatCount: 'indefinite' })
+          {React.createElement('rect', { ...baseRect, fill: lampColor },
+            React.createElement('animate', { attributeName: 'fill', values: `${lampColor};${COLORS.BLACK}`, dur: '1s', calcMode: 'discrete', repeatCount: 'indefinite' })
           )}
           {letterEl}
         </>;
       case 'winking': // HOLD: 1/sec, 95/5 on/off
         return <>
-          {React.createElement('rect', { ...baseRect, fill: COLORS.GREEN },
-            React.createElement('animate', { attributeName: 'fill', values: `${COLORS.GREEN};${COLORS.GREEN};${COLORS.BLACK}`, keyTimes: '0;0.95;1', dur: '1s', repeatCount: 'indefinite' })
+          {React.createElement('rect', { ...baseRect, fill: lampColor },
+            React.createElement('animate', { attributeName: 'fill', values: `${lampColor};${lampColor};${COLORS.BLACK}`, keyTimes: '0;0.95;1', dur: '1s', calcMode: 'discrete', repeatCount: 'indefinite' })
           )}
           {letterEl}
         </>;
       case 'flutter': // Active call: 12/sec (83ms), 80/20 on/off
         return <>
-          {React.createElement('rect', { ...baseRect, fill: COLORS.GREEN },
-            React.createElement('animate', { attributeName: 'fill', values: `${COLORS.GREEN};${COLORS.BLACK}`, keyTimes: '0;0.8', dur: '0.083s', repeatCount: 'indefinite' })
+          {React.createElement('rect', { ...baseRect, fill: lampColor },
+            React.createElement('animate', { attributeName: 'fill', values: `${lampColor};${COLORS.BLACK}`, keyTimes: '0;0.8', dur: '0.083s', calcMode: 'discrete', repeatCount: 'indefinite' })
           )}
           {letterEl}
         </>;
-      case 'flutter-green': // Override active: 12/sec green
+      case 'flutter-green': // Override active: 12/sec cyan (same as flutter per spec - all status lights cyan)
         return <>
-          {React.createElement('rect', { ...baseRect, fill: '#93ca63' },
-            React.createElement('animate', { attributeName: 'fill', values: '#93ca63;#000000', keyTimes: '0;0.8', dur: '0.083s', repeatCount: 'indefinite' })
+          {React.createElement('rect', { ...baseRect, fill: lampColor },
+            React.createElement('animate', { attributeName: 'fill', values: `${lampColor};${COLORS.BLACK}`, keyTimes: '0;0.8', dur: '0.083s', calcMode: 'discrete', repeatCount: 'indefinite' })
           )}
           {letterEl}
         </>;
@@ -976,6 +985,9 @@ export default function RDVSWrapper({ variant = 'default' }: RDVSWrapperProps) {
     const isTx = !!ag.t;
     const isHs = !!ag.h;
     const isLs = !!ag.l;
+    const isTalking = !!ag.talking;
+    const isPttHere = ptt && isTx;
+    const isPttElsewhere = isTalking && !isPttHere;
 
     // Check if this is an emergency frequency (121.5 MHz or 243.0 MHz)
     const isEmergency = isEmergencyFrequency(freq);
@@ -1022,12 +1034,12 @@ export default function RDVSWrapper({ variant = 'default' }: RDVSWrapperProps) {
           <line x1="38" y1="8" x2="54" y2="8" stroke={COLORS.GREEN} strokeWidth="1" />
           <line x1="38" y1="8" x2="38" y2="27" stroke={COLORS.GREEN} strokeWidth="1" />
           <line x1="54" y1="8" x2="54" y2="27" stroke={COLORS.GREEN} strokeWidth="1" />
-          <rect x="39" y="9" width="14" height="17" fill={isHs ? COLORS.GREEN : 'none'} stroke="none" />
+          <rect x="39" y="9" width="14" height="17" fill={isHs ? COLORS.GREEN : COLORS.BLACK} stroke="none" />
           {/* LS indicator box - bottom half */}
           <line x1="38" y1="27" x2="38" y2="46" stroke={COLORS.GREEN} strokeWidth="1" />
           <line x1="54" y1="27" x2="54" y2="46" stroke={COLORS.GREEN} strokeWidth="1" />
           <line x1="38" y1="46" x2="54" y2="46" stroke={COLORS.GREEN} strokeWidth="1" />
-          <rect x="39" y="28" width="14" height="17" fill={isLs ? COLORS.GREEN : 'none'} stroke="none" />
+          <rect x="39" y="28" width="14" height="17" fill={isLs ? COLORS.GREEN : COLORS.BLACK} stroke="none" />
         </svg>
 
         {/* Cell 2: RX Section - clickable to toggle RX selection */}
@@ -1040,7 +1052,7 @@ export default function RDVSWrapper({ variant = 'default' }: RDVSWrapperProps) {
           <line x1="0" y1={cellH - 1} x2={cellW1} y2={cellH - 1} stroke={radioColors.border} strokeWidth="2" />
           <line x1={cellW1 - 1} y1="0" x2={cellW1 - 1} y2={cellH} stroke={radioColors.border} strokeWidth="2" />
           <text x="6" y="18" fill={COLORS.WHITE} fontSize="16" fontFamily="RDVSimulated, monospace" fontWeight="100">RX</text>
-          <rect x="30" y="6" width="30" height="15" fill={isRx ? COLORS.GREEN : 'none'} stroke={COLORS.GREEN} strokeWidth="1" />
+          <rect x="30" y="6" width="30" height="15" fill={isRx ? COLORS.GREEN : COLORS.BLACK} stroke={COLORS.GREEN} strokeWidth="1" />
           <text x="3" y="42" fill={COLORS.WHITE} fontSize="18" fontFamily="RDVSimulated, monospace" fontWeight="100">{(freq / 1_000_000).toFixed(2)}</text>
         </svg>
 
@@ -1065,9 +1077,15 @@ export default function RDVSWrapper({ variant = 'default' }: RDVSWrapperProps) {
           <line x1="0" y1={cellH - 1} x2={cellW3} y2={cellH - 1} stroke={radioColors.border} strokeWidth="2" />
           <line x1={cellW3 - 1} y1="0" x2={cellW3 - 1} y2={cellH} stroke={radioColors.border} strokeWidth="2" />
           <text x="6" y="18" fill={COLORS.WHITE} fontSize="16" fontFamily="RDVSimulated, monospace" fontWeight="100">TX</text>
-          <rect x="30" y="6" width="30" height="15" fill={isTx ? COLORS.GREEN : 'none'} stroke={COLORS.GREEN} strokeWidth="1" />
-          {/* TX radial selector */}
-          <circle cx="45" cy="34" r="6" fill={COLORS.BLACK} stroke={radioColors.border} strokeWidth="1" />
+          <rect x="30" y="6" width="30" height="15" fill={isTx ? COLORS.GREEN : COLORS.BLACK} stroke={COLORS.GREEN} strokeWidth="1" />
+          {/* TX radial PTT indicator - per spec: RED circle, flutter at keying position, steady-on at other positions */}
+          {isPttHere ? (
+            React.createElement('circle', { cx: 45, cy: 34, r: 6, fill: COLORS.RED, stroke: COLORS.RED, strokeWidth: 2 },
+              React.createElement('animate', { attributeName: 'fill', values: `${COLORS.RED};${COLORS.BLACK}`, keyTimes: '0;0.8', dur: '0.083s', calcMode: 'discrete', repeatCount: 'indefinite' })
+            )
+          ) : (
+            <circle cx="45" cy="34" r="6" fill={isPttElsewhere ? COLORS.RED : COLORS.BLACK} stroke={COLORS.RED} strokeWidth="2" />
+          )}
         </svg>
 
         {/* Cell 5: Secondary M/S Section - all radio panel text is white */}
@@ -1118,7 +1136,9 @@ export default function RDVSWrapper({ variant = 'default' }: RDVSWrapperProps) {
     const radioStatus = getRadioAgStatus(radioId) || {};
     const isRx = !!radioStatus.r;
     const isTx = !!radioStatus.t;
-    const isPtt = isTx; // PTT indicator matches TX state
+    const isTalking = !!(radioStatus as any).talking;
+    const isPttHere = ptt && isTx;
+    const isPttElsewhere = isTalking && !isPttHere;
 
     // Colors for top row labels:
     // - Hs label: always lime green (if frequency exists), dark gray for "HL" (no frequency)
@@ -1234,16 +1254,21 @@ export default function RDVSWrapper({ variant = 'default' }: RDVSWrapperProps) {
             {formatFreqShort(freq)}
           </text>
 
-          {/* PTT indicator - red radial circle, radius 6, stroke 2 */}
-          {/* Centered vertically with frequency text, shows filled red when PTT is pressed */}
-          <circle
-            cx={pttX}
-            cy={pttCenterY}
-            r={pttRadius}
-            fill={isPtt ? COLORS.RED : COLORS.BLACK}
-            stroke={COLORS.RED}
-            strokeWidth="2"
-          />
+          {/* PTT indicator - per spec: RED circle, flutter at keying position, steady-on at other positions */}
+          {isPttHere ? (
+            React.createElement('circle', { cx: pttX, cy: pttCenterY, r: pttRadius, fill: COLORS.RED, stroke: COLORS.RED, strokeWidth: 2 },
+              React.createElement('animate', { attributeName: 'fill', values: `${COLORS.RED};${COLORS.BLACK}`, keyTimes: '0;0.8', dur: '0.083s', calcMode: 'discrete', repeatCount: 'indefinite' })
+            )
+          ) : (
+            <circle
+              cx={pttX}
+              cy={pttCenterY}
+              r={pttRadius}
+              fill={isPttElsewhere ? COLORS.RED : COLORS.BLACK}
+              stroke={COLORS.RED}
+              strokeWidth="2"
+            />
+          )}
         </svg>
       </div>
     );
@@ -1410,6 +1435,9 @@ export default function RDVSWrapper({ variant = 'default' }: RDVSWrapperProps) {
         const isTx = !!radioStatus.t;
         const isHs = !!radioStatus.h;
         const isLs = !!radioStatus.l;
+        const isTalking = !!(radioStatus as any).talking;
+        const isPttHere = ptt && isTx;
+        const isPttElsewhere = isTalking && !isPttHere;
 
         // 5 cells fill the quadrant width (5 grid cells + 4 gaps) with no internal gaps
         // Quadrant width = 5 * CELL_WIDTH + 4 * GAP = 384px, divide by 5 cells with remainder distribution
@@ -1444,12 +1472,12 @@ export default function RDVSWrapper({ variant = 'default' }: RDVSWrapperProps) {
               <line x1="38" y1="8" x2="54" y2="8" stroke={COLORS.GREEN} strokeWidth="1" />
               <line x1="38" y1="8" x2="38" y2="27" stroke={COLORS.GREEN} strokeWidth="1" />
               <line x1="54" y1="8" x2="54" y2="27" stroke={COLORS.GREEN} strokeWidth="1" />
-              <rect x="39" y="9" width="14" height="17" fill={isHs ? COLORS.GREEN : 'none'} stroke="none" />
+              <rect x="39" y="9" width="14" height="17" fill={isHs ? COLORS.GREEN : COLORS.BLACK} stroke="none" />
               {/* LS indicator box - bottom half */}
               <line x1="38" y1="27" x2="38" y2="46" stroke={COLORS.GREEN} strokeWidth="1" />
               <line x1="54" y1="27" x2="54" y2="46" stroke={COLORS.GREEN} strokeWidth="1" />
               <line x1="38" y1="46" x2="54" y2="46" stroke={COLORS.GREEN} strokeWidth="1" />
-              <rect x="39" y="28" width="14" height="17" fill={isLs ? COLORS.GREEN : 'none'} stroke="none" />
+              <rect x="39" y="28" width="14" height="17" fill={isLs ? COLORS.GREEN : COLORS.BLACK} stroke="none" />
             </svg>
 
             {/* Cell 2: RX Section - all radio panel text is white */}
@@ -1462,7 +1490,7 @@ export default function RDVSWrapper({ variant = 'default' }: RDVSWrapperProps) {
               <line x1="0" y1={cellH - 1} x2={cellW1} y2={cellH - 1} stroke={radioColors.border} strokeWidth="2" />
               <line x1={cellW1 - 1} y1="0" x2={cellW1 - 1} y2={cellH} stroke={radioColors.border} strokeWidth="2" />
               <text x="6" y="18" fill={COLORS.WHITE} fontSize="16" fontFamily="RDVSimulated, monospace" fontWeight="100">RX</text>
-              <rect x="30" y="6" width="30" height="15" fill={isRx ? COLORS.GREEN : 'none'} stroke={COLORS.GREEN} strokeWidth="1" />
+              <rect x="30" y="6" width="30" height="15" fill={isRx ? COLORS.GREEN : COLORS.BLACK} stroke={COLORS.GREEN} strokeWidth="1" />
               <text x="3" y="42" fill={COLORS.WHITE} fontSize="18" fontFamily="RDVSimulated, monospace" fontWeight="100">{(freq / 1_000_000).toFixed(2)}</text>
             </svg>
 
@@ -1487,9 +1515,15 @@ export default function RDVSWrapper({ variant = 'default' }: RDVSWrapperProps) {
               <line x1="0" y1={cellH - 1} x2={cellW3} y2={cellH - 1} stroke={radioColors.border} strokeWidth="2" />
               <line x1={cellW3 - 1} y1="0" x2={cellW3 - 1} y2={cellH} stroke={radioColors.border} strokeWidth="2" />
               <text x="6" y="18" fill={COLORS.WHITE} fontSize="16" fontFamily="RDVSimulated, monospace" fontWeight="100">TX</text>
-              <rect x="30" y="6" width="30" height="15" fill={isTx ? COLORS.GREEN : 'none'} stroke={COLORS.GREEN} strokeWidth="1" />
-              {/* TX radial PTT indicator - matches partial radio styling */}
-              <circle cx="45" cy="34" r="6" fill={isTx ? COLORS.RED : COLORS.BLACK} stroke={COLORS.RED} strokeWidth="2" />
+              <rect x="30" y="6" width="30" height="15" fill={isTx ? COLORS.GREEN : COLORS.BLACK} stroke={COLORS.GREEN} strokeWidth="1" />
+              {/* TX radial PTT indicator - per spec: RED circle, flutter at keying position, steady-on at other positions */}
+              {isPttHere ? (
+                React.createElement('circle', { cx: 45, cy: 34, r: 6, fill: COLORS.RED, stroke: COLORS.RED, strokeWidth: 2 },
+                  React.createElement('animate', { attributeName: 'fill', values: `${COLORS.RED};${COLORS.BLACK}`, keyTimes: '0;0.8', dur: '0.083s', calcMode: 'discrete', repeatCount: 'indefinite' })
+                )
+              ) : (
+                <circle cx="45" cy="34" r="6" fill={isPttElsewhere ? COLORS.RED : COLORS.BLACK} stroke={COLORS.RED} strokeWidth="2" />
+              )}
             </svg>
 
             {/* Cell 5: Secondary M/S Section - all radio panel text is white */}
@@ -1559,7 +1593,7 @@ export default function RDVSWrapper({ variant = 'default' }: RDVSWrapperProps) {
             <text x={w / 2} y={textY} textAnchor="middle" fill={funcColors.text} fontSize={16} fontFamily="RDVSimulated, monospace" fontWeight="100">
               {funcType}
             </text>
-            <rect x={(w - indicatorSize) / 2} y={indicatorY} width={indicatorSize} height={indicatorSize} fill={COLORS.BLACK} stroke={funcColors.text} strokeWidth="1" />
+            <rect x={(w - indicatorSize) / 2} y={indicatorY} width={indicatorSize} height={indicatorSize} fill={isFuncActive(funcType) ? COLORS.CYAN : COLORS.BLACK} stroke={COLORS.CYAN} strokeWidth="1" />
           </svg>
         );
       }
@@ -1860,16 +1894,16 @@ export default function RDVSWrapper({ variant = 'default' }: RDVSWrapperProps) {
           {/* Invisible clickable area covering the entire IA region */}
           <rect x={iaX - 4} y={0} width={iaBoxWidth + 8} height={height} fill="transparent" />
           <text x={iaCenterX} y={textY} textAnchor="middle" fill={COLORS.WHITE} fontSize="13" fontFamily="RDVSimulated, monospace" fontWeight="bold">IA</text>
-          <rect x={iaX} y={boxY} width={iaBoxWidth} height={boxHeight} fill={iaActive ? COLORS.WHITE : 'none'} stroke={COLORS.WHITE} strokeWidth="1" />
+          <rect x={iaX} y={boxY} width={iaBoxWidth} height={boxHeight} fill={iaActive ? COLORS.WHITE : COLORS.BLACK} stroke={COLORS.WHITE} strokeWidth="1" />
         </g>
         {/* OVR - steady green when active/ok, winking when hold, off otherwise */}
         <text x={ovrCenterX} y={textY} textAnchor="middle" fill={COLORS.WHITE} fontSize="13" fontFamily="RDVSimulated, monospace" fontWeight="bold">OVR</text>
         {overrideCallStatus === 'hold' ? (
           React.createElement('rect', { x: ovrX, y: boxY, width: ovrBoxWidth, height: boxHeight, fill: COLORS.GREEN, stroke: COLORS.GREEN, strokeWidth: '1' },
-            React.createElement('animate', { attributeName: 'fill', values: `${COLORS.GREEN};${COLORS.GREEN};${COLORS.BLACK}`, keyTimes: '0;0.95;1', dur: '1s', repeatCount: 'indefinite' })
+            React.createElement('animate', { attributeName: 'fill', values: `${COLORS.GREEN};${COLORS.GREEN};${COLORS.BLACK}`, keyTimes: '0;0.95;1', dur: '1s', calcMode: 'discrete', repeatCount: 'indefinite' })
           )
         ) : (
-          <rect x={ovrX} y={boxY} width={ovrBoxWidth} height={boxHeight} fill={isBeingOverridden ? COLORS.GREEN : 'none'} stroke={COLORS.GREEN} strokeWidth="1" />
+          <rect x={ovrX} y={boxY} width={ovrBoxWidth} height={boxHeight} fill={isBeingOverridden ? COLORS.GREEN : COLORS.BLACK} stroke={COLORS.GREEN} strokeWidth="1" />
         )}
         {/* CA */}
         <text x={caCenterX} y={textY} textAnchor="middle" fill={COLORS.WHITE} fontSize="13" fontFamily="RDVSimulated, monospace" fontWeight="bold">CA</text>
@@ -2688,6 +2722,9 @@ export default function RDVSWrapper({ variant = 'default' }: RDVSWrapperProps) {
         const isTx = selectedRadio && !!radioStatus.t;
         const isHs = selectedRadio && !!radioStatus.h;
         const isLs = selectedRadio && !!radioStatus.l;
+        const isTalking = !!(radioStatus as any).talking;
+        const isPttHere = ptt && isTx;
+        const isPttElsewhere = isTalking && !isPttHere;
 
         // Format frequency
         const freqDisplay = freq > 0 ? (freq / 1_000_000).toFixed(2) : '';
@@ -2713,12 +2750,12 @@ export default function RDVSWrapper({ variant = 'default' }: RDVSWrapperProps) {
               <line x1="38" y1="8" x2="54" y2="8" stroke={selectedRadio ? COLORS.GREEN : popupBorderColor} strokeWidth="1" />
               <line x1="38" y1="8" x2="38" y2="27" stroke={selectedRadio ? COLORS.GREEN : popupBorderColor} strokeWidth="1" />
               <line x1="54" y1="8" x2="54" y2="27" stroke={selectedRadio ? COLORS.GREEN : popupBorderColor} strokeWidth="1" />
-              <rect x="39" y="9" width="14" height="17" fill={isHs ? COLORS.GREEN : 'none'} stroke="none" />
+              <rect x="39" y="9" width="14" height="17" fill={isHs ? COLORS.GREEN : COLORS.BLACK} stroke="none" />
               {/* LS indicator box - bottom half */}
               <line x1="38" y1="27" x2="38" y2="46" stroke={selectedRadio ? COLORS.GREEN : popupBorderColor} strokeWidth="1" />
               <line x1="54" y1="27" x2="54" y2="46" stroke={selectedRadio ? COLORS.GREEN : popupBorderColor} strokeWidth="1" />
               <line x1="38" y1="46" x2="54" y2="46" stroke={selectedRadio ? COLORS.GREEN : popupBorderColor} strokeWidth="1" />
-              <rect x="39" y="28" width="14" height="17" fill={isLs ? COLORS.GREEN : 'none'} stroke="none" />
+              <rect x="39" y="28" width="14" height="17" fill={isLs ? COLORS.GREEN : COLORS.BLACK} stroke="none" />
             </svg>
 
             {/* Cell 2: RX Section */}
@@ -2730,7 +2767,7 @@ export default function RDVSWrapper({ variant = 'default' }: RDVSWrapperProps) {
               <line x1="0" y1={cellH - 1} x2={cellW1} y2={cellH - 1} stroke={popupBorderColor} strokeWidth="2" />
               <line x1={cellW1 - 1} y1="0" x2={cellW1 - 1} y2={cellH} stroke={popupBorderColor} strokeWidth="2" />
               <text x="6" y="18" fill={selectedRadio ? COLORS.WHITE : popupTextColor} fontSize="16" fontFamily="RDVSimulated, monospace" fontWeight="100">RX</text>
-              <rect x="30" y="6" width="30" height="15" fill={isRx ? COLORS.GREEN : 'none'} stroke={selectedRadio ? COLORS.GREEN : popupBorderColor} strokeWidth="1" />
+              <rect x="30" y="6" width="30" height="15" fill={isRx ? COLORS.GREEN : COLORS.BLACK} stroke={selectedRadio ? COLORS.GREEN : popupBorderColor} strokeWidth="1" />
               <text x="3" y="42" fill={selectedRadio ? COLORS.WHITE : popupTextColor} fontSize="18" fontFamily="RDVSimulated, monospace" fontWeight="100">{freqDisplay}</text>
             </svg>
 
@@ -2742,7 +2779,7 @@ export default function RDVSWrapper({ variant = 'default' }: RDVSWrapperProps) {
               <line x1="0" y1={cellH - 1} x2={cellW2} y2={cellH - 1} stroke={popupBorderColor} strokeWidth="2" />
               <line x1={cellW2 - 1} y1="0" x2={cellW2 - 1} y2={cellH} stroke={popupBorderColor} strokeWidth="2" />
               <text x="6" y="18" fill={selectedRadio ? COLORS.WHITE : popupTextColor} fontSize="16" fontFamily="RDVSimulated, monospace" fontWeight="100">M/S</text>
-              <rect x="44" y="6" width="15" height="15" fill={selectedRadio ? COLORS.GREEN : 'none'} stroke={selectedRadio ? COLORS.GREEN : popupBorderColor} strokeWidth="1" />
+              <rect x="44" y="6" width="15" height="15" fill={selectedRadio ? COLORS.GREEN : COLORS.BLACK} stroke={selectedRadio ? COLORS.GREEN : popupBorderColor} strokeWidth="1" />
               {selectedRadio && <text x="51" y="18" textAnchor="middle" fill={COLORS.BLACK} fontSize="15" fontFamily="RDVSimulated, monospace" fontWeight="100">M</text>}
             </svg>
 
@@ -2755,9 +2792,15 @@ export default function RDVSWrapper({ variant = 'default' }: RDVSWrapperProps) {
               <line x1="0" y1={cellH - 1} x2={cellW3} y2={cellH - 1} stroke={popupBorderColor} strokeWidth="2" />
               <line x1={cellW3 - 1} y1="0" x2={cellW3 - 1} y2={cellH} stroke={popupBorderColor} strokeWidth="2" />
               <text x="6" y="18" fill={selectedRadio ? COLORS.WHITE : popupTextColor} fontSize="16" fontFamily="RDVSimulated, monospace" fontWeight="100">TX</text>
-              <rect x="30" y="6" width="30" height="15" fill={isTx ? COLORS.GREEN : 'none'} stroke={selectedRadio ? COLORS.GREEN : popupBorderColor} strokeWidth="1" />
-              {/* TX radial PTT indicator */}
-              <circle cx="45" cy="34" r="6" fill={isTx ? COLORS.RED : COLORS.BLACK} stroke={selectedRadio ? COLORS.RED : popupBorderColor} strokeWidth="2" />
+              <rect x="30" y="6" width="30" height="15" fill={isTx ? COLORS.GREEN : COLORS.BLACK} stroke={selectedRadio ? COLORS.GREEN : popupBorderColor} strokeWidth="1" />
+              {/* TX radial PTT indicator - per spec: RED circle, flutter at keying position, steady-on at other positions */}
+              {isPttHere ? (
+                React.createElement('circle', { cx: 45, cy: 34, r: 6, fill: COLORS.RED, stroke: selectedRadio ? COLORS.RED : popupBorderColor, strokeWidth: 2 },
+                  React.createElement('animate', { attributeName: 'fill', values: `${COLORS.RED};${COLORS.BLACK}`, keyTimes: '0;0.8', dur: '0.083s', calcMode: 'discrete', repeatCount: 'indefinite' })
+                )
+              ) : (
+                <circle cx="45" cy="34" r="6" fill={isPttElsewhere ? COLORS.RED : COLORS.BLACK} stroke={selectedRadio ? COLORS.RED : popupBorderColor} strokeWidth="2" />
+              )}
             </svg>
 
             {/* Cell 5: Secondary M/S Section */}
@@ -2768,7 +2811,7 @@ export default function RDVSWrapper({ variant = 'default' }: RDVSWrapperProps) {
               <line x1="0" y1={cellH - 1} x2={cellW4} y2={cellH - 1} stroke={popupBorderColor} strokeWidth="2" />
               <line x1={cellW4 - 1} y1="0" x2={cellW4 - 1} y2={cellH} stroke={popupBorderColor} strokeWidth="2" />
               <text x="6" y="18" fill={selectedRadio ? COLORS.WHITE : popupTextColor} fontSize="16" fontFamily="RDVSimulated, monospace" fontWeight="100">M/S</text>
-              <rect x="44" y="6" width="15" height="15" fill={selectedRadio ? COLORS.GREEN : 'none'} stroke={selectedRadio ? COLORS.GREEN : popupBorderColor} strokeWidth="1" />
+              <rect x="44" y="6" width="15" height="15" fill={selectedRadio ? COLORS.GREEN : COLORS.BLACK} stroke={selectedRadio ? COLORS.GREEN : popupBorderColor} strokeWidth="1" />
               {selectedRadio && <text x="51" y="18" textAnchor="middle" fill={COLORS.BLACK} fontSize="15" fontFamily="RDVSimulated, monospace" fontWeight="100">M</text>}
             </svg>
           </div>

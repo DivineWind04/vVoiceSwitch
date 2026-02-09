@@ -27,12 +27,12 @@
   81%, 100% { background-color: #000000; } /* black background, border remains */
 }
 
-/* Green flutter for override calls */
+/* Cyan flutter for override calls (all status lights are cyan per spec) */
 .rdvs-flutter-green {
   animation: rdvs-flutter-green 0.083s steps(2, start) infinite; /* 12 times per second = 83ms per cycle */
 }
 @keyframes rdvs-flutter-green {
-  0%, 80% { background-color: #93ca63; } /* green filled */
+  0%, 80% { background-color: rgb(103, 232, 249); } /* cyan filled */
   81%, 100% { background-color: #000000; } /* black background */
 }
 
