@@ -174,6 +174,22 @@ let line_order: Record<string, number> = {} // Track original line order for sor
 let placeholder_indices: number[] = [] // Track indices where empty placeholder buttons should appear
 let ag_freq_order: number[] = [] // Track A/G frequency insertion order (preserves CRC add order)
 
+// Helper to extract line ID from server call field (handles varying prefix formats)
+function resolveCallId(call: string): string {
+    if (!call) return '';
+    // Try 3-char prefix strip (SO_, GG_, OV_, DA_, DL_, IA_)
+    const stripped3 = call.substring(3);
+    if (stripped3 in call_table) return stripped3;
+    // Try full call value as ID (no prefix)
+    if (call in call_table) return call;
+    // Try finding a known ID that the call ends with
+    for (const id of Object.keys(call_table)) {
+        if (call.endsWith(id)) return id;
+    }
+    // Fallback: return the 3-char stripped version
+    return stripped3;
+}
+
 // RDVS-specific types
 export interface RDVSButton {
     id: string;
@@ -777,14 +793,14 @@ export const useCoreStore = create<CoreState>((set: any, get: any) => {
                         } else if (k.call?.startsWith('OV_')) {
                             // Handle incoming override calls - OV_ prefix indicates this position is being overridden
                             console.log('[WebSocket] Override call detected:', k);
-                            const call_id = k.call?.substring(3);
+                            const call_id = resolveCallId(k.call || '');
                             k.call_name = call_table[call_id]?.[0] || call_id
                             k.lineType = call_table[call_id]?.[1] ?? 0; // Override defaults to type 0
                             new_override.push({ ...k })
                             // Also add to G/G list for button display
                             new_gg.push({ ...k })
                         } else {
-                            const call_id = k.call?.substring(3);
+                            const call_id = resolveCallId(k.call || '');
                             k.call_name = call_table[call_id]?.[0]
                             k.lineType = call_table[call_id]?.[1] ?? 2; // Default to type 2 (regular)
                             new_gg.push({ ...k })
@@ -815,6 +831,20 @@ export const useCoreStore = create<CoreState>((set: any, get: any) => {
                         ov.status === 'ok' || ov.status === 'active' || ov.status === 'hold'
                     );
                     const overrideCallStatus = new_override.length > 0 ? new_override[0].status : 'off';
+
+                    // Sort gg_status based on original line order from config
+                    new_gg.sort((a: any, b: any) => {
+                        const aId = resolveCallId(a.call || '');
+                        const bId = resolveCallId(b.call || '');
+                        const aOrder = line_order[aId] ?? 9999;
+                        const bOrder = line_order[bId] ?? 9999;
+                        return aOrder - bOrder;
+                    });
+                    
+                    // Insert placeholder objects at the correct indices for empty [] entries
+                    for (const placeholderIdx of placeholder_indices) {
+                        new_gg.splice(placeholderIdx, 0, { isPlaceholder: true });
+                    }
 
                     // Track A/G frequency insertion order: new freqs appended, removed freqs pruned
                     const currentFreqs = new Set(new_ag.map((a: any) => a.freq));
