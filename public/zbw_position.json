@@ -4289,7 +4289,7 @@
               "pos": "Boston CIC",
               "freq": 128825000,
               "rn": "Boston CIC",
-              "ui": "stvs",
+              "ui": "etvs",
               "lines": [
                 ["8111097", 0, "Boston"],
                 ["8111102", 0, "Skyways"],
@@ -4303,7 +4303,7 @@
               "pos": "Clearance Delivery",
               "freq": 121650000,
               "rn": "Boston Clearance",
-              "ui": "stvs",
+              "ui": "etvs",
               "lines": [
                 ["6170747", 0, "Flight D"],
                 ["8111099", 0, "Boston"],
@@ -4318,7 +4318,7 @@
               "pos": "Flight Data",
               "freq": 129650000,
               "rn": "Boston Clearance",
-              "ui": "stvs",
+              "ui": "etvs",
               "lines": [
                 ["6170747", 0, "Clearanc"],
                 ["8111099", 0, "Boston"],
@@ -4333,7 +4333,7 @@
               "pos": "Ground Control",
               "freq": 121900000,
               "rn": "Boston Ground",
-              "ui": "stvs",
+              "ui": "etvs",
               "lines": [
                 ["6170748", 0, "Ground C"],
                 ["6170749", 0, "Ground C"],
@@ -4349,7 +4349,7 @@
               "pos": "Ground Control (Secondary)",
               "freq": 121750000,
               "rn": "Boston Ground",
-              "ui": "stvs",
+              "ui": "etvs",
               "lines": [
                 ["6170748", 0, "Ground C"],
                 ["6170750", 0, "Ground C"],
@@ -4365,15 +4365,16 @@
               "pos": "Ground Control (Tertiary)",
               "freq": 134050000,
               "rn": "Boston Ground",
-              "ui": "stvs",
+              "ui": "etvs",
               "lines": [
-                ["6170749", 0, "Ground C"],
-                ["6170750", 0, "Ground C"],
-                ["8111100", 0, "Boston"],
-                ["8111104", 0, "CIC"],
-                ["8111107", 0, "Skyways"],
-                ["8111109", 0, "Boston"],
-                ["8111111", 0, "Ramp"]
+                ["6170746", 0, "LCE"],
+                ["8111097", 0, "F1 LCW"],
+                ["8111098", 0, "ERAD PTT"],
+                ["8111099", 0, "LCE"],
+                ["8111100", 0, "F2 LCW"],
+                ["8111101", 0, "HSLS"],
+                ["5085000", 0, "GC1"],
+                ["9999", 0, "ID LCW"]
               ]
             },
             {
@@ -4381,16 +4382,16 @@
               "pos": "Local Control East",
               "freq": 132225000,
               "rn": "Boston Tower",
-              "ui": "stvs",
+              "ui": "etvs",
               "lines": [
-                ["6170746", 0, "Local Co"],
-                ["8111097", 0, "CIC"],
-                ["8111098", 0, "Skyways"],
-                ["8111099", 0, "Boston"],
-                ["8111100", 0, "Boston"],
-                ["8111101", 0, "Ramp"],
-                ["5085000", 2, "A90"],
-                ["9999", 3, "MULTI,DIAL"]
+                ["6170746", 0, "LCE ETVS"],
+                ["8111097", 0, "F1 LCW"],
+                ["8111098", 0, "ERAD PTT"],
+                ["8111099", 0, "LCE"],
+                ["8111100", 0, "F2 LCW"],
+                ["8111101", 0, "HSLS"],
+                ["5085000", 0, "GC1"],
+                ["9999", 0, "ID LCW"]
               ]
             },
             {
@@ -4398,13 +4399,16 @@
               "pos": "Local Control Helicopter (Skyways)",
               "freq": 124725000,
               "rn": "Boston Skyways",
-              "ui": "stvs",
+              "ui": "etvs",
               "lines": [
-                ["8111098", 0, "Boston"],
-                ["8111102", 0, "CIC"],
-                ["8111106", 0, "Boston"],
-                ["8111107", 0, "Boston"],
-                ["8111108", 0, "Ramp"]
+                ["6170746", 0, "LCH ETVS"],
+                ["8111097", 0, "F1 LCW"],
+                ["8111098", 0, "ERAD PTT"],
+                ["8111099", 0, "LCE"],
+                ["8111100", 0, "F2 LCW"],
+                ["8111101", 0, "HSLS"],
+                ["5085000", 0, "GC1"],
+                ["9999", 0, "ID LCW"]
               ]
             },
             {
@@ -4412,16 +4416,27 @@
               "pos": "Local Control West",
               "freq": 128800000,
               "rn": "Boston Tower",
-              "ui": "stvs",
+              "ui": "etvs",
               "lines": [
-                ["6170746", 0, "Local Co"],
-                ["8111097", 0, "CIC"],
-                ["8111098", 0, "Skyways"],
-                ["8111099", 0, "Boston"],
-                ["8111100", 0, "Boston"],
-                ["8111101", 0, "Ramp"],
-                ["5085000", 2, "A90"],
-                ["9999", 3, "MULTI,DIAL"]
+                ["6170746", 0, "LCW ETVS"],
+                ["8111097", 0, "F1 LCW"],
+                ["8111098", 0, "ERAD PTT"],
+                ["8111099", 0, "LCE"],
+                ["8111100", 0, "F2 LCW"],
+                ["8111101", 0, "HSLS"],
+                ["5085000", 0, "GC1"],
+                ["9999", 0, "ID LCW"],
+                ["99991", 0, "A/G HSLS"],
+                ["99992", 0, "GC2"],
+                ["99993", 0, "SB LCW"],
+                ["99994", 0, "G/G HSLS"],
+                ["99995", 0, "LH"],
+                ["99996", 0, "AL LCW"],
+                ["99997", 0, "OVR HSLS"],
+                ["99998", 0, "A90 YELL"],
+                ["99999", 0, "CD"],
+                ["999991", 0, "BRF"],
+                ["999992", 0, "NWS WX"]
               ]
             },
             {
@@ -4429,7 +4444,7 @@
               "pos": "Ramp Control",
               "freq": 131850000,
               "rn": "Boston Ramp",
-              "ui": "stvs",
+              "ui": "etvs",
               "lines": [
                 ["8111101", 0, "Boston"],
                 ["8111105", 0, "CIC"],
