@@ -125,13 +125,26 @@ function SettingModal({ open, setModal }: SettingModalProps) {
         setHasSavedToken(false);
     }, []);
 
-    /** Stop polling the popup */
+    /** Stop polling */
     const stopPolling = useCallback(() => {
         if (pollRef.current) {
             clearInterval(pollRef.current);
             pollRef.current = null;
         }
     }, []);
+
+    /** Auto-connect after obtaining a token */
+    const finishVacsAuth = useCallback((token: string) => {
+        setVacsOauthStatus('Connected!');
+        const positionId = callsign || undefined;
+        connectVacs(token, positionId, useProdVacs);
+        setTimeout(() => {
+            setHasSavedToken(!!loadVacsCredentials());
+            setVacsOauthStatus(null);
+            setVacsSessionId(null);
+            setVacsCallbackUrl('');
+        }, 2000);
+    }, [callsign, connectVacs, useProdVacs]);
 
     /** Complete the VACS OAuth exchange: code+state → WS token → connect */
     const completeVacsExchange = useCallback(async (sessionId: string, code: string, state: string) => {
@@ -148,29 +161,26 @@ function SettingModal({ open, setModal }: SettingModalProps) {
                 setVacsOauthLoading(false);
                 return;
             }
-            setVacsOauthStatus('Connected!');
-            const positionId = callsign || undefined;
-            connectVacs(data.token, positionId, useProdVacs);
-            setTimeout(() => {
-                setHasSavedToken(!!loadVacsCredentials());
-                setVacsOauthStatus(null);
-                setVacsSessionId(null);
-                setVacsCallbackUrl('');
-            }, 2000);
+            finishVacsAuth(data.token);
         } catch (err: any) {
             setVacsOauthStatus('Error: ' + (err.message || 'Network error'));
         } finally {
             setVacsOauthLoading(false);
         }
-    }, [callsign, connectVacs, useProdVacs]);
+    }, [finishVacsAuth]);
 
     /**
-     * Login with VATSIM: open popup, poll for the vacs:// redirect.
+     * Login with VATSIM: open popup, poll server for token.
      *
-     * After the user authorizes on VATSIM, the browser redirects to:
-     *   vacs://auth/vatsim/callback?code=X&state=Y
-     * The browser can't load vacs:// — the popup shows an error page or protocol dialog.
-     * We poll popup.location to catch this URL and extract code+state automatically.
+     * After the user authorizes on VATSIM, the callback goes to vacs://
+     * which is intercepted by the VACS desktop app (or shown as an error
+     * in the browser). We can't read the popup URL due to cross-origin policy.
+     *
+     * Instead, we poll our server which tries /ws/token with the stored
+     * session cookie. If VACS authenticated our session (via the shared
+     * OAuth state), the token will be returned automatically.
+     *
+     * If auto-detection fails, the user can paste the callback URL or WS token.
      */
     const handleVacsLogin = useCallback(async () => {
         stopPolling();
@@ -191,7 +201,7 @@ function SettingModal({ open, setModal }: SettingModalProps) {
             setVacsSessionId(sessionId);
             setVacsOauthStatus('Waiting for VATSIM authorization...');
 
-            // Open popup
+            // Open popup to VATSIM auth
             const popup = window.open(data.url, 'vacs_auth', 'width=600,height=700,popup=yes');
             popupRef.current = popup;
 
@@ -201,46 +211,72 @@ function SettingModal({ open, setModal }: SettingModalProps) {
                 return;
             }
 
-            // Poll the popup location every 200ms to catch the vacs:// redirect
+            // Poll our server for the token every 2 seconds
+            // This works if the VACS server authenticates our session after the
+            // OAuth callback is processed (by the VACS app or the browser)
             let resolved = false;
-            pollRef.current = setInterval(() => {
+            let pollCount = 0;
+            const MAX_POLLS = 60; // 2 min max
+
+            pollRef.current = setInterval(async () => {
+                pollCount++;
+
+                // Check if popup was closed
+                if (popup.closed && !resolved) {
+                    // Give a few more seconds for server-side processing
+                    if (pollCount > 5) {
+                        // Keep polling for a bit after popup closes, but update status
+                        setVacsOauthStatus('Checking for token...');
+                    }
+                }
+
+                // Stop after max polls
+                if (pollCount >= MAX_POLLS) {
+                    stopPolling();
+                    if (!resolved) {
+                        setVacsOauthStatus('Timed out — paste the callback URL or WS token below');
+                        setVacsOauthLoading(false);
+                    }
+                    return;
+                }
+
+                // Poll server for token
                 try {
-                    if (!popup || popup.closed) {
+                    const pollRes = await fetch(`/api/vacs/auth/poll-token?sessionId=${sessionId}`);
+                    const pollData = await pollRes.json();
+                    if (pollData.ready && pollData.token) {
+                        resolved = true;
+                        stopPolling();
+                        if (popup && !popup.closed) popup.close();
+                        finishVacsAuth(pollData.token);
+                        setVacsOauthLoading(false);
+                        return;
+                    }
+                    // If session expired on server side
+                    if (pollData.error === 'Session expired') {
                         stopPolling();
                         if (!resolved) {
-                            setVacsOauthStatus('Popup closed — paste the callback URL or WS token below');
+                            setVacsOauthStatus('Session expired — paste callback URL or WS token below');
                             setVacsOauthLoading(false);
                         }
                         return;
                     }
-                    // Try to read the popup URL — will throw SecurityError while on auth.vatsim.net
-                    const href = popup.location.href;
-                    if (href && href.startsWith('vacs://')) {
-                        // Caught the callback URL!
-                        resolved = true;
-                        stopPolling();
-                        popup.close();
-                        // Extract code and state
-                        const parseable = href.replace(/^vacs:\/\//, 'https://vacs.internal/');
-                        const parsed = new URL(parseable);
-                        const code = parsed.searchParams.get('code') || '';
-                        const state = parsed.searchParams.get('state') || '';
-                        if (code && state) {
-                            completeVacsExchange(sessionId, code, state);
-                        } else {
-                            setVacsOauthStatus('Error: callback URL missing code/state');
-                            setVacsOauthLoading(false);
-                        }
-                    }
                 } catch {
-                    // SecurityError is expected while popup is on cross-origin auth.vatsim.net — just keep polling
+                    // Network error — keep trying
                 }
-            }, 200);
+
+                // After popup closes + some grace period, stop loading indicator
+                // but keep polling silently
+                if (popup.closed && pollCount > 10 && !resolved) {
+                    setVacsOauthLoading(false);
+                    setVacsOauthStatus('Waiting for token... paste callback URL or WS token below if needed');
+                }
+            }, 2000);
         } catch (err: any) {
             setVacsOauthStatus('Error: ' + (err.message || 'Network error'));
             setVacsOauthLoading(false);
         }
-    }, [useProdVacs, stopPolling, completeVacsExchange]);
+    }, [useProdVacs, stopPolling, finishVacsAuth]);
 
     // Cleanup polling on unmount
     useEffect(() => {
