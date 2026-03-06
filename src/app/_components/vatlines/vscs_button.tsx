@@ -71,7 +71,7 @@ export default function VscsButtonComponent(props: {
           <div className="gg-line3">{props.multiLineData.line3 || ''}</div>
           <div className="gg-line4">{props.multiLineData.line4 || ''}</div>
           <div className="gg-line5">
-            {props.config.type === ButtonType.OVERRIDE ? 'OVR' : (props.multiLineData.line5 || props.typeString)}
+            {props.multiLineData.line5 || props.typeString}
           </div>
         </div>
       ) : (

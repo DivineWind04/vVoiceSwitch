@@ -534,6 +534,15 @@
     border: 1px solid #333333;
 }
 
+/* Empty/unavailable G/G buttons - grey background like static buttons */
+.vscs-button.NONE,
+.vscs-button:disabled:not(.ag-button) {
+    background-color: #78716c;
+    color: #78716c;
+    border: 1px solid #555555;
+    cursor: default;
+}
+
 /* A/G buttons need to be wider than G/G buttons - force with highest specificity */
 .ag-frequency-container .vscs-button.ag-button,
 .ag-frequency-container .vscs-button.ag-button.state-unselected {

@@ -13,30 +13,48 @@ interface VscsAGProps {
 export default function VscsAG({ page, sendMsg }: VscsAGProps) {
   const ag_status = useCoreStore((s: any) => s.ag_status);
   const ptt = useCoreStore((s: any) => s.ptt);
+  const selectedPositions = useCoreStore((s: any) => s.selectedPositions);
   const positionData = useCoreStore((s: any) => s.positionData);
   
   const ITEMS_PER_PAGE = 12; // 4x3 grid
   
   // Helper function to get radio sites for a frequency
+  // First checks the selected position's `rn` field (applies to all A/G freqs for that position),
+  // then falls back to searching the full facility tree by matching freq.
   const getRadioSitesForFreq = (freq: number): string[] => {
+    // 1. Primary: use the `rn` field from the currently selected position
+    //    In VSCS positions, `rn` lists the radio sites for that position's A/G panel.
+    const currentPosition = selectedPositions?.[0];
+    if (currentPosition?.rn) {
+      const sites = currentPosition.rn.split(',').map((s: string) => s.trim()).filter(Boolean);
+      if (sites.length > 0) return sites;
+    }
+
+    // 2. Fallback: search the facility tree for a position with this exact freq
     if (!positionData || !freq) return [];
     
-    // Search through positions to find matching frequency
     const searchPositions = (positions: any[]): string[] => {
       for (const position of positions) {
         if (position.freq === freq && position.rn) {
-          // Split by comma and trim whitespace
-          return position.rn.split(',').map((site: string) => site.trim());
+          return position.rn.split(',').map((s: string) => s.trim()).filter(Boolean);
         }
       }
       return [];
     };
     
-    // Handle both array and single object formats
-    if (Array.isArray(positionData)) {
-      return searchPositions(positionData);
-    } else if (positionData.positions) {
-      return searchPositions(positionData.positions);
+    // Search top-level positions
+    if (positionData.positions) {
+      const result = searchPositions(positionData.positions);
+      if (result.length > 0) return result;
+    }
+    // Search child facility positions
+    if (positionData.childFacilities) {
+      for (const child of positionData.childFacilities) {
+        if (child.positions) {
+          const result = searchPositions(child.positions);
+          if (result.length > 0) return result;
+        }
+      }
     }
     
     return [];

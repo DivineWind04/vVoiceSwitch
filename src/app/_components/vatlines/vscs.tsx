@@ -565,11 +565,13 @@ interface OverridingPosition {
 function RtAuxiliaryMessageArea({ 
   rtEnabled, 
   callForwardInfo, 
-  overridingPositions 
+  overridingPositions,
+  isBeingOverridden 
 }: { 
   rtEnabled: boolean; 
   callForwardInfo: CallForwardInfo | null;
   overridingPositions: OverridingPosition[];
+  isBeingOverridden: boolean;
 }) {
   // Determine background color based on state
   // R/T ON with override or no forwarding: Green (#008000)
@@ -600,13 +602,12 @@ function RtAuxiliaryMessageArea({
         </div>
       )}
       
-      {/* Overriding Positions Display (when R/T ON and being overridden) */}
-      {rtEnabled && hasOverride && (
+      {/* Overriding Positions Display (only shown to the receiver of the override) */}
+      {rtEnabled && hasOverride && isBeingOverridden && (
         <div className="text-sm w-full">
           {overridingPositions.map((pos, idx) => (
-            <div key={idx} className="flex justify-between w-full">
+            <div key={idx} className="w-full">
               <span>{pos.position}</span>
-              <span>{pos.dialCode}</span>
             </div>
           ))}
         </div>
@@ -1685,7 +1686,7 @@ function VscsPanel(props: VscsProps & { panelId?: string; defaultScreenMode?: st
 
   // Generate multi-line data for G/G buttons
   const generateGGMultiLineData = (data: any, buttonIndex: number) => {
-    if (!data) return undefined;
+    if (!data || data.isPlaceholder) return undefined;
     
     // Extract meaningful parts from the data
     const callIdFull = data.call?.substring(3) || ''; // Get everything after "gg_" or "SO_"
@@ -1730,26 +1731,26 @@ function VscsPanel(props: VscsProps & { panelId?: string; defaultScreenMode?: st
       line4Content = callNameParts[2] || '';
       line5Content = callNameParts[3] || '';
     } else if (lineType === 1) {
-      // Ring lines: empty line1, distribute call name parts across lines 2-4, RING on line5
+      // Ring lines: empty line1, distribute call name parts across lines 2-4
       line1Content = '';
       line2Content = callNameParts[0] || '';
       line3Content = callNameParts[1] || '';
       line4Content = callNameParts[2] || '';
-      line5Content = callNameParts[3] || 'RING';
+      line5Content = callNameParts[3] || '';
     } else if (lineType === 0) {
-      // Override lines: empty line1, distribute call name parts across lines 2-4, OVRD on line5
+      // Override lines: empty line1, distribute call name parts across lines 2-5
       line1Content = '';
       line2Content = callNameParts[0] || '';
       line3Content = callNameParts[1] || '';
       line4Content = callNameParts[2] || '';
-      line5Content = callNameParts[3] || 'OVRD';
+      line5Content = callNameParts[3] || '';
     } else {
-      // Default: empty line1, distribute call name parts across lines 2-4, RING on line5
+      // Default: empty line1, distribute call name parts across lines 2-4
       line1Content = '';
       line2Content = callNameParts[0] || '';
       line3Content = callNameParts[1] || '';
       line4Content = callNameParts[2] || '';
-      line5Content = callNameParts[3] || 'RING';
+      line5Content = callNameParts[3] || '';
     }
     
     return {
@@ -2319,13 +2320,12 @@ function VscsPanel(props: VscsProps & { panelId?: string; defaultScreenMode?: st
                                 )}
                               </div>
                             )}
-                            {/* Overriding Positions Display (always shown when being overridden) */}
-                            {overridingPositions.length > 0 && (
+                            {/* Overriding Positions Display (only shown to the receiver of the override) */}
+                            {isBeingOverridden && overridingPositions.length > 0 && (
                               <div className="text-sm w-full leading-tight">
                                 {overridingPositions.map((pos, idx) => (
-                                  <div key={idx} className="flex justify-between w-full">
+                                  <div key={idx} className="w-full">
                                     <span>{pos.position}</span>
-                                    <span>{pos.dialCode}</span>
                                   </div>
                                 ))}
                               </div>
@@ -2415,13 +2415,12 @@ function VscsPanel(props: VscsProps & { panelId?: string; defaultScreenMode?: st
                                 )}
                               </div>
                             )}
-                            {/* Overriding Positions Display (always shown when being overridden) */}
-                            {overridingPositions.length > 0 && (
+                            {/* Overriding Positions Display (only shown to the receiver of the override) */}
+                            {isBeingOverridden && overridingPositions.length > 0 && (
                               <div className="text-sm w-full leading-tight">
                                 {overridingPositions.map((pos, idx) => (
-                                  <div key={idx} className="flex justify-between w-full">
+                                  <div key={idx} className="w-full">
                                     <span>{pos.position}</span>
-                                    <span>{pos.dialCode}</span>
                                   </div>
                                 ))}
                               </div>
@@ -2462,9 +2461,9 @@ function VscsPanel(props: VscsProps & { panelId?: string; defaultScreenMode?: st
                 config={{ ...btn, type: typeof btn.type === 'string' && Object.values(ButtonType).includes(btn.type as ButtonType) ? btn.type as ButtonType : ButtonType.NONE }}
                 typeString={
                   btn.type === ButtonType.OVERRIDE
-                    ? 'OVR'
+                    ? ''
                     : btn.type === ButtonType.RING
-                      ? 'RING'
+                      ? ''
                       : btn.type === ButtonType.SHOUT
                         ? btn.dialCode ?? ''
                         : btn.type === ButtonType.NONE
@@ -2488,9 +2487,9 @@ function VscsPanel(props: VscsProps & { panelId?: string; defaultScreenMode?: st
                 config={{ ...btn, type: typeof btn.type === 'string' && Object.values(ButtonType).includes(btn.type as ButtonType) ? btn.type as ButtonType : ButtonType.NONE }}
                 typeString={
                   btn.type === ButtonType.OVERRIDE
-                    ? 'OVR'
+                    ? ''
                     : btn.type === ButtonType.RING
-                      ? 'RING'
+                      ? ''
                       : btn.type === ButtonType.SHOUT
                         ? btn.dialCode ?? ''
                         : btn.type === ButtonType.NONE
@@ -2569,13 +2568,12 @@ function VscsPanel(props: VscsProps & { panelId?: string; defaultScreenMode?: st
                   </div>
                 )}
                 
-                {/* Overriding Positions Display (always shown when being overridden) */}
-                {overridingPositions.length > 0 && (
+                {/* Overriding Positions Display (only shown to the receiver of the override) */}
+                {isBeingOverridden && overridingPositions.length > 0 && (
                   <div className="text-sm w-full leading-tight">
                     {overridingPositions.map((pos, idx) => (
-                      <div key={idx} className="flex justify-between w-full">
+                      <div key={idx} className="w-full">
                         <span>{pos.position}</span>
-                        <span>{pos.dialCode}</span>
                       </div>
                     ))}
                   </div>

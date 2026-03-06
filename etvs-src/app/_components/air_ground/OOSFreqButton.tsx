@@ -1,7 +1,7 @@
 // components/OOSFreqButton.tsx
 
 import React from 'react';
-import { FaHeadphones, FaVolumeOff } from 'react-icons/fa';
+import Image from 'next/image';
 
 type OOSFreqButtonProps = {
   style?: React.CSSProperties;
@@ -31,12 +31,12 @@ const OOSFreqButton: React.FC<OOSFreqButtonProps> = ({ style }) => {
       disabled
     >
       {/* Preferred Individual A/G Routing (faded) */}
-      <div className="absolute top-[2px] left-[1px] opacity-40">
-        <FaHeadphones className="text-customYellow border border-customYellow" />
+      <div className="absolute top-[2px] left-[1px] opacity-40 border border-customYellow">
+        <Image src="/etvs/etvs_headset.png" alt="headset" width={16} height={16} />
       </div>
       {/* Current A/G Routing (faded) */}
       <div className="absolute top-[2px] right-[3px] opacity-40">
-        <FaHeadphones className="text-customYellow" />
+        <Image src="/etvs/etvs_headset.png" alt="headset" width={16} height={16} />
       </div>
       {/* No frequency text */}
     </button>

@@ -3,7 +3,7 @@
 "use client"; // Mark as Client Component if using Next.js
 
 import React, { CSSProperties, useState } from 'react';
-import { FaHeadphones, FaVolumeOff } from 'react-icons/fa';
+import Image from 'next/image';
 
 type SummFreqButtonProps = {
   frequency: string;
@@ -56,23 +56,23 @@ const SummFreqButton: React.FC<SummFreqButtonProps> = ({ frequency, prefMode: in
     >
       {/* Preferred Individual A/G Routing */}
       {isprefMode ? (
-        <div className="absolute top-[2px] left-[1px]">
-          <FaHeadphones className="text-customYellow border border-customYellow" />
+        <div className="absolute top-[2px] left-[1px] border border-customYellow">
+          <Image src="/etvs/etvs_headset.png" alt="headset" width={16} height={16} />
         </div>
       ) : (
-        <div className="absolute top-[2px] left-[1px]">
-          <FaVolumeOff className="text-customYellow border border-customYellow" />
+        <div className="absolute top-[2px] left-[1px] border border-customYellow">
+          <Image src="/etvs/etvs_speaker.png" alt="speaker" width={16} height={16} />
         </div>
       )}
 
       {/* Current A/G Routing */}
       {isCurrentMode ? (
         <div className="absolute top-[2px] right-[3px]">
-          <FaHeadphones className="text-customYellow " />
+          <Image src="/etvs/etvs_headset.png" alt="headset" width={16} height={16} />
         </div>
       ) : (
         <div className="absolute top-[2px] right-[3px]">
-          <FaVolumeOff className="text-customYellow" />
+          <Image src="/etvs/etvs_speaker.png" alt="speaker" width={16} height={16} />
         </div>
       )}
 

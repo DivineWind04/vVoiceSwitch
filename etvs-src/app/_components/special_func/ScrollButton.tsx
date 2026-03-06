@@ -1,6 +1,7 @@
 // components/ScrollButton.tsx
 
 import React, { useState } from 'react';
+import Image from 'next/image';
 
 type ScrollButtonProps = {
   direction: 'up' | 'down';
@@ -45,11 +46,13 @@ const ScrollButton: React.FC<ScrollButtonProps> = ({ direction, onClick, style }
       onMouseUp={handleMouseUp}
       onMouseLeave={() => setIsActive(false)} // Handle case where mouse leaves without release
     >
-      <span
-        className={`text-5xl leading-none select-none origin-center transform scale-100 ${direction === 'up' ? 'rotate-[-90deg]' : 'rotate-90'}`}
-      >
-        &#10095;
-      </span>
+      <Image
+        src={direction === 'up' ? '/etvs/etvs_uarrow.png' : '/etvs/etvs_darrow.png'}
+        alt={direction === 'up' ? 'up' : 'down'}
+        width={32}
+        height={32}
+        className="select-none"
+      />
     </button>
   );
 };
