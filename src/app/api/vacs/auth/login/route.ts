@@ -1,24 +1,26 @@
 /**
  * VACS Auth: Initiate VATSIM Connect OAuth2 Login
  *
- * Proxies the VACS server's /auth/vatsim/login endpoint.
- * Returns a JSON object with { url } pointing to the VATSIM Connect auth page.
+ * Proxies the VACS server's /auth/vatsim endpoint.
+ * Returns { url, sessionId } — the sessionId tracks the VACS session cookie
+ * server-side so we can exchange the code later without browser cookie issues.
  *
  * Flow:
- *   1. Client calls GET /api/vacs/auth/login
- *   2. We call VACS server's /auth/vatsim/login
- *   3. Return the OAuth2 authorization URL to the client
- *   4. Client opens the URL (popup or redirect)
+ *   1. Client calls GET /api/vacs/auth/login?env=prod|dev
+ *   2. We call VACS server's GET /auth/vatsim (capturing session cookie)
+ *   3. Return the OAuth2 authorization URL + server-side sessionId
+ *   4. Client opens the URL in a popup
  */
 
-import { NextResponse } from 'next/server';
+import { NextRequest, NextResponse } from 'next/server';
+import { vacsSessionStore } from '../_session';
 
-// Default to dev server; can be overridden with env var
-const VACS_BASE_URL = process.env.VACS_BASE_URL || 'https://dev.vacs.network';
-
-export async function GET() {
+export async function GET(request: NextRequest) {
   try {
-    const response = await fetch(`${VACS_BASE_URL}/auth/vatsim/login`, {
+    const env = request.nextUrl.searchParams.get('env') || 'dev';
+    const baseUrl = env === 'prod' ? 'https://vacs.network' : 'https://dev.vacs.network';
+
+    const response = await fetch(`${baseUrl}/auth/vatsim`, {
       headers: { 'Accept': 'application/json' },
     });
 
@@ -30,17 +32,13 @@ export async function GET() {
       );
     }
 
-    const data = await response.json();
+    const data = await response.json() as { url: string };
 
-    // Forward any cookies from the VACS server (session tracking)
+    // Capture the VACS session cookie for later use in the exchange step
     const setCookie = response.headers.get('set-cookie');
-    const headers = new Headers();
-    headers.set('Content-Type', 'application/json');
-    if (setCookie) {
-      headers.set('Set-Cookie', setCookie);
-    }
+    const sessionId = vacsSessionStore.save(setCookie || '', baseUrl);
 
-    return new NextResponse(JSON.stringify(data), { headers });
+    return NextResponse.json({ url: data.url, sessionId });
   } catch (error) {
     console.error('[VACS Auth] Error initiating login:', error);
     return NextResponse.json(
