@@ -4,7 +4,7 @@
  * New simplified flow (vatsim-token-auth branch):
  *   1. POST /auth/vatsim/token with Authorization: Bearer <VATSIM_ACCESS_TOKEN>
  *      → { cid, token: VACS_API_TOKEN }
- *   2. POST /ws/token with Authorization: Bearer <VACS_API_TOKEN>
+ *   2. GET /ws/token with Authorization: Bearer <VACS_API_TOKEN>
  *      → { token: WS_TOKEN }
  *
  * This replaces the old OAuth redirect + session cookie flow entirely.
@@ -60,7 +60,7 @@ export async function POST(request: NextRequest) {
     // ── Step 2: Use VACS API token to get WebSocket token ───────────────
 
     const wsRes = await fetch(`${baseUrl}/ws/token`, {
-      method: 'POST',
+      method: 'GET',
       headers: {
         'Authorization': `Bearer ${authData.token}`,
         'Accept': 'application/json',

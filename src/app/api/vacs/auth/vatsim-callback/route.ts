@@ -143,7 +143,7 @@ export async function GET(request: NextRequest) {
 
     // ── Step 3: Get WS token from VACS ────────────────────────────────
     const wsRes = await fetch(`${vacsBaseUrl}/ws/token`, {
-      method: 'POST',
+      method: 'GET',
       headers: {
         'Authorization': `Bearer ${vacsAuthData.token}`,
         'Accept': 'application/json',
