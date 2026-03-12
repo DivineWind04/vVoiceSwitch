@@ -61,7 +61,7 @@
 @layer utilities {
 
   .clipped-boxSmall {
-    clip-path: polygon(14px 0,calc(100% - 14px) 0,100% 14px,100% 100%,0 100%,0 14px);
+    clip-path: polygon(0 0,100% 0,100% calc(100% - 14px),calc(100% - 14px) 100%,14px 100%,0 calc(100% - 14px));
   }
 }
 
