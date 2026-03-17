@@ -1096,7 +1096,7 @@
               ]
             },
             {
-              "cs": "MEM_N_TWR",
+              "cs": "MEM_3_TWR",
               "pos": "LC3",
               "freq": 118300000,
               "rn": "Memphis Tower",
@@ -1159,7 +1159,7 @@
               "pos": "GC",
               "freq": 121375000,
               "rn": "Millington Ground",
-              "ui": "lstar",
+              "ui": "ivsr",
               "lines": [
                 ["912712", 0, "LC"],
                 ["6150860", 2, "M03"]
@@ -1170,7 +1170,7 @@
               "pos": "LC",
               "freq": 120250000,
               "rn": "Millington Tower",
-              "ui": "lstar",
+              "ui": "ivsr",
               "lines": [
                 ["912712", 0, "GC"],
                 ["6150860", 2, "M03"]
@@ -1453,7 +1453,7 @@
               "pos": "GC",
               "freq": 121400000,
               "rn": "Smyrna Ground",
-              "ui": "lstar",
+              "ui": "ivsr",
               "lines": [
                 ["6150941", 0, "LC OVR"],
                 ["6150942", 2, "BNA TWR"],
@@ -1465,7 +1465,7 @@
               "pos": "LC",
               "freq": 118500000,
               "rn": "Smryna Tower",
-              "ui": "lstar",
+              "ui": "ivsr",
               "lines": [
                 ["6150941", 0, "GC OVR"],
                 ["6150942", 2, "BNA TWR"],
@@ -1484,7 +1484,7 @@
               "pos": "GC",
               "freq": 121700000,
               "rn": "John Tune Ground",
-              "ui": "lstar",
+              "ui": "ivsr",
               "lines": [
                 ["6150944", 0, "LC OVR"],
                 ["6150945", 2, "BNA TWR"],
@@ -1496,7 +1496,7 @@
               "pos": "LC",
               "freq": 119450000,
               "rn": "John Tune Tower",
-              "ui": "lstar",
+              "ui": "ivsr",
               "lines": [
                 ["6150944", 0, "GC OVR"],
                 ["6150945", 2, "BNA TWR"],
@@ -1855,7 +1855,7 @@
               "pos": "GC",
               "freq": 121800000,
               "rn": "Drake Ground",
-              "ui": "lstar",
+              "ui": "ivsr",
               "lines": [
                 ["6150762", 0, "LC OVR"],
                 ["6150761", 2, "RZC"],
@@ -1868,7 +1868,7 @@
               "pos": "LC",
               "freq": 128000000,
               "rn": "Drake Tower",
-              "ui": "lstar",
+              "ui": "ivsr",
               "lines": [
                 ["6150762", 0, "GC OVR"],
                 ["6150761", 2, "RZC"],
@@ -1887,7 +1887,7 @@
               "pos": "GC",
               "freq": 121900000,
               "rn": "Northwest Arkansas Ground",
-              "ui": "lstar",
+              "ui": "ivsr",
               "lines": [
                 ["912720", 0, "LC OVR"],
                 ["6150758", 2, "RZC"],
@@ -1900,7 +1900,7 @@
               "pos": "LC",
               "freq": 127100000,
               "rn": "Northwest Arkansas Tower",
-              "ui": "lstar",
+              "ui": "ivsr",
               "lines": [
                 ["912720", 0, "GC OVR"],
                 ["6150758", 2, "RZC"],
@@ -1920,7 +1920,7 @@
               "pos": "GC",
               "freq": 121600000,
               "rn": "Springdale Ground",
-              "ui": "lstar",
+              "ui": "ivsr",
               "lines": [
                 ["912726", 0, "LC OVR"],
                 ["6150760", 2, "RZC"],
@@ -1934,7 +1934,7 @@
               "pos": "LC",
               "freq": 118200000,
               "rn": "Springdale Tower",
-              "ui": "lstar",
+              "ui": "ivsr",
               "lines": [
                 ["912726", 0, "GC OVR"],
                 ["6150760", 2, "RZC"],
@@ -1955,7 +1955,7 @@
               "pos": "GC",
               "freq": 118000000,
               "rn": "Rogers Ground",
-              "ui": "lstar",
+              "ui": "ivsr",
               "lines": [
                 ["912724", 0, "LC"],
                 ["6150759", 2, "RZC"],
@@ -1968,7 +1968,7 @@
               "pos": "LC",
               "freq": 119375000,
               "rn": "Rogers Tower",
-              "ui": "lstar",
+              "ui": "ivsr",
               "lines": [
                 ["912724", 0, "GC"],
                 ["6150759", 2, "RZC"],
@@ -2698,7 +2698,7 @@
               "pos": "Ground",
               "freq": 121900000,
               "rn": "Hawkins Ground",
-              "ui": "lstar",
+              "ui": "ivsr",
               "lines": [
                 ["6150868", 0, "LC OVR"],
                 ["6150866", 2, "JAN APP"],
@@ -2711,7 +2711,7 @@
               "pos": "LC",
               "freq": 119650000,
               "rn": "Hawkins Tower",
-              "ui": "lstar",
+              "ui": "ivsr",
               "lines": [
                 ["6150868", 0, "GC OVR"],
                 ["6150866", 2, "JAN APP"],
@@ -3006,7 +3006,7 @@
           "pos": "GC",
           "freq": 121600000,
           "rn": "Cape Girardeau Ground",
-          "ui": "lstar",
+          "ui": "ivsr",
           "lines": [["912742", 0, "LC"]]
         },
         {
@@ -3014,7 +3014,7 @@
           "pos": "LC",
           "freq": 125525000,
           "rn": "Cape Girardeau Tower",
-          "ui": "lstar",
+          "ui": "ivsr",
           "lines": [["912742", 0, "GC"]]
         }
       ],
@@ -3121,7 +3121,7 @@
           "pos": "GC",
           "freq": 120900000,
           "rn": "Jackson Ground",
-          "ui": "lstar",
+          "ui": "ivsr",
           "lines": [["912710", 0, "LC"]]
         },
         {
@@ -3129,7 +3129,7 @@
           "pos": "LC",
           "freq": 127150000,
           "rn": "Jackson Tower",
-          "ui": "lstar",
+          "ui": "ivsr",
           "lines": [["912710", 0, "GC"]]
         }
       ],
