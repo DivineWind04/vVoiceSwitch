@@ -81,6 +81,13 @@ class LandlineStore {
   private llDialCodeTable: LandlineDialCodeTable | null = null;
   /** Maps a shout group key → active call IDs for that group */
   private shoutGroupCalls = new Map<string, CallId[]>();
+  /** Path to override sound file (set by UI layer) */
+  private overrideSoundPath: string | null = null;
+
+  /** Set the override sound file to play when an override call connects */
+  setOverrideSoundPath(path: string): void {
+    this.overrideSoundPath = path;
+  }
 
   /** Bind to the zustand store's set/get functions */
   bindStore(set: (partial: any) => void, get: () => any): void {
@@ -479,6 +486,17 @@ class LandlineStore {
         break;
 
       case 'callStateChanged':
+        // Play override sound when an override call (lineType 0) connects
+        if (event.state === 'connected' && this.overrideSoundPath) {
+          const call = this.client?.getCallInfo(event.callId);
+          if (call && call.lineType === 0) {
+            try {
+              const tone = new Audio(this.overrideSoundPath);
+              tone.volume = 0.7;
+              tone.play().catch(() => {});
+            } catch (_) { /* ignore audio errors */ }
+          }
+        }
         this.refreshGgStatus();
         break;
 

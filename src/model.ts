@@ -463,6 +463,8 @@ export const useCoreStore = create<CoreState>((set: any, get: any) => {
     vvscsStore.bindStore(set, get);
     // Bind Landline store bridge to this zustand instance
     landlineStore.bindStore(set, get);
+    // Default override sound for RDVS/IVSR/ETVS (VSCS overrides this in its component)
+    landlineStore.setOverrideSoundPath('/Override_Term.wav');
 
     let socket: WebSocket | null;
     const ds: CoreState = {

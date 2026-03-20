@@ -1606,6 +1606,11 @@ function VscsPanel(props: VscsProps & { panelId?: string; defaultScreenMode?: st
     showVdmMessage(msg, autoDismissMs);
   };
 
+  // Set VSCS-specific override sound
+  useEffect(() => {
+    landlineStore.setOverrideSoundPath('/vscs/Override.wav');
+  }, []);
+
   // Subscribe to landline call errors and show appropriate VDM messages
   useEffect(() => {
     const unsubscribe = landlineStore.on((event) => {
