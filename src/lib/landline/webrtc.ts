@@ -61,6 +61,9 @@ interface PeerEntry {
   createdAt: number;
 }
 
+/** Buffer ICE candidates that arrive before the peer connection is ready */
+const pendingCandidates = new Map<CallId, string[]>();
+
 export class LandlinePeerManager {
   private peers = new Map<CallId, PeerEntry>();
   private localStream: MediaStream | null = null;
@@ -121,6 +124,7 @@ export class LandlinePeerManager {
       });
       await pc.setLocalDescription(offer);
       this.callbacks.onOffer(callId, remoteClientId, pc.localDescription!.sdp!);
+      await this.flushPendingCandidates(callId);
     } catch (err) {
       console.error('[Landline Peers] Error creating offer:', err);
       this.closePeer(callId);
@@ -160,6 +164,7 @@ export class LandlinePeerManager {
       const answer = await pc.createAnswer();
       await pc.setLocalDescription(answer);
       this.callbacks.onAnswer(callId, remoteClientId, pc.localDescription!.sdp!);
+      await this.flushPendingCandidates(callId);
     } catch (err) {
       console.error('[Landline Peers] Error handling offer:', err);
       this.closePeer(callId);
@@ -178,10 +183,19 @@ export class LandlinePeerManager {
     }
   }
 
-  /** Handle a received ICE candidate */
+  /** Handle a received ICE candidate — buffer if peer not yet created */
   async handleIceCandidate(callId: CallId, candidateJson: string): Promise<void> {
     const entry = this.peers.get(callId);
-    if (!entry) return;
+    if (!entry) {
+      // Peer not created yet (getUserMedia still pending) — buffer
+      let buf = pendingCandidates.get(callId);
+      if (!buf) {
+        buf = [];
+        pendingCandidates.set(callId, buf);
+      }
+      buf.push(candidateJson);
+      return;
+    }
 
     try {
       const candidate = JSON.parse(candidateJson) as RTCIceCandidateInit;
@@ -191,8 +205,19 @@ export class LandlinePeerManager {
     }
   }
 
+  /** Flush any ICE candidates that were buffered before peer creation */
+  private async flushPendingCandidates(callId: CallId): Promise<void> {
+    const buf = pendingCandidates.get(callId);
+    if (!buf || buf.length === 0) return;
+    pendingCandidates.delete(callId);
+    for (const json of buf) {
+      await this.handleIceCandidate(callId, json);
+    }
+  }
+
   /** Close a peer connection for a call */
   closePeer(callId: CallId): void {
+    pendingCandidates.delete(callId);
     const entry = this.peers.get(callId);
     if (!entry) return;
 
@@ -240,6 +265,14 @@ export class LandlinePeerManager {
         const audio = new Audio();
         audio.srcObject = stream;
         audio.autoplay = true;
+        audio.play().catch((err) => {
+          console.warn('[Landline Peers] Autoplay blocked, retrying on user interaction:', err);
+          const resume = () => {
+            audio.play().catch(() => {});
+            document.removeEventListener('click', resume);
+          };
+          document.addEventListener('click', resume, { once: true });
+        });
         entry.audioElement = audio;
         this.callbacks.onTrack(callId, stream);
       }

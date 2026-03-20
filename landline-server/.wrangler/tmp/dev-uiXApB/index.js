@@ -36,6 +36,7 @@ var SignalingRoom = class {
       server.accept();
       this.handleNewConnection(server);
       server.addEventListener("message", (event) => {
+        console.log("[Room] WS message received, data type:", typeof event.data);
         if (typeof event.data === "string") {
           const cl = this.findClientByWs(server);
           if (!cl)
@@ -129,6 +130,7 @@ var SignalingRoom = class {
   }
   // ─── PDU Router ──────────────────────────────────────────────────────
   handlePdu(client, pdu) {
+    console.log("[Room] PDU from", client.clientId, ":", pdu.type, JSON.stringify(pdu));
     switch (pdu.type) {
       case "REGISTER":
         this.handleRegister(client, pdu.facility, pdu.position, pdu.assumedPositions);
@@ -340,6 +342,7 @@ var SignalingRoom = class {
   }
   sendTo(ws, pdu) {
     try {
+      console.log("[Room] Sending:", pdu.type, JSON.stringify(pdu));
       ws.send(JSON.stringify(pdu));
     } catch {
     }

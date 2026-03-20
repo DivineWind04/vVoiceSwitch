@@ -52,6 +52,7 @@ export class SignalingRoom implements DurableObject {
 
       // Wire up event handlers directly on the server-side WebSocket
       server.addEventListener('message', (event: MessageEvent) => {
+        console.log('[Room] WS message received, data type:', typeof event.data);
         if (typeof event.data === 'string') {
           const cl = this.findClientByWs(server);
           if (!cl) return;
@@ -162,6 +163,7 @@ export class SignalingRoom implements DurableObject {
   // ─── PDU Router ──────────────────────────────────────────────────────
 
   private handlePdu(client: ConnectedClient, pdu: ClientPdu): void {
+    console.log('[Room] PDU from', client.clientId, ':', pdu.type, JSON.stringify(pdu));
     switch (pdu.type) {
       case 'REGISTER':
         this.handleRegister(client, pdu.facility, pdu.position, pdu.assumedPositions);
@@ -447,6 +449,7 @@ export class SignalingRoom implements DurableObject {
 
   private sendTo(ws: WebSocket, pdu: ServerPdu): void {
     try {
+      console.log('[Room] Sending:', pdu.type, JSON.stringify(pdu));
       ws.send(JSON.stringify(pdu));
     } catch {
       // Client may have disconnected

@@ -81,6 +81,15 @@ export class LandlineClient {
         if (call) {
           call.state = 'connected';
           this.emitEvent({ type: 'callStateChanged', callId, state: 'connected' });
+
+          // Play override tone for override calls (lineType 0) on both sides
+          if (call.lineType === 0) {
+            try {
+              const tone = new Audio('/Override_Term.wav');
+              tone.volume = 0.7;
+              tone.play().catch(() => {});
+            } catch (_) { /* ignore audio errors */ }
+          }
         }
       },
       onDisconnected: (callId) => {

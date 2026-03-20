@@ -191,6 +191,7 @@ export class LandlineSignalingClient {
       console.error('[Landline Signaling] Invalid JSON:', raw);
       return;
     }
+    console.log('[Landline Signaling] <<< RECV:', pdu.type, pdu);
 
     switch (pdu.type) {
       case 'REGISTERED':
@@ -254,9 +255,10 @@ export class LandlineSignalingClient {
 
   private send(pdu: ClientPdu): boolean {
     if (!this.ws || this.ws.readyState !== WebSocket.OPEN) {
-      console.warn('[Landline Signaling] Cannot send: not connected');
+      console.warn('[Landline Signaling] Cannot send: not connected, readyState:', this.ws?.readyState);
       return false;
     }
+    console.log('[Landline Signaling] >>> SEND:', pdu.type, pdu);
     this.ws.send(JSON.stringify(pdu));
     return true;
   }
