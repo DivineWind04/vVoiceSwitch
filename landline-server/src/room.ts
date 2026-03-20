@@ -46,8 +46,27 @@ export class SignalingRoom implements DurableObject {
       const pair = new WebSocketPair();
       const [client, server] = [pair[0], pair[1]];
 
-      this.state.acceptWebSocket(server);
+      // Use traditional (non-hibernatable) WebSocket handling for local dev compatibility
+      server.accept();
       this.handleNewConnection(server);
+
+      // Wire up event handlers directly on the server-side WebSocket
+      server.addEventListener('message', (event: MessageEvent) => {
+        if (typeof event.data === 'string') {
+          const cl = this.findClientByWs(server);
+          if (!cl) return;
+          let pdu: ClientPdu;
+          try {
+            pdu = JSON.parse(event.data) as ClientPdu;
+          } catch {
+            this.sendTo(server, { type: 'ERROR', reason: 'Invalid JSON' });
+            return;
+          }
+          this.handlePdu(cl, pdu);
+        }
+      });
+      server.addEventListener('close', () => this.handleDisconnect(server));
+      server.addEventListener('error', () => this.handleDisconnect(server));
 
       return new Response(null, { status: 101, webSocket: client });
     }
