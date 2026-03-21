@@ -4,6 +4,7 @@
 import React, { useState, useEffect, useCallback, useRef } from "react";
 import SquareButton from "../base_button/SquareButton";
 import { useCoreStore } from "~/model";
+import { landlineStore } from '~/lib/landline/store';
 import '../vatlines/styles.css';
 
 interface KeypadProps {
@@ -62,6 +63,7 @@ const Keypad: React.FC<KeypadProps> = ({ dialLineInfo, onClose }) => {
   const [displayMessage, setDisplayMessage] = useState("READY");
   const [callState, setCallState] = useState<'ready' | 'dialing' | 'ringback' | 'active' | 'error'>('ready');
   const ringbackAudioRef = useRef<HTMLAudioElement | null>(null);
+  const dialToneStartedRef = useRef(false);
   
   // Store access
   const sendDialCall = useCoreStore((s: any) => s.sendDialCall);
@@ -69,6 +71,17 @@ const Keypad: React.FC<KeypadProps> = ({ dialLineInfo, onClose }) => {
   const iaDisplayBuffer = useCoreStore((s: any) => s.iaDisplayBuffer);
   const appendToIaDisplay = useCoreStore((s: any) => s.appendToIaDisplay);
   const clearIaDisplay = useCoreStore((s: any) => s.clearIaDisplay);
+  
+  // Play dial tone when keypad opens for a dial line
+  useEffect(() => {
+    if (dialLineInfo) {
+      landlineStore.startDialTone();
+      dialToneStartedRef.current = true;
+    }
+    return () => {
+      landlineStore.stopDialTone();
+    };
+  }, [dialLineInfo]);
   
   // Clear the IA display when keypad opens
   useEffect(() => {
@@ -147,6 +160,12 @@ const Keypad: React.FC<KeypadProps> = ({ dialLineInfo, onClose }) => {
 
   const handleDigitPress = (digit: string) => {
     if (callState !== 'ready' && callState !== 'dialing') return;
+    
+    // Stop dial tone on first digit
+    if (dialToneStartedRef.current) {
+      landlineStore.stopDialTone();
+      dialToneStartedRef.current = false;
+    }
     
     // Play DTMF tone
     playDTMFTone(digit);

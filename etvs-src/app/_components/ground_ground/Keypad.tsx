@@ -4,6 +4,7 @@
 import React, { useState, useEffect, useCallback, useRef } from "react";
 import KeypadButton from "../ground_ground/KeypadButton";
 import { useCoreStore, findDialCodeTable, resolveDialCode } from "~/model";
+import { landlineStore } from '~/lib/landline/store';
 
 interface KeypadProps {
   dialLineInfo?: { trunkName: string; lineType: number } | null;
@@ -54,6 +55,7 @@ const Keypad: React.FC<KeypadProps> = ({ dialLineInfo, onClose }) => {
   const [dialBuffer, setDialBuffer] = useState('');
   const [callState, setCallState] = useState<'ready' | 'dialing' | 'ringback' | 'connected' | 'error'>('ready');
   const ringbackAudioRef = useRef<HTMLAudioElement | null>(null);
+  const dialToneStartedRef = useRef(false);
   
   // Store access
   const sendDialCall = useCoreStore((s: any) => s.sendDialCall);
@@ -69,7 +71,13 @@ const Keypad: React.FC<KeypadProps> = ({ dialLineInfo, onClose }) => {
   useEffect(() => {
     setDialBuffer('');
     setCallState('ready');
+    // Play dial tone when keypad opens for a dial line
+    if (dialLineInfo) {
+      landlineStore.startDialTone();
+      dialToneStartedRef.current = true;
+    }
     return () => {
+      landlineStore.stopDialTone();
       if (ringbackAudioRef.current) {
         ringbackAudioRef.current.pause();
         ringbackAudioRef.current = null;
@@ -118,6 +126,11 @@ const Keypad: React.FC<KeypadProps> = ({ dialLineInfo, onClose }) => {
   
   const handleDigitPress = useCallback((digit: string) => {
     if (callState !== 'ready' && callState !== 'dialing') return;
+    // Stop dial tone on first digit
+    if (dialToneStartedRef.current) {
+      landlineStore.stopDialTone();
+      dialToneStartedRef.current = false;
+    }
     playDTMFTone(digit);
     const newBuffer = dialBuffer + digit;
     setDialBuffer(newBuffer);

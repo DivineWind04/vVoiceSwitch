@@ -122,14 +122,24 @@ const GroundGroundPage: React.FC<GroundGroundPageProps> = ({
 
       // Landline WebRTC calls — route through Landline handler
       if (data.isLandline && data.landlineCallId) {
-        if (data.status === 'ok' || data.status === 'active') {
-          indicator = ptt;
-          indicatorClassName = indicator ? 'flutter active' : 'steady green';
-        } else if (data.status === 'chime' || data.status === 'ringing') {
-          indicator = true;
-          indicatorClassName = 'flutter receive flashing';
+        // LineType 3 dial lines → open keypad instead of direct call
+        if (data.lineType === 3 && (data.status === 'off' || data.status === '' || !data.status)) {
+          const trunkName = data.call_name || data.call || '';
+          onClick = () => {
+            if (onOpenKeypadForDialLine) {
+              onOpenKeypadForDialLine(trunkName, 3);
+            }
+          };
+        } else {
+          if (data.status === 'ok' || data.status === 'active') {
+            indicator = ptt;
+            indicatorClassName = indicator ? 'flutter active' : 'steady green';
+          } else if (data.status === 'chime' || data.status === 'ringing') {
+            indicator = true;
+            indicatorClassName = 'flutter receive flashing';
+          }
+          onClick = () => landlineHandleButtonPress(data.landlineCallId, data.status);
         }
-        onClick = () => landlineHandleButtonPress(data.landlineCallId, data.status);
 
         const callNameStr = data.call_name || data.call || '';
         const callNameParts = callNameStr.includes(',')

@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { useCoreStore, findDialCodeTable, resolveDialCode } from '~/model';
+import { landlineStore } from '~/lib/landline/store';
 
 type KeypadMode = 'ia' | 'dialline';
 
@@ -71,6 +72,7 @@ export default function RdvsKeypad({
   const [statusLine, setStatusLine] = useState<string>('');
   const [activeKey, setActiveKey] = useState<string | null>(null);
   const [callStatus, setCallStatus] = useState<'idle' | 'dialing' | 'ringback' | 'connected' | 'error'>('idle');
+  const dialToneStartedRef = useRef(false);
   
   // Audio context for DTMF tones
   const audioContextRef = useRef<AudioContext | null>(null);
@@ -81,6 +83,17 @@ export default function RdvsKeypad({
   
   // Max digits based on mode
   const maxDigits = mode === 'ia' ? 4 : 2;
+  
+  // Play dial tone on mount for dialline mode
+  useEffect(() => {
+    if (mode === 'dialline') {
+      landlineStore.startDialTone();
+      dialToneStartedRef.current = true;
+    }
+    return () => {
+      landlineStore.stopDialTone();
+    };
+  }, [mode]);
   
   // Initialize audio context on first interaction
   const initAudioContext = useCallback(() => {
@@ -253,6 +266,12 @@ export default function RdvsKeypad({
   // Handle digit press
   const handleDigitPress = useCallback((digit: string) => {
     if (dialedCode.length >= maxDigits) return;
+    
+    // Stop dial tone on first digit
+    if (dialToneStartedRef.current) {
+      landlineStore.stopDialTone();
+      dialToneStartedRef.current = false;
+    }
     
     playDTMF(digit);
     setActiveKey(digit);

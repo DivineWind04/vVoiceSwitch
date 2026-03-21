@@ -4,6 +4,7 @@
 import React, { useState, useCallback, useRef, useEffect } from "react";
 import StvsKeypadButton from "./StvsKeypadButton";
 import { useCoreStore, findDialCodeTable, resolveDialCode } from "~/model";
+import { landlineStore } from '~/lib/landline/store';
 
 // DTMF frequency pairs for each key
 const DTMF_FREQUENCIES: Record<string, [number, number]> = {
@@ -42,6 +43,18 @@ const StvsKeypad: React.FC<StvsKeypadProps> = ({ brightness = 1.0, trunkName, on
   
   // Ringback audio ref
   const ringbackAudioRef = useRef<HTMLAudioElement | null>(null);
+  const dialToneStartedRef = useRef(false);
+  
+  // Play dial tone when activeDialLine is set (lineType 3 button pressed)
+  useEffect(() => {
+    if (activeDialLine?.lineType === 3) {
+      landlineStore.startDialTone();
+      dialToneStartedRef.current = true;
+    }
+    return () => {
+      landlineStore.stopDialTone();
+    };
+  }, [activeDialLine]);
   
   // Initialize audio context
   const initAudioContext = useCallback(() => {
@@ -153,6 +166,12 @@ const StvsKeypad: React.FC<StvsKeypadProps> = ({ brightness = 1.0, trunkName, on
   }, []);
   
   const handleKeypadClick = useCallback((key: string) => {
+    // Stop dial tone on first digit
+    if (dialToneStartedRef.current) {
+      landlineStore.stopDialTone();
+      dialToneStartedRef.current = false;
+    }
+    
     // Play DTMF tone
     playDTMF(key);
     

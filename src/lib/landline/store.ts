@@ -83,10 +83,107 @@ class LandlineStore {
   private shoutGroupCalls = new Map<string, CallId[]>();
   /** Path to override sound file (set by UI layer) */
   private overrideSoundPath: string | null = null;
+  /** Path (or resolver function) for ring chime sound on incoming lineType 1 calls */
+  private ringChimeSoundPath: string | (() => string) | null = null;
+  /** Currently playing ring chime audio element */
+  private activeChimeAudio: HTMLAudioElement | null = null;
+  /** Call ID that the active chime is associated with */
+  private activeChimeCallId: string | null = null;
+  /** Currently playing ringback audio element (caller side) */
+  private activeRingbackAudio: HTMLAudioElement | null = null;
+  /** Call ID that the active ringback is associated with */
+  private activeRingbackCallId: string | null = null;
 
   /** Set the override sound file to play when an override call connects */
   setOverrideSoundPath(path: string): void {
     this.overrideSoundPath = path;
+  }
+
+  /** Set the ring chime sound path (or a function returning the path) for incoming lineType 1 calls */
+  setRingChimeSoundPath(pathOrGetter: string | (() => string)): void {
+    this.ringChimeSoundPath = pathOrGetter;
+  }
+
+  /** Start playing the ring chime for an incoming call */
+  private startRingChime(callId: string): void {
+    this.stopRingChime(); // Stop any existing chime first
+    const path = typeof this.ringChimeSoundPath === 'function'
+      ? this.ringChimeSoundPath()
+      : this.ringChimeSoundPath;
+    if (!path) return;
+    try {
+      const audio = new Audio(path);
+      audio.loop = true;
+      audio.volume = 0.7;
+      audio.play().catch(() => {});
+      this.activeChimeAudio = audio;
+      this.activeChimeCallId = callId;
+    } catch (_) { /* ignore audio errors */ }
+  }
+
+  /** Stop the ring chime (optionally only if it matches a specific call) */
+  private stopRingChime(callId?: string): void {
+    if (callId && this.activeChimeCallId !== callId) return;
+    if (this.activeChimeAudio) {
+      try {
+        this.activeChimeAudio.pause();
+        this.activeChimeAudio.currentTime = 0;
+      } catch (_) { /* ignore */ }
+      this.activeChimeAudio = null;
+      this.activeChimeCallId = null;
+    }
+  }
+
+  /** Start playing ringback tone for an outgoing ring call (caller side) */
+  private startRingback(callId: string): void {
+    this.stopRingback(); // Stop any existing ringback first
+    try {
+      const audio = new Audio('/rdvs/RingBack.wav');
+      audio.loop = true;
+      audio.volume = 0.7;
+      audio.play().catch(() => {});
+      this.activeRingbackAudio = audio;
+      this.activeRingbackCallId = callId;
+    } catch (_) { /* ignore audio errors */ }
+  }
+
+  /** Stop the ringback tone (optionally only if it matches a specific call) */
+  private stopRingback(callId?: string): void {
+    if (callId && this.activeRingbackCallId !== callId) return;
+    if (this.activeRingbackAudio) {
+      try {
+        this.activeRingbackAudio.pause();
+        this.activeRingbackAudio.currentTime = 0;
+      } catch (_) { /* ignore */ }
+      this.activeRingbackAudio = null;
+      this.activeRingbackCallId = null;
+    }
+  }
+
+  /** Currently playing dial tone audio element */
+  private activeDialToneAudio: HTMLAudioElement | null = null;
+
+  /** Start playing dial tone (for lineType 3 dial lines) */
+  startDialTone(): void {
+    this.stopDialTone();
+    try {
+      const audio = new Audio('/rdvs/DialTone.wav');
+      audio.loop = true;
+      audio.volume = 0.7;
+      audio.play().catch(() => {});
+      this.activeDialToneAudio = audio;
+    } catch (_) { /* ignore audio errors */ }
+  }
+
+  /** Stop the dial tone */
+  stopDialTone(): void {
+    if (this.activeDialToneAudio) {
+      try {
+        this.activeDialToneAudio.pause();
+        this.activeDialToneAudio.currentTime = 0;
+      } catch (_) { /* ignore */ }
+      this.activeDialToneAudio = null;
+    }
   }
 
   /** Bind to the zustand store's set/get functions */
@@ -456,6 +553,8 @@ class LandlineStore {
 
       case 'disconnected':
         console.warn('[Landline Store] WebSocket disconnected');
+        this.stopRingChime(); // Stop any active chime
+        this.stopRingback(); // Stop any active ringback
         this.updateState({
           landlineConnected: false,
           landlineStatus: 'disconnected',
@@ -497,10 +596,31 @@ class LandlineStore {
             } catch (_) { /* ignore audio errors */ }
           }
         }
+        // Start ring chime for incoming lineType 1 (ring) calls
+        if (event.state === 'ringing') {
+          const call = this.client?.getCallInfo(event.callId);
+          if (call && call.lineType === 1 && call.direction === 'incoming') {
+            this.startRingChime(event.callId);
+          }
+        }
+        // Start ringback for outgoing lineType 1 (ring) calls
+        if (event.state === 'setup') {
+          const call = this.client?.getCallInfo(event.callId);
+          if (call && call.lineType === 1 && call.direction === 'outgoing') {
+            this.startRingback(event.callId);
+          }
+        }
+        // Stop ring chime and ringback when call connects or is accepted
+        if (event.state === 'connected' || event.state === 'accepted') {
+          this.stopRingChime(event.callId);
+          this.stopRingback(event.callId);
+        }
         this.refreshGgStatus();
         break;
 
       case 'callEnded':
+        this.stopRingChime(event.callId);
+        this.stopRingback(event.callId);
         this.refreshGgStatus();
         break;
 

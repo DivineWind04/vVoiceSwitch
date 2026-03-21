@@ -913,14 +913,15 @@ function VikKeypad() {
     return false;
   };
 
-  // Initiate call with current dial buffer (extracted for reuse)
-  const initiateCall = () => {
-    if (dialBuffer.length < 2) return;
+  // Initiate call with given buffer (or current dial buffer as fallback)
+  const initiateCall = (buffer?: string) => {
+    const buf = buffer ?? dialBuffer;
+    if (buf.length < 2) return;
     
-    console.log('VIK: Initiating call to:', dialBuffer);
+    console.log('VIK: Initiating call to:', buf);
     
-    const firstDigit = dialBuffer[0] || '';
-    const targetCode = dialBuffer.substring(1);
+    const firstDigit = buf[0] || '';
+    const targetCode = buf.substring(1);
     
     // Ring timeout timer ID for cleanup
     let ringTimeoutId: ReturnType<typeof setTimeout> | null = null;
@@ -975,7 +976,7 @@ function VikKeypad() {
       } else {
         console.log('VIK: Override line not found for code:', targetCode);
         setDisplayLine1(VIK_MESSAGES.INVALID_CODE);
-        setDisplayLine2(dialBuffer);
+        setDisplayLine2(buf);
         setTimeout(() => {
           setDisplayLine1('');
           setDisplayLine2('');
@@ -989,10 +990,10 @@ function VikKeypad() {
       const lineId = findLineIdByDialCode(positionData, currentPosition, targetCode, LINE_TYPE_RING);
       
       if (lineId) {
-        initiateCallWithTimeout(lineId, dialBuffer, 1);
+        initiateCallWithTimeout(lineId, buf, 1);
       } else {
         setDisplayLine1(VIK_MESSAGES.INVALID_CODE);
-        setDisplayLine2(dialBuffer);
+        setDisplayLine2(buf);
         setTimeout(() => {
           setDisplayLine1('');
           setDisplayLine2('');
@@ -1006,10 +1007,10 @@ function VikKeypad() {
       const lineId = findLineIdByDialCode(positionData, currentPosition, targetCode, LINE_TYPE_RING);
       
       if (lineId) {
-        initiateCallWithTimeout(lineId, dialBuffer, 1);
+        initiateCallWithTimeout(lineId, buf, 1);
       } else {
         setDisplayLine1(VIK_MESSAGES.INVALID_CODE);
-        setDisplayLine2(dialBuffer);
+        setDisplayLine2(buf);
         setTimeout(() => {
           setDisplayLine1('');
           setDisplayLine2('');
@@ -1021,7 +1022,7 @@ function VikKeypad() {
     } else if (firstDigit === '0') {
       // PABX call
       setDisplayLine1(VIK_MESSAGES.DIALING_COMPLETE);
-      setDisplayLine2(dialBuffer);
+      setDisplayLine2(buf);
       setActiveLineId(targetCode);
       sendMsg({ type: 'call', cmd1: targetCode, dbl1: 2 });
       setCallState('ringing');
@@ -1039,7 +1040,7 @@ function VikKeypad() {
     } else if (firstDigit === '9') {
       // Meet-Me conference
       setDisplayLine1(VIK_MESSAGES.CALL_RINGING);
-      setDisplayLine2(dialBuffer);
+      setDisplayLine2(buf);
       setActiveLineId(targetCode);
       sendMsg({ type: 'call', cmd1: targetCode, dbl1: 3 });
       setCallState('ringing');
@@ -1057,9 +1058,9 @@ function VikKeypad() {
     } else {
       // Generic call fallback
       setDisplayLine1(VIK_MESSAGES.CALL_RINGING);
-      setDisplayLine2(dialBuffer);
-      setActiveLineId(dialBuffer);
-      sendMsg({ type: 'call', cmd1: dialBuffer, dbl1: 2 });
+      setDisplayLine2(buf);
+      setActiveLineId(buf);
+      sendMsg({ type: 'call', cmd1: buf, dbl1: 2 });
       setCallState('ringing');
       setKeysIlluminated(false);
       
@@ -1100,12 +1101,9 @@ function VikKeypad() {
       }
       
       // Check if we should auto-initiate the call
-      // Use setTimeout to allow state to update first
-      setTimeout(() => {
-        if (shouldAutoInitiate(newBuffer)) {
-          initiateCall();
-        }
-      }, 100);
+      if (shouldAutoInitiate(newBuffer)) {
+        initiateCall(newBuffer);
+      }
     }
   };
 
@@ -1150,7 +1148,7 @@ function VikKeypad() {
       const firstDigit = dialBuffer[0] || '';
       if (firstDigit === '0') {
         // PABX call - initiate on INIT press
-        initiateCall();
+        initiateCall(dialBuffer);
       }
       // Other call types auto-initiate when digits complete, INIT does nothing extra
     } else if (callState === 'ready') {
@@ -1606,9 +1604,10 @@ function VscsPanel(props: VscsProps & { panelId?: string; defaultScreenMode?: st
     showVdmMessage(msg, autoDismissMs);
   };
 
-  // Set VSCS-specific override sound
+  // Set VSCS-specific override and ring chime sounds
   useEffect(() => {
     landlineStore.setOverrideSoundPath('/vscs/Override.wav');
+    landlineStore.setRingChimeSoundPath('/vscs/GGChime.wav');
   }, []);
 
   // Subscribe to landline call errors and show appropriate VDM messages

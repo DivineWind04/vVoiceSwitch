@@ -465,6 +465,16 @@ export const useCoreStore = create<CoreState>((set: any, get: any) => {
     landlineStore.bindStore(set, get);
     // Default override sound for RDVS/IVSR/ETVS (VSCS overrides this in its component)
     landlineStore.setOverrideSoundPath('/Override_Term.wav');
+    // Default ring chime for incoming lineType 1 landline calls
+    // IVSR uses its chime selector; others default to RDVS chime (VSCS overrides in its component)
+    landlineStore.setRingChimeSoundPath(() => {
+        const ctx = getCurrentUIContext();
+        if (ctx === 'ivsr') {
+            const sel = get().selectedChime || 1;
+            return `/ivsr/IVSRChime-${sel.toString().padStart(2, '0')}.wav`;
+        }
+        return '/rdvs/RDVS_Chime.wav';
+    });
 
     let socket: WebSocket | null;
     const ds: CoreState = {

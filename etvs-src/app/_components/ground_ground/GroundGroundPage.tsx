@@ -39,6 +39,9 @@ const GroundGroundPage: React.FC<GroundGroundPageProps> = ({ onGG3Toggle }) => {
   const sendMsg = useCoreStore((s: any) => s.sendMessageNow);
   const ptt = useCoreStore((s: any) => s.ptt);
   const gg_status = useCoreStore((s: any) => s.gg_status);
+  const vacsHandleButtonPress = useCoreStore((s: any) => s.vacsHandleButtonPress);
+  const vvscsHandleButtonPress = useCoreStore((s: any) => s.vvscsHandleButtonPress);
+  const landlineHandleButtonPress = useCoreStore((s: any) => s.landlineHandleButtonPress);
   const ITEM_PER_PAGE = 18;
   const currentSlice = useMemo(() => {
     // Implement overflow logic: if there are more G/G entries than can fit on page 1,
@@ -85,7 +88,77 @@ const GroundGroundPage: React.FC<GroundGroundPageProps> = ({ onGG3Toggle }) => {
       let onClick: (() => void) | undefined = undefined;
       let indicator = false;
       let indicatorClassName = '';
-      // Simplified mapping; follow panel.tsx behavior
+
+      // v-VSCS WebRTC calls
+      if (data.isVvscs && data.vvscsLineId) {
+        if (data.status === 'ok' || data.status === 'active') {
+          indicator = ptt;
+          indicatorClassName = indicator ? 'flutter active' : 'steady green';
+        } else if (data.status === 'chime' || data.status === 'ringing') {
+          indicator = true;
+          indicatorClassName = 'flutter receive flashing';
+        }
+        onClick = () => vvscsHandleButtonPress(data.vvscsLineId, data.status);
+
+        const callNameStr = data.call_name || data.call || '';
+        const callNameParts = callNameStr.includes(',')
+          ? callNameStr.split(',').map((part: string) => part.trim())
+          : [callNameStr];
+        buttons.push(
+          <DAButton key={index} topLine={callNameParts[0] || ''} middleLine={callNameParts[1]} bottomLine={callNameParts[2]} latching={false} onClick={onClick} controlledIndicator={indicator} indicatorClassName={indicatorClassName} />
+        );
+        return;
+      }
+
+      // Landline WebRTC calls
+      if (data.isLandline && data.landlineCallId) {
+        // LineType 3 dial lines → open keypad instead of direct call
+        if (data.lineType === 3 && (data.status === 'off' || data.status === '' || !data.status)) {
+          const trunkName = data.call_name || data.call || '';
+          onClick = () => openKeypadForDialLine(trunkName, 3);
+        } else {
+          if (data.status === 'ok' || data.status === 'active') {
+            indicator = ptt;
+            indicatorClassName = indicator ? 'flutter active' : 'steady green';
+          } else if (data.status === 'chime' || data.status === 'ringing') {
+            indicator = true;
+            indicatorClassName = 'flutter receive flashing';
+          }
+          onClick = () => landlineHandleButtonPress(data.landlineCallId, data.status);
+        }
+
+        const callNameStr = data.call_name || data.call || '';
+        const callNameParts = callNameStr.includes(',')
+          ? callNameStr.split(',').map((part: string) => part.trim())
+          : [callNameStr];
+        buttons.push(
+          <DAButton key={index} topLine={callNameParts[0] || ''} middleLine={callNameParts[1]} bottomLine={callNameParts[2]} latching={false} onClick={onClick} controlledIndicator={indicator} indicatorClassName={indicatorClassName} />
+        );
+        return;
+      }
+
+      // VACS WebRTC calls
+      if (data.isVacs && data.vacsCallId) {
+        if (data.status === 'ok' || data.status === 'active') {
+          indicator = ptt;
+          indicatorClassName = indicator ? 'flutter active' : 'steady green';
+        } else if (data.status === 'chime' || data.status === 'ringing') {
+          indicator = true;
+          indicatorClassName = 'flutter receive flashing';
+        }
+        onClick = () => vacsHandleButtonPress(data.vacsCallId, data.status);
+
+        const callNameStr = data.call_name || data.call || '';
+        const callNameParts = callNameStr.includes(',')
+          ? callNameStr.split(',').map((part: string) => part.trim())
+          : [callNameStr];
+        buttons.push(
+          <DAButton key={index} topLine={callNameParts[0] || ''} middleLine={callNameParts[1]} bottomLine={callNameParts[2]} latching={false} onClick={onClick} controlledIndicator={indicator} indicatorClassName={indicatorClassName} />
+        );
+        return;
+      }
+
+      // AFV calls — Simplified mapping; follow panel.tsx behavior
       if (call_type === 'SO') {
         if (data.status === 'idle') {
           onClick = () => sendMsg({ type: 'call', cmd1: call_id, dbl1: 2 });
