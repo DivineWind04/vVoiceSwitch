@@ -432,11 +432,11 @@ export class SignalingRoom implements DurableObject {
     const upperPos = position.toUpperCase();
     const upperFac = facility.toUpperCase();
 
+    // First try exact facility + position match
     for (const [, client] of this.clients) {
       if (!client.registered) continue;
       if (client.facility?.toUpperCase() !== upperFac) continue;
 
-      // Match primary position or any assumed position
       if (
         client.position?.toUpperCase() === upperPos ||
         client.assumedPositions.some((p) => p.toUpperCase() === upperPos)
@@ -444,6 +444,19 @@ export class SignalingRoom implements DurableObject {
         return client;
       }
     }
+
+    // Fall back to position-only match (cross-facility calls, e.g. ARTCC ↔ TRACON)
+    for (const [, client] of this.clients) {
+      if (!client.registered) continue;
+
+      if (
+        client.position?.toUpperCase() === upperPos ||
+        client.assumedPositions.some((p) => p.toUpperCase() === upperPos)
+      ) {
+        return client;
+      }
+    }
+
     return undefined;
   }
 
