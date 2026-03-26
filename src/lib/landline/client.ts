@@ -374,6 +374,37 @@ export class LandlineClient {
    * Call begins ringing at our HS/LS. User must press button to accept.
    */
   private handleIncomingCall(data: IncomingCallPdu): void {
+    // ─── Shout glare detection ─────────────────────────────────────────
+    // When both sides press a shout button simultaneously, two independent
+    // calls are created (A→B and B→A).  Both auto-accept, producing two
+    // parallel WebRTC audio paths whose echo cancellation fights itself
+    // and causes the call to cut in and out.  Resolve by tie-breaking on
+    // client ID: lower ID keeps its outgoing call, higher ID yields.
+    if (data.lineType === 2) {
+      const existingOutgoing = Array.from(this.activeCalls.values()).find(
+        (c) =>
+          c.direction === 'outgoing' &&
+          c.remotePosition === data.fromPosition &&
+          c.lineType === 2 &&
+          c.state !== 'ended',
+      );
+
+      if (existingOutgoing) {
+        const myId = this.signaling.clientId;
+        if (myId && myId < data.fromClientId) {
+          // We win — reject the incoming call, keep our outgoing
+          console.log('[Landline Client] Shout glare: we win, rejecting incoming:', data.callId);
+          this.signaling.sendCallEnd(data.callId);
+          return;
+        } else {
+          // We lose — cancel our outgoing, accept the incoming below
+          console.log('[Landline Client] Shout glare: we lose, canceling outgoing:', existingOutgoing.callId);
+          this.signaling.sendCallEnd(existingOutgoing.callId);
+          this.cleanupCall(existingOutgoing.callId);
+        }
+      }
+    }
+
     const call: ActiveCall = {
       callId: data.callId,
       state: 'ringing',
