@@ -79,8 +79,17 @@ export class LandlineClient {
         console.log('[Landline Client] Remote audio track for call:', callId);
         const call = this.activeCalls.get(callId);
         if (call) {
-          call.state = 'connected';
-          this.emitEvent({ type: 'callStateChanged', callId, state: 'connected' });
+          if (call.shoutPendingPickup) {
+            // Shout line: WebRTC connected but receiver hasn't picked up yet.
+            // Mute our local tracks (one-way: caller → receiver only).
+            // Keep state as 'ringing' so the button shows indication.
+            this.peers.muteLocalTracks(callId);
+            call.state = 'ringing';
+            this.emitEvent({ type: 'callStateChanged', callId, state: 'ringing' });
+          } else {
+            call.state = 'connected';
+            this.emitEvent({ type: 'callStateChanged', callId, state: 'connected' });
+          }
         }
       },
       onDisconnected: (callId) => {
@@ -205,6 +214,10 @@ export class LandlineClient {
   /**
    * Accept an incoming call. Sends CALL_ACCEPTED and begins WebRTC setup.
    * The acceptor creates the WebRTC offer (caller answers).
+   *
+   * For shout lines (type 2) with shoutPendingPickup, WebRTC connects
+   * but our local mic tracks are muted. The call stays in 'ringing'
+   * state until the user picks up via pickupShoutCall().
    */
   acceptCall(callId: CallId): void {
     const call = this.activeCalls.get(callId);
@@ -221,6 +234,24 @@ export class LandlineClient {
     if (call.remoteClientId) {
       this.peers.createOffer(callId, call.remoteClientId);
     }
+  }
+
+  /**
+   * Pick up a shout call that was auto-accepted with one-way audio.
+   * Unmutes local mic tracks → full duplex audio.
+   */
+  pickupShoutCall(callId: CallId): void {
+    const call = this.activeCalls.get(callId);
+    if (!call || !call.shoutPendingPickup) {
+      console.warn('[Landline Client] Cannot pickup shout call:', callId, 'pending:', call?.shoutPendingPickup);
+      return;
+    }
+
+    console.log('[Landline Client] Shout pickup — enabling full duplex:', callId);
+    call.shoutPendingPickup = false;
+    call.state = 'connected';
+    this.peers.unmuteLocalTracks(callId);
+    this.emitEvent({ type: 'callStateChanged', callId, state: 'connected' });
   }
 
   // ─── Call End (CALL_END) ─────────────────────────────────────────────
@@ -376,10 +407,10 @@ export class LandlineClient {
   private handleIncomingCall(data: IncomingCallPdu): void {
     // ─── Shout glare detection ─────────────────────────────────────────
     // When both sides press a shout button simultaneously, two independent
-    // calls are created (A→B and B→A).  Both auto-accept, producing two
-    // parallel WebRTC audio paths whose echo cancellation fights itself
-    // and causes the call to cut in and out.  Resolve by tie-breaking on
+    // calls are created (A→B and B→A).  Resolve by tie-breaking on
     // client ID: lower ID keeps its outgoing call, higher ID yields.
+    // The losing side auto-accepts since both users already pressed the button.
+    let shoutGlareAutoAccept = false;
     if (data.lineType === 2) {
       const existingOutgoing = Array.from(this.activeCalls.values()).find(
         (c) =>
@@ -397,10 +428,11 @@ export class LandlineClient {
           this.signaling.sendCallEnd(data.callId);
           return;
         } else {
-          // We lose — cancel our outgoing, accept the incoming below
+          // We lose — cancel our outgoing, auto-accept incoming (both sides want to talk)
           console.log('[Landline Client] Shout glare: we lose, canceling outgoing:', existingOutgoing.callId);
           this.signaling.sendCallEnd(existingOutgoing.callId);
           this.cleanupCall(existingOutgoing.callId);
+          shoutGlareAutoAccept = true;
         }
       }
     }
@@ -418,14 +450,24 @@ export class LandlineClient {
     };
     this.activeCalls.set(data.callId, call);
 
-    // For override (type 0) and shout (type 2) lines, auto-accept —
-    // bypass ring, immediate connect directly to speakers
-    if (data.lineType === 0 || data.lineType === 2) {
-      console.log('[Landline Client] Override/shout call — auto-accepting:', data.callId);
+    // Override (type 0) always auto-accepts — bypass ring, immediate connect
+    // Shout glare (both sides pressed simultaneously) also auto-accepts fully
+    if (data.lineType === 0 || shoutGlareAutoAccept) {
+      console.log('[Landline Client] Auto-accepting call:', data.callId, shoutGlareAutoAccept ? '(shout glare)' : '(override)');
       this.acceptCall(data.callId);
       return;
     }
 
+    // Shout (type 2): auto-accept WebRTC so receiver hears caller (one-way),
+    // but mute our mic until receiver presses the DA button to pick up.
+    if (data.lineType === 2) {
+      console.log('[Landline Client] Shout call — establishing one-way audio, awaiting pickup:', data.callId);
+      call.shoutPendingPickup = true;
+      this.acceptCall(data.callId);
+      return;
+    }
+
+    // Ring (type 1) lines require manual pickup
     this.emitEvent({ type: 'callStateChanged', callId: data.callId, state: 'ringing' });
   }
 

@@ -240,6 +240,28 @@ export class LandlinePeerManager {
     }
   }
 
+  /** Mute local audio tracks for a specific call (receiver hears caller, but caller can't hear receiver) */
+  muteLocalTracks(callId: CallId): void {
+    const entry = this.peers.get(callId);
+    if (!entry) return;
+    for (const sender of entry.pc.getSenders()) {
+      if (sender.track && sender.track.kind === 'audio') {
+        sender.track.enabled = false;
+      }
+    }
+  }
+
+  /** Unmute local audio tracks for a specific call (full duplex) */
+  unmuteLocalTracks(callId: CallId): void {
+    const entry = this.peers.get(callId);
+    if (!entry) return;
+    for (const sender of entry.pc.getSenders()) {
+      if (sender.track && sender.track.kind === 'audio') {
+        sender.track.enabled = true;
+      }
+    }
+  }
+
   /** Check if a call has an active peer connection */
   hasPeer(callId: CallId): boolean {
     return this.peers.has(callId);

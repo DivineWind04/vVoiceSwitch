@@ -359,9 +359,15 @@ class LandlineStore {
         break;
 
       case 'chime':
-        // Incoming call ringing — accept it
+        // Incoming call ringing — accept / pickup
         if (!landlineCallId.startsWith('ll_cfg:')) {
-          this.acceptCall(landlineCallId);
+          const callInfo = this.client?.getCallInfo(landlineCallId);
+          if (callInfo?.shoutPendingPickup) {
+            // Shout line: WebRTC already connected one-way, now enable full duplex
+            this.client?.pickupShoutCall(landlineCallId);
+          } else {
+            this.acceptCall(landlineCallId);
+          }
         }
         break;
 
@@ -602,14 +608,14 @@ class LandlineStore {
             } catch (_) { /* ignore audio errors */ }
           }
         }
-        // Start ring chime for incoming lineType 1 (ring) calls
+        // Start ring chime for incoming lineType 1 (ring) calls only — NOT shout (type 2)
         if (event.state === 'ringing') {
           const call = this.client?.getCallInfo(event.callId);
           if (call && call.lineType === 1 && call.direction === 'incoming') {
             this.startRingChime(event.callId);
           }
         }
-        // Start ringback for outgoing lineType 1 (ring) calls
+        // Start ringback for outgoing lineType 1 (ring) calls only — NOT shout (type 2)
         if (event.state === 'setup') {
           const call = this.client?.getCallInfo(event.callId);
           if (call && call.lineType === 1 && call.direction === 'outgoing') {

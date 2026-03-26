@@ -323,4 +323,9 @@ export interface ActiveCall {
   displayName: string;
   /** When the call was created */
   createdAt: number;
+  /**
+   * Shout (type 2) incoming: WebRTC is connected (receiver hears caller)
+   * but receiver's mic is muted until they press the DA button to pick up.
+   */
+  shoutPendingPickup?: boolean;
 }
