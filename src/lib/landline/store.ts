@@ -344,12 +344,9 @@ class LandlineStore {
           }
           // Find the configured line that produced this cfgId
           const cfgLine = this.configuredLines.find(l => this.makeCfgId(l) === landlineCallId);
-          if (cfgLine && cfgLine.targets.length > 1 && cfgLine.lineType === 2) {
-            // Shout line (type 2) — fan out to all targets
+          if (cfgLine && cfgLine.targets.length > 1) {
+            // Multi-target line — fan out to all targets (backend), UI shows one composite button
             this.initiateShout(cfgLine);
-          } else if (cfgLine && cfgLine.targets.length > 1) {
-            // Non-shout multi-target (override/ring) — find first online target from roster
-            this.initiateToFirstOnline(cfgLine);
           } else {
             // Single-target line
             const parts = landlineCallId.split(':');
@@ -415,20 +412,29 @@ class LandlineStore {
 
   // ─── Shout Fan-Out ─────────────────────────────────────────────────
 
-  /** Initiate calls to all targets in a shout line */
+  /** Initiate calls to all targets in a multi-target line */
   private initiateShout(cfgLine: LandlineConfiguredLine): void {
     const groupKey = this.makeCfgId(cfgLine);
-    const callIds: CallId[] = [];
 
+    // Pre-register the group key BEFORE making calls, so that refreshGgStatus()
+    // triggered by each callPosition() can find the group and won't leak sub-calls
+    // as individual unmatched buttons.
+    this.shoutGroupCalls.set(groupKey, []);
+
+    const callIds: CallId[] = [];
     for (const target of cfgLine.targets) {
       const callId = this.callPosition(target.facility, target.position, cfgLine.lineType);
-      if (callId) callIds.push(callId);
+      if (callId) {
+        callIds.push(callId);
+        // Update the group incrementally so mid-loop refreshes see all IDs so far
+        this.shoutGroupCalls.set(groupKey, [...callIds]);
+      }
     }
 
-    if (callIds.length > 0) {
-      this.shoutGroupCalls.set(groupKey, callIds);
-      console.log('[Landline Store] Shout initiated:', groupKey, callIds.length, 'calls');
+    if (callIds.length === 0) {
+      this.shoutGroupCalls.delete(groupKey);
     }
+    console.log('[Landline Store] Multi-target initiated:', groupKey, callIds.length, 'calls');
   }
 
   /** For non-shout multi-target lines (override/ring): call the first online target from the roster */
@@ -490,11 +496,16 @@ class LandlineStore {
     for (const cfgLine of this.configuredLines) {
       const cfgId = this.makeCfgId(cfgLine);
 
-      // Check for shout group calls first (multi-target)
+      // Check for multi-target (shout group) calls
       const shoutCallIds = this.shoutGroupCalls.get(cfgId);
-      if (shoutCallIds && shoutCallIds.length > 0) {
-        // Match shout sub-calls from active entries
-        const shoutEntries = activeEntries.filter((e: any) => shoutCallIds.includes(e.landlineCallId));
+      if (shoutCallIds) {
+        // Match sub-calls by call ID, and also by target position name (catches any
+        // calls made before the group map was populated mid-loop)
+        const targetNames = new Set(cfgLine.targets.map(t => t.position.toUpperCase()));
+        const shoutEntries = activeEntries.filter((e: any) =>
+          shoutCallIds.includes(e.landlineCallId) ||
+          (e.landlineDirection === 'outgoing' && targetNames.has((e.otherPosition || '').toUpperCase()))
+        );
         for (const e of shoutEntries) matchedCallIds.add(e.landlineCallId);
 
         // Derive composite status: any connected → ok, any ringing → ringing, else ended → off
@@ -506,39 +517,41 @@ class LandlineStore {
 
         // Clean up ended shout groups
         const aliveIds = shoutCallIds.filter(id => activeEntries.some((e: any) => e.landlineCallId === id));
-        if (aliveIds.length === 0) {
+        if (aliveIds.length === 0 && shoutEntries.length === 0) {
           this.shoutGroupCalls.delete(cfgId);
           compositeStatus = 'off';
-        } else {
+        } else if (aliveIds.length > 0) {
           this.shoutGroupCalls.set(cfgId, aliveIds);
         }
 
         entries.push({
-          call: `LL_SHOUT_${cfgLine.targetPosition}`,
+          call: `LL_GROUP_${cfgLine.targetPosition}`,
           call_name: cfgLine.label,
           status: compositeStatus,
           isLandline: true,
-          landlineCallId: compositeStatus === 'off' ? cfgId : cfgId,
+          landlineCallId: cfgId,
           landlineTargetFacility: cfgLine.targetFacility,
           landlineTargetPosition: cfgLine.targetPosition,
           lineType: cfgLine.lineType,
-          isShout: true,
+          isShout: cfgLine.targets.length > 1,
           shoutCallIds: aliveIds,
         });
         continue;
       }
 
-      // Single-target: try to match an active call
-      const matchingCall = activeEntries.find((entry: any) => {
+      // Single or multi-target without active shout group: match by target position
+      const targetNames = new Set(cfgLine.targets.map(t => t.position.toUpperCase()));
+      const matchingCalls = activeEntries.filter((entry: any) => {
         const remoteName = (entry.otherPosition || '').toUpperCase();
-        // Check against all targets (usually just one for non-shout)
-        return cfgLine.targets.some(t => remoteName === t.position.toUpperCase());
+        return targetNames.has(remoteName) && !matchedCallIds.has(entry.landlineCallId);
       });
 
-      if (matchingCall) {
-        matchedCallIds.add(matchingCall.landlineCallId);
+      if (matchingCalls.length > 0) {
+        for (const mc of matchingCalls) matchedCallIds.add(mc.landlineCallId);
+        // Use the first matching call for display status, but mark all as matched
+        const firstMatch = matchingCalls[0];
         entries.push({
-          ...matchingCall,
+          ...firstMatch,
           call_name: cfgLine.label,
           lineType: cfgLine.lineType,
           landlineTargetFacility: cfgLine.targetFacility,
