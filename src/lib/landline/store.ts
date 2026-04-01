@@ -344,9 +344,12 @@ class LandlineStore {
           }
           // Find the configured line that produced this cfgId
           const cfgLine = this.configuredLines.find(l => this.makeCfgId(l) === landlineCallId);
-          if (cfgLine && cfgLine.targets.length > 1) {
-            // Shout line — fan out to all targets
+          if (cfgLine && cfgLine.targets.length > 1 && cfgLine.lineType === 2) {
+            // Shout line (type 2) — fan out to all targets
             this.initiateShout(cfgLine);
+          } else if (cfgLine && cfgLine.targets.length > 1) {
+            // Non-shout multi-target (override/ring) — find first online target from roster
+            this.initiateToFirstOnline(cfgLine);
           } else {
             // Single-target line
             const parts = landlineCallId.split(':');
@@ -425,6 +428,30 @@ class LandlineStore {
     if (callIds.length > 0) {
       this.shoutGroupCalls.set(groupKey, callIds);
       console.log('[Landline Store] Shout initiated:', groupKey, callIds.length, 'calls');
+    }
+  }
+
+  /** For non-shout multi-target lines (override/ring): call the first online target from the roster */
+  private initiateToFirstOnline(cfgLine: LandlineConfiguredLine): void {
+    const roster: RosterEntry[] = this.storeGet?.()?.landlineRoster ?? [];
+    // Find the first target whose position appears in the current roster
+    const onlineTarget = cfgLine.targets.find(t =>
+      roster.some(r =>
+        r.position.toUpperCase() === t.position.toUpperCase() ||
+        (r.assumedPositions || []).some(ap => ap.toUpperCase() === t.position.toUpperCase())
+      )
+    );
+
+    if (onlineTarget) {
+      console.log('[Landline Store] Multi-target override/ring — calling first online target:', onlineTarget.position);
+      this.callPosition(onlineTarget.facility, onlineTarget.position, cfgLine.lineType);
+    } else {
+      // No target online — try the first target anyway (server will reject if not available)
+      console.log('[Landline Store] Multi-target override/ring — no target online, trying first target:', cfgLine.targets[0]?.position);
+      const first = cfgLine.targets[0];
+      if (first) {
+        this.callPosition(first.facility, first.position, cfgLine.lineType);
+      }
     }
   }
 
