@@ -138,21 +138,34 @@ function SettingModal({ open, setModal }: SettingModalProps) {
         }
     }, []);
 
-    // Build facility options from top-level childFacilities
+    // Build facility options from top-level childFacilities, plus the parent itself if it has positions
     const facilities = useMemo(() => {
-        if (!positionsData || !positionsData.childFacilities) return [];
-        return positionsData.childFacilities.map(f => ({
+        if (!positionsData) return [];
+        const children = (positionsData.childFacilities || []).map(f => ({
             value: f.id,
             label: f.name || f.id,
         }));
+        if (positionsData.positions && positionsData.positions.length > 0) {
+            return [
+                { value: positionsData.id, label: positionsData.name || positionsData.id },
+                ...children,
+            ];
+        }
+        return children;
     }, [positionsData]);
 
     // Get positions for the selected facility, filtered by search
     const filteredPositions = useMemo(() => {
         if (!positionsData || !selectedFacility) return [];
-        const facility = positionsData.childFacilities?.find(f => f.id === selectedFacility);
-        if (!facility) return [];
-        const all = collectPositions(facility);
+        let all: Position[];
+        if (selectedFacility === positionsData.id) {
+            // Parent facility selected — show only its direct positions
+            all = [...(positionsData.positions || [])];
+        } else {
+            const facility = positionsData.childFacilities?.find(f => f.id === selectedFacility);
+            if (!facility) return [];
+            all = collectPositions(facility);
+        }
         if (!search.trim()) return all;
         const q = search.toLowerCase();
         return all.filter(p =>

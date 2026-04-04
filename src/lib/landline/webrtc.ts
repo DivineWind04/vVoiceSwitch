@@ -330,11 +330,13 @@ export class LandlinePeerManager {
     };
 
     pc.ontrack = (event) => {
-      const stream = event.streams[0];
+      const stream = event.streams[0] ?? new MediaStream([event.track]);
       if (stream) {
         // Route remote audio through a PSTN telephone filter chain:
         // Bandpass 300–3400 Hz (ITU-T G.712) + dynamics compression + soft clip
         const ctx = new AudioContext();
+        // Resume AudioContext — it starts suspended outside user gesture handlers
+        ctx.resume().catch(() => {});
         const source = ctx.createMediaStreamSource(stream);
 
         // High-pass at 300 Hz — cuts low rumble
