@@ -134,11 +134,11 @@ export function findPositionByCallsign(data: Facility, callsign: string): {
   facility: Facility | null;
 } | null {
   // Search recursively through facility tree
-  function search(facility: Facility): { position: any; facility: Facility } | null {
+  function search(facility: Facility, matchFn: (cs: string) => boolean): { position: any; facility: Facility } | null {
     // Check positions at this level
     if (facility.positions) {
       for (const pos of facility.positions) {
-        if (pos.cs === callsign) {
+        if (matchFn(pos.cs)) {
           return { position: pos, facility };
         }
       }
@@ -147,7 +147,7 @@ export function findPositionByCallsign(data: Facility, callsign: string): {
     // Search child facilities
     if (facility.childFacilities) {
       for (const child of facility.childFacilities) {
-        const result = search(child);
+        const result = search(child, matchFn);
         if (result) return result;
       }
     }
@@ -155,7 +155,18 @@ export function findPositionByCallsign(data: Facility, callsign: string): {
     return null;
   }
   
-  return search(data);
+  // Try exact match first
+  const exact = search(data, (cs) => cs === callsign);
+  if (exact) return exact;
+
+  // Relief position matching: "PAO_1_TWR" → "PAO_TWR"
+  const baseCallsign = callsign.replace(/_\d+_/, '_');
+  if (baseCallsign !== callsign) {
+    const relief = search(data, (cs) => cs === baseCallsign);
+    if (relief) return relief;
+  }
+
+  return null;
 }
 
 /**

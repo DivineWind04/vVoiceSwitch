@@ -85,6 +85,32 @@ const StvsBase: React.FC = () => {
   const vvscsHandleButtonPress = useCoreStore((s: any) => s.vvscsHandleButtonPress);
   const landlineHandleButtonPress = useCoreStore((s: any) => s.landlineHandleButtonPress);
   const setActiveDialLine = useCoreStore((s: any) => s.setActiveDialLine);
+  const activeDialLine = useCoreStore((s: any) => s.activeDialLine);
+
+  // REL button: release all active G/G calls
+  const handleRelease = useCallback(() => {
+    const activeCalls = (ggData || []).filter((call: any) =>
+      call && (call.status === 'ok' || call.status === 'active' || call.status === 'ringing' || call.status === 'chime')
+    );
+    console.log('[STVS REL] Releasing', activeCalls.length, 'active calls');
+    for (const call of activeCalls) {
+      if (call.isLandline && call.landlineCallId) {
+        landlineHandleButtonPress(call.landlineCallId, call.status);
+      } else if (call.isVvscs && call.vvscsLineId) {
+        vvscsHandleButtonPress(call.vvscsLineId, call.status);
+      } else if (call.isVacs && call.vacsCallId) {
+        vacsHandleButtonPress(call.vacsCallId, call.status);
+      } else {
+        const call_id = call.call?.substring(3) || '';
+        const lineType = call.lineType ?? 2;
+        if (call_id) {
+          sendMsg({ type: 'stop', cmd1: call_id, dbl1: lineType });
+        }
+      }
+    }
+    // Also clear any active dial line
+    setActiveDialLine(null);
+  }, [ggData, landlineHandleButtonPress, vvscsHandleButtonPress, vacsHandleButtonPress, sendMsg, setActiveDialLine]);
   
   // Convert ILLUM knob angle (-135 to +135) to brightness (0.1 to 1.0)
   const handleIllumChange = useCallback((angle: number) => {
@@ -260,10 +286,15 @@ const StvsBase: React.FC = () => {
           if (ggItem && ggItem.call) {
             // v-VSCS WebRTC calls — route through v-VSCS handler
             if (ggItem.isLandline && ggItem.landlineCallId) {
-              // LineType 3 dial lines → set active dial line (keypad is always visible)
+              // LineType 3 dial lines → toggle active dial line or end call
               if (ggItem.lineType === 3 && (!ggItem.status || ggItem.status === 'off' || ggItem.status === 'idle')) {
                 const trunkName = ggItem.call_name || ggItem.call || '';
-                onClick = () => setActiveDialLine({ trunkName, lineType: 3 });
+                // Toggle: if same trunk is already active, deactivate it
+                if (activeDialLine?.trunkName === trunkName) {
+                  onClick = () => setActiveDialLine(null);
+                } else {
+                  onClick = () => setActiveDialLine({ trunkName, lineType: 3 });
+                }
               } else {
                 onClick = () => landlineHandleButtonPress(ggItem.landlineCallId, ggItem.status);
               }
@@ -471,6 +502,7 @@ const StvsBase: React.FC = () => {
           label="REL"
           active
           brightness={brightness}
+          onClick={handleRelease}
           style={{
             left: `${(718/899.16)*95}%`,
             top: `${(88/164.4)*100}%`,
