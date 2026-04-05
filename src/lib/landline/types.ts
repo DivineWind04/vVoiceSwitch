@@ -226,6 +226,8 @@ export interface IncomingCallPdu {
   fromFacility: FacilityId;
   fromPosition: PositionName;
   lineType: LineType;
+  /** Which position was targeted (useful when receiving via assumedPositions) */
+  targetPosition?: PositionName;
 }
 
 /** Server relays CALL_ACCEPTED back to initiator */
@@ -328,4 +330,10 @@ export interface ActiveCall {
    * but receiver's mic is muted until they press the DA button to pick up.
    */
   shoutPendingPickup?: boolean;
+  /**
+   * For incoming calls: which of our positions was targeted.
+   * Set when the call arrives via an assumed position, so the UI
+   * can match the call to the correct configured button.
+   */
+  targetPosition?: PositionName;
 }

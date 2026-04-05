@@ -7,6 +7,8 @@ import { vvscsStore, INITIAL_VVSCS_STATE } from './lib/vvscs/store';
 import type { VvscsStoreState } from './lib/vvscs/store';
 import { landlineStore, INITIAL_LANDLINE_STATE } from './lib/landline/store';
 import type { LandlineStoreState, LandlineConfiguredLine, LandlineTarget } from './lib/landline/store';
+import { vnasStore, INITIAL_VNAS_STATE } from './lib/vnas/store';
+import type { VnasStoreState } from './lib/vnas/store';
 
 interface Position {
     cs: string;
@@ -131,7 +133,7 @@ export function resolveDialCode(dialCodeTable: DialCodeTable | null, trunkName: 
     return trunkCodes[dialCode] || null;
 }
 
-interface CoreState extends VacsStoreState, VvscsStoreState, LandlineStoreState {
+interface CoreState extends VacsStoreState, VvscsStoreState, LandlineStoreState, VnasStoreState {
     connected: boolean;
     afv_version: string;
     ptt: boolean;
@@ -223,6 +225,11 @@ interface CoreState extends VacsStoreState, VvscsStoreState, LandlineStoreState 
     disconnectLandline: () => void;
     landlineHandleButtonPress: (landlineCallId: string, currentStatus: string) => void;
     sendLandlineDialCall: (trunkName: string, dialCode: string) => void;
+
+    // vNAS / Sweatbox integration
+    vnasSelectEnvironment: (env: any) => void;
+    vnasLoginWithToken: (vatsimToken: string) => Promise<boolean>;
+    vnasDisconnect: () => Promise<void>;
 }
 
 let call_table: Record<string, [string, number]> = {}
@@ -463,6 +470,8 @@ export const useCoreStore = create<CoreState>((set: any, get: any) => {
     vvscsStore.bindStore(set, get);
     // Bind Landline store bridge to this zustand instance
     landlineStore.bindStore(set, get);
+    // Bind vNAS store bridge to this zustand instance
+    vnasStore.bindStore(set, get);
     // Default override sound for RDVS/IVSR/ETVS (VSCS overrides this in its component)
     landlineStore.setOverrideSoundPath('/Override_Term.wav');
     // Default ring chime for incoming lineType 1 landline calls
@@ -770,6 +779,20 @@ export const useCoreStore = create<CoreState>((set: any, get: any) => {
         sendLandlineDialCall: (trunkName: string, dialCode: string) => {
             landlineStore.sendLandlineDialCall(trunkName, dialCode);
         },
+
+        // vNAS / Sweatbox integration state
+        ...INITIAL_VNAS_STATE,
+
+        // vNAS / Sweatbox integration methods
+        vnasSelectEnvironment: (env: any) => {
+            vnasStore.selectEnvironment(env);
+        },
+        vnasLoginWithToken: async (vatsimToken: string) => {
+            return vnasStore.loginWithToken(vatsimToken);
+        },
+        vnasDisconnect: async () => {
+            await vnasStore.logout();
+        },
     }
 
     function addCall(callType: number, cmd1: string) {
@@ -805,14 +828,21 @@ export const useCoreStore = create<CoreState>((set: any, get: any) => {
     function resetWindow() {
         const { callsign = '', cid = 0 } = get();
         const { selectedPositions: selected_positions } = get();
+        const inSweatbox = vnasStore.getState().isSweatbox;
         // Don't send del/sync until we have both callsign AND positions
         // to avoid wiping server state before we can re-register lines
-        if (!callsign || !selected_positions || selected_positions.length === 0) {
+        // In sweatbox mode, callsign may be empty (no AFV) — only require positions
+        if (!inSweatbox && (!callsign || !selected_positions || selected_positions.length === 0)) {
+            return;
+        }
+        if (inSweatbox && (!selected_positions || selected_positions.length === 0)) {
             return;
         }
         // Cancel any pending sync from a previous resetWindow call
         if (syncTimeout) clearTimeout(syncTimeout);
-        sendMessageNow({ type: 'del', cmd1: '', dbl1: 0 })
+        if (!inSweatbox) {
+            sendMessageNow({ type: 'del', cmd1: '', dbl1: 0 });
+        }
         // Collect all lines from selected positions, preserving order
         // Track placeholder indices for empty [] entries
         const orderedLines: any[] = [];
@@ -996,10 +1026,12 @@ export const useCoreStore = create<CoreState>((set: any, get: any) => {
                     });
                 }
             } else {
-                // AFV line — register normally
+                // AFV line — register normally (skip in sweatbox mode since AFV is unavailable)
                 call_table[line[0]] = [line[2], line[1]];
                 line_order[String(line[0])] = item.originalIndex;
-                addCall(line[1], '' + line[0]);
+                if (!vnasStore.getState().isSweatbox) {
+                    addCall(line[1], '' + line[0]);
+                }
             }
         }
 
@@ -1033,7 +1065,8 @@ export const useCoreStore = create<CoreState>((set: any, get: any) => {
         findFacility(positionData);
 
         // Auto-connect to v-VSCS if position has vvscs: lines and we're not already connected
-        if (vvscsConfigLines.length > 0 && !vvscsStore.isConnected) {
+        // (skip in sweatbox mode — v-VSCS is not available)
+        if (vvscsConfigLines.length > 0 && !vvscsStore.isConnected && !vnasStore.getState().isSweatbox) {
             if (facilityId && posName) {
                 console.log('[resetWindow] Auto-connecting to v-VSCS as', facilityId, posName);
                 vvscsStore.connectVvscs(facilityId, posName);
@@ -1050,7 +1083,8 @@ export const useCoreStore = create<CoreState>((set: any, get: any) => {
 
         // Auto-connect to VACS if position has vacs: lines, we're not already connected,
         // and we have a saved token from a previous session
-        if (vacsConfigLines.length > 0 && !vacsStore.isConnected) {
+        // (skip in sweatbox mode — VACS is not available)
+        if (vacsConfigLines.length > 0 && !vacsStore.isConnected && !vnasStore.getState().isSweatbox) {
             const saved = loadVacsCredentials();
             if (saved) {
                 const positionId = callsign || undefined;
@@ -1066,11 +1100,13 @@ export const useCoreStore = create<CoreState>((set: any, get: any) => {
             }
         }
 
-        cid && addIaCall(1, '' + cid)
-        syncTimeout = setTimeout(() => {
-            sendMessageNow({ type: 'sync' })
-            syncTimeout = null;
-        }, 4000)
+        if (!inSweatbox) {
+            cid && addIaCall(1, '' + cid)
+            syncTimeout = setTimeout(() => {
+                sendMessageNow({ type: 'sync' })
+                syncTimeout = null;
+            }, 4000)
+        }
     }
     setInterval(() => {
         if (!socket) {

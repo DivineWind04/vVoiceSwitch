@@ -345,6 +345,7 @@ export class LandlineClient {
         landlineDirection: call.direction,
         lineType: call.lineType,
         otherPosition: call.remotePosition,
+        targetPosition: call.targetPosition,
       });
     });
     return entries;
@@ -489,6 +490,7 @@ export class LandlineClient {
       lineType: data.lineType,
       displayName: data.fromPosition,
       createdAt: Date.now(),
+      targetPosition: data.targetPosition,
     };
     this.activeCalls.set(data.callId, call);
 

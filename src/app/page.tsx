@@ -33,6 +33,7 @@ export default function Page() {
   const callsign = useCoreStore(s => s.callsign);
   const cid = useCoreStore(s => s.cid);
   const afv_version = useCoreStore(s => s.afv_version);
+  const isSweatbox = useCoreStore(s => s.isSweatbox);
   const updateSelectedPositions = useCoreStore(s => s.updateSelectedPositions);
   const setCurrentUI = useCoreStore(s => s.setCurrentUI);
   const [versionAlert, setVersionAlert] = useState<any>(null);
@@ -191,7 +192,7 @@ export default function Page() {
 
   // Track when UI should be considered "loaded"
   useEffect(() => {
-    if ((connected || isLocalhost) && selectedPositions && selectedPositions.length > 0 && currentUI) {
+    if ((connected || isLocalhost || isSweatbox) && selectedPositions && selectedPositions.length > 0 && currentUI) {
       // Add a small delay to ensure UI components have time to mount
       const timer = setTimeout(() => {
         setUiLoaded(true);
@@ -201,7 +202,7 @@ export default function Page() {
     } else {
       setUiLoaded(false);
     }
-  }, [connected, isLocalhost, selectedPositions, currentUI]);
+  }, [connected, isLocalhost, isSweatbox, selectedPositions, currentUI]);
 
   // Update page title to reflect the loaded UI
   useEffect(() => {
@@ -290,11 +291,20 @@ export default function Page() {
         />
       )}
       
-      {!connected && !isLocalhost ? (
+      {!connected && !isLocalhost && !isSweatbox ? (
         <div className="flex items-center justify-center min-h-screen">
           <div className="text-center text-white">
             <h2 className="text-2xl font-bold mb-4">AFV Client</h2>
             <p className="text-lg text-zinc-300">Not Connected</p>
+            <p className="text-sm text-zinc-400 mt-2">
+              Connect AFV or select a sweatbox environment in Settings
+            </p>
+            <button
+              onClick={() => setSettingModal(true)}
+              className="mt-4 bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
+            >
+              Open Settings
+            </button>
           </div>
         </div>
       ) : !selectedPositions || selectedPositions.length === 0 || !uiLoaded ? (

@@ -102,6 +102,8 @@ export interface IncomingCallPdu {
   fromFacility: FacilityId;
   fromPosition: PositionName;
   lineType: LineType;
+  /** Which position was targeted (useful when receiving via assumedPositions) */
+  targetPosition?: PositionName;
 }
 
 export interface CallAcceptedRelayPdu {

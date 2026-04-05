@@ -31093,27 +31093,27 @@
               "ui": "ivsr",
               "lines": [
                 [
-                  "ll:MOD_J_APP,OAK_DEP,OAK_D_DEP,OAK_F_DEP,OAK_G_APP,OAK_M_APP,OAK_S_APP,SFO_2_GND,SFO_A_TWR,SFO_DEL,SFO_Q_DEP,SFO_TWR",
+                  "ll:OAK_DEP",
                   0,
                   "RICHM"
                 ],
                 [
-                  "ll:SFO_2_GND,SFO_A_TWR,SFO_DEL,SFO_DEP,SFO_TWR",
+                  "ll:SFO_DEP",
                   0,
                   "SUTRO"
                 ],
                 [
-                  "ll:NCT_APP,NCT_RDO,SFO_2_GND,SFO_A_TWR,SFO_DEL,SFO_G_APP,SFO_N_APP,SFO_TWR,SFO_W_APP",
+                  "ll:NCT_APP,SFO_W_APP",
                   0,
                   "WOODS"
                 ],
                 [
-                  "ll:SFO_2_GND,SFO_A_TWR,SFO_DEL,SFO_F_APP,SFO_G_APP,SFO_N_APP,SFO_TWR",
+                  "ll:SFO_F_APP",
                   0,
                   "FOSTR"
                 ],
                 [
-                  "ll:SFO_2_GND,SFO_A_TWR,SFO_DEL,SFO_TWR",
+                  "ll:NCT_APP,SFO_B_APP,SFO_Z_APP,SFO_F_APP,SFO_G_APP,SFO_N_APP,SFO_W_APP,OAK_D_DEP,OAK_F_DEP,SFO_Q_DEP,OAK_DEP,SFO_DEP",
                   2,
                   "NCT"
                 ],
@@ -31123,12 +31123,12 @@
                   "ZOA"
                 ],
                 [
-                  "ll:SFO_2_GND,SFO_A_TWR,SFO_TWR",
+                  "ll:SFO_A_TWR,SFO_TWR",
                   0,
                   "LC"
                 ],
                 [
-                  "ll:SFO_2_GND,SFO_A_TWR,SFO_DEL,SFO_TWR",
+                  "ll:OAK_TWR",
                   0,
                   "OAK 1"
                 ],
@@ -31152,27 +31152,27 @@
               "ui": "ivsr",
               "lines": [
                 [
-                  "ll:MOD_J_APP,OAK_DEP,OAK_D_DEP,OAK_F_DEP,OAK_G_APP,OAK_M_APP,OAK_S_APP,SFO_2_GND,SFO_A_TWR,SFO_DEL,SFO_Q_DEP,SFO_TWR",
+                  "ll:OAK_DEP",
                   0,
                   "RICHM"
                 ],
                 [
-                  "ll:SFO_2_GND,SFO_A_TWR,SFO_DEL,SFO_DEP,SFO_TWR",
+                  "ll:SFO_DEP",
                   0,
                   "SUTRO"
                 ],
                 [
-                  "ll:NCT_APP,NCT_RDO,SFO_2_GND,SFO_A_TWR,SFO_DEL,SFO_G_APP,SFO_N_APP,SFO_TWR,SFO_W_APP",
+                  "ll:NCT_APP,SFO_W_APP",
                   0,
                   "WOODS"
                 ],
                 [
-                  "ll:SFO_2_GND,SFO_A_TWR,SFO_DEL,SFO_F_APP,SFO_G_APP,SFO_N_APP,SFO_TWR",
+                  "ll:SFO_F_APP",
                   0,
                   "FOSTR"
                 ],
                 [
-                  "ll:SFO_2_GND,SFO_A_TWR,SFO_DEL,SFO_TWR",
+                  "ll:NCT_APP,SFO_B_APP,SFO_Z_APP,SFO_F_APP,SFO_G_APP,SFO_N_APP,SFO_W_APP,OAK_D_DEP,OAK_F_DEP,SFO_Q_DEP,OAK_DEP,SFO_DEP",
                   2,
                   "NCT"
                 ],
@@ -31211,27 +31211,27 @@
               "ui": "ivsr",
               "lines": [
                 [
-                  "ll:MOD_J_APP,OAK_DEP,OAK_D_DEP,OAK_F_DEP,OAK_G_APP,OAK_M_APP,OAK_S_APP,SFO_A_TWR,SFO_DEL,SFO_GND,SFO_Q_DEP,SFO_TWR",
+                  "ll:OAK_DEP",
                   0,
                   "RICHM"
                 ],
                 [
-                  "ll:SFO_A_TWR,SFO_DEL,SFO_DEP,SFO_GND,SFO_TWR",
+                  "ll:SFO_DEP",
                   0,
                   "SUTRO"
                 ],
                 [
-                  "ll:NCT_APP,NCT_RDO,SFO_A_TWR,SFO_DEL,SFO_GND,SFO_G_APP,SFO_N_APP,SFO_TWR,SFO_W_APP",
+                  "ll:NCT_APP,SFO_W_APP",
                   0,
                   "WOODS"
                 ],
                 [
-                  "ll:SFO_A_TWR,SFO_DEL,SFO_F_APP,SFO_GND,SFO_G_APP,SFO_N_APP,SFO_TWR",
+                  "ll:SFO_F_APP",
                   0,
                   "FOSTR"
                 ],
                 [
-                  "ll:SFO_A_TWR,SFO_DEL,SFO_GND,SFO_TWR",
+                  "ll:NCT_APP,SFO_B_APP,SFO_Z_APP,SFO_F_APP,SFO_G_APP,SFO_N_APP,SFO_W_APP,OAK_D_DEP,OAK_F_DEP,SFO_Q_DEP,OAK_DEP,SFO_DEP",
                   2,
                   "NCT"
                 ],
@@ -31270,27 +31270,27 @@
               "ui": "ivsr",
               "lines": [
                 [
-                  "ll:MOD_J_APP,OAK_DEP,OAK_D_DEP,OAK_F_DEP,OAK_G_APP,OAK_M_APP,OAK_S_APP,SFO_Q_DEP,SFO_TWR",
+                  "ll:OAK_DEP",
                   0,
                   "RICHM"
                 ],
                 [
-                  "ll:SFO_DEP,SFO_TWR",
+                  "ll:SFO_DEP",
                   0,
                   "SUTRO"
                 ],
                 [
-                  "ll:NCT_APP,NCT_RDO,SFO_G_APP,SFO_N_APP,SFO_TWR,SFO_W_APP",
+                  "ll:NCT_APP,SFO_W_APP",
                   0,
                   "WOODS"
                 ],
                 [
-                  "ll:SFO_F_APP,SFO_G_APP,SFO_N_APP,SFO_TWR",
+                  "ll:SFO_F_APP",
                   0,
                   "FOSTR"
                 ],
                 [
-                  "ll:SFO_TWR",
+                  "ll:NCT_APP,SFO_B_APP,SFO_Z_APP,SFO_F_APP,SFO_G_APP,SFO_N_APP,SFO_W_APP,OAK_D_DEP,OAK_F_DEP,SFO_Q_DEP,OAK_DEP,SFO_DEP",
                   2,
                   "NCT"
                 ],
@@ -31329,27 +31329,27 @@
               "ui": "ivsr",
               "lines": [
                 [
-                  "ll:MOD_J_APP,OAK_DEP,OAK_D_DEP,OAK_F_DEP,OAK_G_APP,OAK_M_APP,OAK_S_APP,SFO_Q_DEP,SFO_TWR",
+                  "ll:OAK_DEP",
                   0,
                   "RICHM"
                 ],
                 [
-                  "ll:SFO_DEP,SFO_TWR",
+                  "ll:SFO_DEP",
                   0,
                   "SUTRO"
                 ],
                 [
-                  "ll:NCT_APP,NCT_RDO,SFO_G_APP,SFO_N_APP,SFO_TWR,SFO_W_APP",
+                  "ll:NCT_APP,SFO_W_APP",
                   0,
                   "WOODS"
                 ],
                 [
-                  "ll:SFO_F_APP,SFO_G_APP,SFO_N_APP,SFO_TWR",
+                  "ll:SFO_F_APP",
                   0,
                   "FOSTR"
                 ],
                 [
-                  "ll:SFO_TWR",
+                  "ll:NCT_APP,SFO_B_APP,SFO_Z_APP,SFO_F_APP,SFO_G_APP,SFO_N_APP,SFO_W_APP,OAK_D_DEP,OAK_F_DEP,SFO_Q_DEP,OAK_DEP,SFO_DEP",
                   2,
                   "NCT"
                 ],
@@ -31388,27 +31388,27 @@
               "ui": "ivsr",
               "lines": [
                 [
-                  "ll:MOD_J_APP,OAK_DEP,OAK_D_DEP,OAK_F_DEP,OAK_G_APP,OAK_M_APP,OAK_S_APP,SFO_A_TWR,SFO_Q_DEP",
+                  "ll:OAK_DEP",
                   0,
                   "RICHM"
                 ],
                 [
-                  "ll:SFO_A_TWR,SFO_DEP",
+                  "ll:SFO_DEP",
                   0,
                   "SUTRO"
                 ],
                 [
-                  "ll:NCT_APP,NCT_RDO,SFO_A_TWR,SFO_G_APP,SFO_N_APP,SFO_W_APP",
+                  "ll:NCT_APP,SFO_W_APP",
                   0,
                   "WOODS"
                 ],
                 [
-                  "ll:SFO_A_TWR,SFO_F_APP,SFO_G_APP,SFO_N_APP",
+                  "ll:SFO_F_APP",
                   0,
                   "FOSTR"
                 ],
                 [
-                  "ll:SFO_A_TWR",
+                  "ll:NCT_APP,SFO_B_APP,SFO_Z_APP,SFO_F_APP,SFO_G_APP,SFO_N_APP,SFO_W_APP,OAK_D_DEP,OAK_F_DEP,SFO_Q_DEP,OAK_DEP,SFO_DEP",
                   2,
                   "NCT"
                 ],
@@ -31447,27 +31447,27 @@
               "ui": "ivsr",
               "lines": [
                 [
-                  "ll:MOD_J_APP,OAK_DEP,OAK_D_DEP,OAK_F_DEP,OAK_G_APP,OAK_M_APP,OAK_S_APP,SFO_A_TWR,SFO_Q_DEP",
+                  "ll:OAK_DEP",
                   0,
                   "RICHM"
                 ],
                 [
-                  "ll:SFO_A_TWR,SFO_DEP",
+                  "ll:SFO_DEP",
                   0,
                   "SUTRO"
                 ],
                 [
-                  "ll:NCT_APP,NCT_RDO,SFO_A_TWR,SFO_G_APP,SFO_N_APP,SFO_W_APP",
+                  "ll:NCT_APP,SFO_W_APP",
                   0,
                   "WOODS"
                 ],
                 [
-                  "ll:SFO_A_TWR,SFO_F_APP,SFO_G_APP,SFO_N_APP",
+                  "ll:SFO_F_APP",
                   0,
                   "FOSTR"
                 ],
                 [
-                  "ll:SFO_A_TWR",
+                  "ll:NCT_APP,SFO_B_APP,SFO_Z_APP,SFO_F_APP,SFO_G_APP,SFO_N_APP,SFO_W_APP,OAK_D_DEP,OAK_F_DEP,SFO_Q_DEP,OAK_DEP,SFO_DEP",
                   2,
                   "NCT"
                 ],
@@ -31569,12 +31569,12 @@
                   "NCT-2"
                 ],
                 [
-                  "ll:OAK_DEP,OAK_D_DEP,OAK_F_DEP,OAK_N_TWR,SFO_DEP,SFO_Q_DEP",
+                  "ll:OAK_D_DEP",
                   0,
                   "DIABLO"
                 ],
                 [
-                  "ll:MOD_APP,MOD_J_APP,OAK_G_APP,OAK_S_APP",
+                  "ll:OAK_G_APP",
                   0,
                   "GROVE"
                 ],
@@ -32235,7 +32235,7 @@
               "ui": "etvs",
               "lines": [
                 [
-                  "ll:HWD_TWR",
+                  "ll:MOD_APP,MOD_J_APP,MOD_K_APP,NCT_APP,NCT_RDO,OAK_DEP,OAK_D_DEP,OAK_F_DEP,OAK_G_APP,OAK_M_APP,OAK_S_APP,SFO_DEP,SFO_Q_DEP",
                   2,
                   "NCT"
                 ],
@@ -32254,7 +32254,7 @@
               "ui": "etvs",
               "lines": [
                 [
-                  "ll:HWD_GND",
+                  "ll:MOD_APP,MOD_J_APP,MOD_K_APP,NCT_APP,NCT_RDO,OAK_DEP,OAK_D_DEP,OAK_F_DEP,OAK_G_APP,OAK_M_APP,OAK_S_APP,SFO_DEP,SFO_Q_DEP",
                   2,
                   "NCT"
                 ],
@@ -32495,7 +32495,7 @@
               "ui": "stvs",
               "lines": [
                 [
-                  "ll:PAO_TWR",
+                  "ll:NCT_APP,MRY_APP,MRY_F_APP,SJC_K_APP,SJC_L_APP,SJC_M_APP,SJC_Q_APP,SJC_DEP,SFO_B_APP,SFO_Z_APP,SFO_F_APP,SFO_G_APP,SFO_N_APP,SFO_W_APP,OAK_G_APP,OAK_M_APP,OAK_S_APP,MOD_J_APP,MOD_APP",
                   2,
                   "NCT"
                 ],
@@ -32514,7 +32514,7 @@
               "ui": "stvs",
               "lines": [
                 [
-                  "ll:PAO_GND",
+                  "ll:NCT_APP,MRY_APP,MRY_F_APP,SJC_K_APP,SJC_L_APP,SJC_M_APP,SJC_Q_APP,SJC_DEP,SFO_B_APP,SFO_Z_APP,SFO_F_APP,SFO_G_APP,SFO_N_APP,SFO_W_APP,OAK_G_APP,OAK_M_APP,OAK_S_APP,MOD_J_APP,MOD_APP",
                   2,
                   "NCT"
                 ],
@@ -32540,7 +32540,7 @@
               "ui": "stvs",
               "lines": [
                 [
-                  "ll:RHV_TWR",
+                  "ll:NCT_APP,MRY_APP,MRY_F_APP,SJC_K_APP,SJC_L_APP,SJC_M_APP,SJC_Q_APP,SJC_DEP",
                   2,
                   "NCT"
                 ],
@@ -32564,7 +32564,7 @@
               "ui": "stvs",
               "lines": [
                 [
-                  "ll:RHV_GND",
+                  "ll:NCT_APP,MRY_APP,MRY_F_APP,SJC_K_APP,SJC_L_APP,SJC_M_APP,SJC_Q_APP,SJC_DEP",
                   2,
                   "NCT"
                 ],
@@ -32685,7 +32685,7 @@
               "ui": "stvs",
               "lines": [
                 [
-                  "ll:NCT_APP,NCT_RDO",
+                  "ll:NCT_APP,MRY_APP,MRY_F_APP,SJC_K_APP,SJC_L_APP,SJC_M_APP,SJC_Q_APP,SJC_DEP",
                   2,
                   "NCT"
                 ],
@@ -32704,7 +32704,7 @@
               "ui": "stvs",
               "lines": [
                 [
-                  "ll:NCT_APP,NCT_RDO",
+                  "ll:NCT_APP,MRY_APP,MRY_F_APP,SJC_K_APP,SJC_L_APP,SJC_M_APP,SJC_Q_APP,SJC_DEP",
                   2,
                   "NCT"
                 ],
@@ -32730,7 +32730,7 @@
               "ui": "stvs",
               "lines": [
                 [
-                  "ll:SQL_TWR",
+                  "ll:MOD_APP,MOD_J_APP,MRY_APP,MRY_F_APP,NCT_APP,NCT_RDO,OAK_DEP,OAK_D_DEP,OAK_G_APP,OAK_M_APP,OAK_S_APP,SFO_B_APP,SFO_DEP,SFO_F_APP,SFO_G_APP,SFO_N_APP,SFO_W_APP,SFO_Z_APP,SJC_DEP,SJC_K_APP,SJC_L_APP,SJC_M_APP,SJC_Q_APP",
                   2,
                   "NCT"
                 ],

@@ -302,6 +302,7 @@ export class SignalingRoom implements DurableObject {
       fromFacility: initiator.facility!,
       fromPosition: initiator.position!,
       lineType,
+      targetPosition,
     });
   }
 

@@ -6,6 +6,8 @@ import { useCoreStore, type Facility } from '../model';
 import { useMemo, useState, useCallback, useEffect, useRef } from 'react';
 import { loadVacsCredentials, clearVacsCredentials } from '../lib/vacs/store';
 import { VVSCS_SERVER_URL } from '../lib/vvscs/types';
+import { vnasStore } from '../lib/vnas/store';
+import type { VnasEnvironment } from '../lib/vnas/types';
 
 interface Position {
     cs: string;
@@ -51,6 +53,16 @@ function SettingModal({ open, setModal }: SettingModalProps) {
     const connectVvscs = useCoreStore(s => s.connectVvscs)
     const disconnectVvscs = useCoreStore(s => s.disconnectVvscs)
     const callsign = useCoreStore(s => s.callsign)
+    const isSweatbox = useCoreStore(s => s.isSweatbox)
+    const vnasConfig = useCoreStore(s => s.vnasConfig)
+    const vnasEnvironment = useCoreStore(s => s.vnasEnvironment)
+    const vnasHubConnected = useCoreStore(s => s.vnasHubConnected)
+    const vnasStatus = useCoreStore(s => s.vnasStatus)
+    const vnasSession = useCoreStore(s => s.vnasSession)
+    const vnasError = useCoreStore(s => s.vnasError)
+    const vnasSelectEnvironment = useCoreStore(s => s.vnasSelectEnvironment)
+    const vnasLoginWithToken = useCoreStore(s => s.vnasLoginWithToken)
+    const vnasDisconnect = useCoreStore(s => s.vnasDisconnect)
     const [selectedFacility, setSelectedFacility] = useState<string | null>(null)
     const [search, setSearch] = useState('')
     const [selectedPosition, setSelectedPosition] = useState<Position | null>(null)
@@ -61,8 +73,11 @@ function SettingModal({ open, setModal }: SettingModalProps) {
     const [vvscsFacility, setVvscsFacility] = useState('')
     const [vvscsPosition, setVvscsPosition] = useState('')
     const vacsPopupRef = useRef<Window | null>(null)
+    const vnasPopupRef = useRef<Window | null>(null)
+    const [vnasLoggingIn, setVnasLoggingIn] = useState(false)
+    const [vnasLoginError, setVnasLoginError] = useState<string | null>(null)
 
-    // Listen for OAuth callback messages from the popup
+    // Listen for OAuth callback messages from the popup (VACS and vNAS)
     useEffect(() => {
         const handleMessage = (event: MessageEvent) => {
             // Only accept messages from our own origin
@@ -75,8 +90,26 @@ function SettingModal({ open, setModal }: SettingModalProps) {
                 return; // Not a JSON message
             }
 
-            // Check if this is a VACS auth result
             if (!data || typeof data.success === 'undefined') return;
+
+            // Check if this is a vNAS auth result
+            if (data.source === 'vnas') {
+                setVnasLoggingIn(false);
+                setVnasLoginError(null);
+                if (data.success && data.vatsimToken) {
+                    console.log('[Settings] vNAS OAuth success');
+                    vnasLoginWithToken(data.vatsimToken).catch((err) => {
+                        setVnasLoginError(err instanceof Error ? err.message : 'Login failed');
+                    });
+                } else {
+                    const msg = data.error || 'vNAS authentication failed';
+                    console.error('[Settings] vNAS OAuth failed:', msg);
+                    setVnasLoginError(msg);
+                }
+                return;
+            }
+
+            // Check if this is a VACS auth result
             if (!data.wsToken && !data.error) return;
 
             setVacsLoggingIn(false);
@@ -96,9 +129,14 @@ function SettingModal({ open, setModal }: SettingModalProps) {
 
         window.addEventListener('message', handleMessage);
         return () => window.removeEventListener('message', handleMessage);
-    }, [callsign, connectVacs]);
+    }, [callsign, connectVacs, vnasLoginWithToken]);
 
-    /** Login with VATSIM via OAuth2 popup */
+    // Fetch vNAS config on first mount
+    useEffect(() => {
+        vnasStore.fetchConfig().catch(() => {/* ignore */});
+    }, []);
+
+    /** Login with VATSIM via OAuth2 popup (VACS) */
     const handleVatsimLogin = useCallback(async () => {
         setVacsLoggingIn(true);
         setVacsLoginError(null);
@@ -214,6 +252,80 @@ function SettingModal({ open, setModal }: SettingModalProps) {
         // Don't clear inputs so user can see what they connected as
     }, [vvscsFacility, vvscsPosition, connectVvscs]);
 
+    /** Login with VATSIM for vNAS (sweatbox) via OAuth2 popup */
+    const handleVnasLogin = useCallback(async () => {
+        setVnasLoggingIn(true);
+        setVnasLoginError(null);
+        try {
+            const res = await fetch('/api/vnas/auth/login');
+            const data = await res.json();
+
+            if (!data.url) {
+                const msg = data.error || 'Failed to start VATSIM login for vNAS';
+                setVnasLoginError(msg);
+                setVnasLoggingIn(false);
+                return;
+            }
+
+            const popup = window.open(
+                data.url,
+                'vnas-login',
+                'width=600,height=700,menubar=no,toolbar=no,location=no,status=no'
+            );
+            vnasPopupRef.current = popup;
+
+            const checkClosed = setInterval(() => {
+                if (popup?.closed) {
+                    clearInterval(checkClosed);
+                    setVnasLoggingIn(false);
+                    vnasPopupRef.current = null;
+                }
+            }, 500);
+        } catch (err) {
+            const msg = err instanceof Error ? err.message : 'Unknown error';
+            setVnasLoginError(msg);
+            setVnasLoggingIn(false);
+        }
+    }, []);
+
+    /** Handle vNAS environment change */
+    const handleVnasEnvChange = useCallback((envName: string) => {
+        if (!vnasConfig) return;
+        if (!envName) {
+            vnasSelectEnvironment(null);
+            return;
+        }
+        const env = vnasConfig.environments.find(e => e.name === envName);
+        if (env) {
+            vnasSelectEnvironment(env);
+        }
+    }, [vnasConfig, vnasSelectEnvironment]);
+
+    /** Get detected position info from vNAS session */
+    const vnasDetectedPosition = useMemo(() => {
+        return vnasStore.getDetectedPosition();
+    }, [vnasSession]);
+
+    /** Apply vNAS-detected position to the position selector */
+    const handleApplyVnasPosition = useCallback(() => {
+        if (!vnasDetectedPosition || !positionsData) return;
+        // Search all facilities for a position matching the detected callsign
+        const findPosition = (fac: Facility): Position | null => {
+            const pos = fac.positions?.find(p => p.cs === vnasDetectedPosition.callsign);
+            if (pos) return pos;
+            for (const child of fac.childFacilities || []) {
+                const found = findPosition(child);
+                if (found) return found;
+            }
+            return null;
+        };
+        const pos = findPosition(positionsData);
+        if (pos) {
+            updateSelectedPosition([pos]);
+            setModal(false);
+        }
+    }, [vnasDetectedPosition, positionsData, updateSelectedPosition, setModal]);
+
     return (
         <Modal
             title="Select Position"
@@ -223,6 +335,90 @@ function SettingModal({ open, setModal }: SettingModalProps) {
             okButtonProps={{ disabled: !selectedPosition }}
             okText="Connect"
         >
+            {/* vNAS / Sweatbox Environment */}
+            <div style={{ marginBottom: 12, borderBottom: '1px solid #d9d9d9', paddingBottom: 12 }}>
+                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 8 }}>
+                    <span style={{ fontWeight: 500 }}>Server Environment</span>
+                    {isSweatbox && (
+                        <span style={{
+                            fontSize: 11,
+                            padding: '2px 8px',
+                            borderRadius: 4,
+                            background: '#fa8c16',
+                            color: '#fff',
+                        }}>
+                            SWEATBOX
+                        </span>
+                    )}
+                </div>
+                <Select
+                    placeholder="Select environment..."
+                    value={vnasEnvironment?.name || undefined}
+                    onChange={handleVnasEnvChange}
+                    allowClear
+                    style={{ width: '100%', marginBottom: 8 }}
+                    options={(vnasConfig?.environments || [])
+                        .filter(e => !e.isDisabled)
+                        .map(e => ({
+                            value: e.name,
+                            label: `${e.name}${e.isSweatbox ? ' (Sweatbox)' : ''}${e.isPrimary ? ' ★' : ''}`,
+                        }))}
+                    loading={!vnasConfig}
+                    notFoundContent={!vnasConfig ? 'Loading environments...' : 'No environments available'}
+                />
+                {vnasEnvironment && (
+                    <>
+                        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 4 }}>
+                            <span style={{
+                                fontSize: 12,
+                                padding: '2px 8px',
+                                borderRadius: 4,
+                                background: vnasHubConnected ? '#52c41a' : '#d9d9d9',
+                                color: vnasHubConnected ? '#fff' : '#666',
+                            }}>
+                                {vnasStatus}
+                            </span>
+                        </div>
+                        {vnasError && (
+                            <div style={{ fontSize: 12, color: '#ff4d4f', marginBottom: 4 }}>{vnasError}</div>
+                        )}
+                        {vnasLoginError && (
+                            <div style={{ fontSize: 12, color: '#ff4d4f', marginBottom: 4 }}>{vnasLoginError}</div>
+                        )}
+                        {vnasHubConnected ? (
+                            <div>
+                                {vnasDetectedPosition ? (
+                                    <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 4 }}>
+                                        <span style={{ fontSize: 12, color: '#52c41a' }}>
+                                            Detected: {vnasDetectedPosition.callsign} ({vnasDetectedPosition.name}) — {vnasDetectedPosition.artccId}
+                                        </span>
+                                        <Button size="small" type="primary" onClick={handleApplyVnasPosition}>
+                                            Apply
+                                        </Button>
+                                    </div>
+                                ) : (
+                                    <div style={{ fontSize: 12, color: '#999', marginBottom: 4 }}>
+                                        Waiting for session... (connect in vATIS/EuroScope first)
+                                    </div>
+                                )}
+                                <Button size="small" danger onClick={() => vnasDisconnect()}>
+                                    Disconnect vNAS
+                                </Button>
+                            </div>
+                        ) : (
+                            <Button
+                                type="primary"
+                                size="small"
+                                loading={vnasLoggingIn}
+                                onClick={handleVnasLogin}
+                            >
+                                {vnasLoggingIn ? 'Waiting for VATSIM...' : 'Login with VATSIM (vNAS)'}
+                            </Button>
+                        )}
+                    </>
+                )}
+            </div>
+
             <div style={{ display: 'flex', gap: 8, marginBottom: 12 }}>
                 <Select
                     placeholder="Facility"
@@ -290,7 +486,8 @@ function SettingModal({ open, setModal }: SettingModalProps) {
                 )}
             </div>
 
-            {/* VACS WebRTC Connection */}
+            {/* VACS WebRTC Connection — hidden in sweatbox mode */}
+            {!isSweatbox && (
             <div style={{ marginTop: 16, borderTop: '1px solid #d9d9d9', paddingTop: 12 }}>
                 <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 8 }}>
                     <span style={{ fontWeight: 500 }}>VACS (WebRTC)</span>
@@ -363,8 +560,10 @@ function SettingModal({ open, setModal }: SettingModalProps) {
                     </>
                 )}
             </div>
+            )}
 
-            {/* v-VSCS WebRTC Connection */}
+            {/* v-VSCS WebRTC Connection — hidden in sweatbox mode */}
+            {!isSweatbox && (
             <div style={{ marginTop: 16, borderTop: '1px solid #d9d9d9', paddingTop: 12 }}>
                 <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 8 }}>
                     <span style={{ fontWeight: 500 }}>v-VSCS (WebRTC)</span>
@@ -418,6 +617,7 @@ function SettingModal({ open, setModal }: SettingModalProps) {
                     </div>
                 )}
             </div>
+            )}
         </Modal>
     );
 }

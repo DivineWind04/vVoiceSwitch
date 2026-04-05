@@ -500,11 +500,13 @@ class LandlineStore {
       const shoutCallIds = this.shoutGroupCalls.get(cfgId);
       if (shoutCallIds) {
         // Match sub-calls by call ID, and also by target position name (catches any
-        // calls made before the group map was populated mid-loop)
+        // calls made before the group map was populated mid-loop).
+        // For incoming calls with targetPosition (instructor mode), match by targeted position.
         const targetNames = new Set(cfgLine.targets.map(t => t.position.toUpperCase()));
         const shoutEntries = activeEntries.filter((e: any) =>
           shoutCallIds.includes(e.landlineCallId) ||
-          (e.landlineDirection === 'outgoing' && targetNames.has((e.otherPosition || '').toUpperCase()))
+          (e.landlineDirection === 'outgoing' && targetNames.has((e.otherPosition || '').toUpperCase())) ||
+          (e.landlineDirection === 'incoming' && e.targetPosition && targetNames.has((e.targetPosition || '').toUpperCase()))
         );
         for (const e of shoutEntries) matchedCallIds.add(e.landlineCallId);
 
@@ -542,8 +544,20 @@ class LandlineStore {
       // Single or multi-target without active shout group: match by target position
       const targetNames = new Set(cfgLine.targets.map(t => t.position.toUpperCase()));
       const matchingCalls = activeEntries.filter((entry: any) => {
+        if (matchedCallIds.has(entry.landlineCallId)) return false;
         const remoteName = (entry.otherPosition || '').toUpperCase();
-        return targetNames.has(remoteName) && !matchedCallIds.has(entry.landlineCallId);
+        // Outgoing calls: match by remote position (who we called)
+        if (entry.landlineDirection === 'outgoing') {
+          return targetNames.has(remoteName);
+        }
+        // Incoming calls: if targetPosition is set (instructor receiving via
+        // assumed position), match by which of our positions was targeted.
+        // Otherwise fall back to matching by caller position (otherPosition).
+        const incomingTarget = (entry.targetPosition || '').toUpperCase();
+        if (incomingTarget) {
+          return targetNames.has(incomingTarget);
+        }
+        return targetNames.has(remoteName);
       });
 
       if (matchingCalls.length > 0) {
