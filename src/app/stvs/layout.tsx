@@ -1,4 +1,5 @@
 import "../../styles/globals.css";
+import "../_components/vatlines/styles.css";
 import { GeistSans } from 'geist/font/sans';
 import React from 'react';
 

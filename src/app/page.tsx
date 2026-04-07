@@ -192,7 +192,7 @@ export default function Page() {
 
   // Track when UI should be considered "loaded"
   useEffect(() => {
-    if ((connected || isLocalhost || isSweatbox) && selectedPositions && selectedPositions.length > 0 && currentUI) {
+    if (selectedPositions && selectedPositions.length > 0 && currentUI) {
       // Add a small delay to ensure UI components have time to mount
       const timer = setTimeout(() => {
         setUiLoaded(true);
@@ -202,7 +202,7 @@ export default function Page() {
     } else {
       setUiLoaded(false);
     }
-  }, [connected, isLocalhost, isSweatbox, selectedPositions, currentUI]);
+  }, [selectedPositions, currentUI]);
 
   // Update page title to reflect the loaded UI
   useEffect(() => {
@@ -291,23 +291,7 @@ export default function Page() {
         />
       )}
       
-      {!connected && !isLocalhost && !isSweatbox ? (
-        <div className="flex items-center justify-center min-h-screen">
-          <div className="text-center text-white">
-            <h2 className="text-2xl font-bold mb-4">AFV Client</h2>
-            <p className="text-lg text-zinc-300">Not Connected</p>
-            <p className="text-sm text-zinc-400 mt-2">
-              Connect AFV or select a sweatbox environment in Settings
-            </p>
-            <button
-              onClick={() => setSettingModal(true)}
-              className="mt-4 bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
-            >
-              Open Settings
-            </button>
-          </div>
-        </div>
-      ) : !selectedPositions || selectedPositions.length === 0 || !uiLoaded ? (
+      {!selectedPositions || selectedPositions.length === 0 || !uiLoaded ? (
         <div className="flex items-center justify-center min-h-screen">
           <div className="text-center text-white">
             <h2 className="text-2xl font-bold mb-4">Welcome to AFV Client</h2>
@@ -344,23 +328,52 @@ export default function Page() {
             )}
             
             {(!selectedPositions || selectedPositions.length === 0) && autoDetectStatus !== 'detecting' && (
-              <div className="flex gap-4 justify-center">
-                {/* Retry auto-detect button (only show if we have CID) */}
-                {cid !== 0 && autoDetectStatus === 'failed' && (
+              <div className="flex flex-col items-center gap-4">
+                <div className="flex gap-4 justify-center">
+                  {/* Retry auto-detect button (only show if we have CID) */}
+                  {cid !== 0 && autoDetectStatus === 'failed' && (
+                    <button 
+                      onClick={retryAutoDetect}
+                      className="bg-green-600 hover:bg-green-700 text-white font-bold py-2 px-4 rounded"
+                    >
+                      Retry Auto-Detect
+                    </button>
+                  )}
+                  
                   <button 
-                    onClick={retryAutoDetect}
-                    className="bg-green-600 hover:bg-green-700 text-white font-bold py-2 px-4 rounded"
+                    onClick={() => setSettingModal(true)}
+                    className="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
                   >
-                    Retry Auto-Detect
+                    Select Position Manually
                   </button>
+                </div>
+
+                {/* Sweatbox mode toggle */}
+                {!isSweatbox ? (
+                  <button
+                    onClick={() => useCoreStore.getState().vnasEnableSweatbox()}
+                    className="bg-amber-600 hover:bg-amber-700 text-white font-bold py-2 px-4 rounded text-sm"
+                  >
+                    Enter Sweatbox Mode
+                  </button>
+                ) : (
+                  <div className="flex items-center gap-3">
+                    <span className="text-amber-400 text-sm font-semibold">Sweatbox Mode Active</span>
+                    <button
+                      onClick={() => useCoreStore.getState().vnasDisableSweatbox()}
+                      className="bg-zinc-600 hover:bg-zinc-500 text-white text-xs py-1 px-3 rounded"
+                    >
+                      Exit Sweatbox
+                    </button>
+                  </div>
                 )}
-                
-                <button 
-                  onClick={() => setSettingModal(true)}
-                  className="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
-                >
-                  Select Position Manually
-                </button>
+
+                {/* Connection status indicator */}
+                {!connected && !isSweatbox && (
+                  <p className="text-xs text-zinc-500 mt-2">
+                    AFV not connected — WebRTC landline calls only
+                  </p>
+                )}
               </div>
             )}
           </div>

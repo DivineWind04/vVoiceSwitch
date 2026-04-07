@@ -159,6 +159,16 @@ class VnasStore {
     } catch { /* SSR */ }
   }
 
+  /** Enable sweatbox mode directly (without vNAS environment/OAuth) */
+  enableSweatboxMode(): void {
+    this.setState({ isSweatbox: true, vnasStatus: 'sweatbox (standalone)' });
+  }
+
+  /** Disable sweatbox mode */
+  disableSweatboxMode(): void {
+    this.setState({ isSweatbox: false, vnasStatus: 'disconnected' });
+  }
+
   private getSavedEnvName(): string | null {
     try {
       return localStorage.getItem(LS_VNAS_ENV_NAME);

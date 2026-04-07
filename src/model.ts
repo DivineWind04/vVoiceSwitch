@@ -230,6 +230,8 @@ interface CoreState extends VacsStoreState, VvscsStoreState, LandlineStoreState,
     vnasSelectEnvironment: (env: any) => void;
     vnasLoginWithToken: (vatsimToken: string) => Promise<boolean>;
     vnasDisconnect: () => Promise<void>;
+    vnasEnableSweatbox: () => void;
+    vnasDisableSweatbox: () => void;
 }
 
 let call_table: Record<string, [string, number]> = {}
@@ -792,6 +794,12 @@ export const useCoreStore = create<CoreState>((set: any, get: any) => {
         },
         vnasDisconnect: async () => {
             await vnasStore.logout();
+        },
+        vnasEnableSweatbox: () => {
+            vnasStore.enableSweatboxMode();
+        },
+        vnasDisableSweatbox: () => {
+            vnasStore.disableSweatboxMode();
         },
     }
 

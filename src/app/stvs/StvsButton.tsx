@@ -123,10 +123,10 @@ const StvsButton: React.FC<StvsButtonProps> = ({ label, active = false, hasFreq 
         className="absolute top-2 left-1/2 -translate-x-1/2 z-10 font-normal text-white tracking-widest"
         style={{
           letterSpacing: 0,
-          fontFamily: `'Arial Rounded MT'`,
+          fontFamily: "'ETVSButton', monospace",
           textShadow: 'none',
-          fontSize: 'clamp(0.8rem, 1.5vw, 1.3rem)',
-          maxWidth: '90%',
+          fontSize: 'clamp(0.45rem, 0.85vw, 0.8rem)',
+          maxWidth: '95%',
           whiteSpace: 'nowrap',
           overflow: 'hidden',
           textOverflow: 'ellipsis',
