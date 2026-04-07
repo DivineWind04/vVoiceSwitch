@@ -32,11 +32,9 @@ export default function Page() {
   const positionData = useCoreStore(s => s.positionData);
   const callsign = useCoreStore(s => s.callsign);
   const cid = useCoreStore(s => s.cid);
-  const afv_version = useCoreStore(s => s.afv_version);
   const isSweatbox = useCoreStore(s => s.isSweatbox);
   const updateSelectedPositions = useCoreStore(s => s.updateSelectedPositions);
   const setCurrentUI = useCoreStore(s => s.setCurrentUI);
-  const [versionAlert, setVersionAlert] = useState<any>(null);
   const [isLocalhost, setIsLocalhost] = useState(false);
 
   // Detect localhost for test bench access
@@ -86,36 +84,9 @@ export default function Page() {
       }
     };
 
-    // Load version info
-    const loadVersionInfo = async () => {
-      try {
-        console.log('Loading version info, current afv_version:', afv_version);
-        const response = await fetch('/html_app/afv_poc/patch/version.json');
-        const version_data = await response.json();
-        console.log('Loaded version data:', version_data);
-        const latest_version = parseFloat(version_data.latest_version);
-        const current_version = parseFloat(afv_version || '1.0.0'); // Default to 1.0.0 if no version
-        const lowest_allowable_version = parseFloat(version_data.lowest_allowable_version);
-        console.log('Version comparison:', { latest_version, current_version, lowest_allowable_version });
-        
-        if (current_version < lowest_allowable_version) {
-          version_data.must_upgrade = true;
-        }
-        const shouldShowAlert = latest_version > current_version;
-        console.log('Should show alert:', shouldShowAlert);
-        setVersionAlert(shouldShowAlert ? version_data : null);
-      } catch (error) {
-        console.error('Failed to load version info:', error);
-      }
-    };
-
     // Always load the data to ensure it's available
     loadPositionData();
-    // Only run AFV version check when AFV is actually connected
-    if (connected && afv_version) {
-      loadVersionInfo();
-    }
-  }, [setPositionData, afv_version, connected]);
+  }, [setPositionData]);
 
   // Auto-detect position from VATSIM when connected with CID/callsign
   useEffect(() => {
@@ -274,26 +245,6 @@ export default function Page() {
 
   return (
     <div className="min-h-screen bg-zinc-700 p-4">
-      {/* Version Alert */}
-      {versionAlert && (
-        <Alert 
-          type={versionAlert?.must_upgrade ? "error" : "warning"} 
-          style={{ marginBottom: 10 }} 
-          closable={!versionAlert?.must_upgrade}
-          onClose={() => setVersionAlert(null)} 
-          showIcon 
-          message={
-            <>
-              Latest AFV version {versionAlert.latest_version} is available.
-              {afv_version ? ` Your current version is: ${afv_version}.` : null}
-              {versionAlert?.must_upgrade ? ` Lowest usable version is ${versionAlert.lowest_allowable_version}, you must at least update to that version.` : ""}
-              <br />
-              Download Link: <a href={versionAlert.link?.windows} target='_blank'>[Windows]</a> <a href={versionAlert.link?.macos} target='_blank'>[macOS]</a>
-            </>
-          } 
-        />
-      )}
-      
       {!selectedPositions || selectedPositions.length === 0 || !uiLoaded ? (
         <div className="flex items-center justify-center min-h-screen">
           <div className="text-center text-white">
