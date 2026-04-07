@@ -111,8 +111,11 @@ export default function Page() {
 
     // Always load the data to ensure it's available
     loadPositionData();
-    loadVersionInfo(); // Always run version check
-  }, [setPositionData, afv_version]);
+    // Only run AFV version check when AFV is actually connected
+    if (connected && afv_version) {
+      loadVersionInfo();
+    }
+  }, [setPositionData, afv_version, connected]);
 
   // Auto-detect position from VATSIM when connected with CID/callsign
   useEffect(() => {
@@ -294,7 +297,7 @@ export default function Page() {
       {!selectedPositions || selectedPositions.length === 0 || !uiLoaded ? (
         <div className="flex items-center justify-center min-h-screen">
           <div className="text-center text-white">
-            <h2 className="text-2xl font-bold mb-4">Welcome to AFV Client</h2>
+            <h2 className="text-2xl font-bold mb-4">Welcome to vIVSR</h2>
             
             {/* Auto-detection status */}
             {autoDetectStatus === 'detecting' && (
@@ -376,13 +379,6 @@ export default function Page() {
                 )}
               </div>
             )}
-          </div>
-        </div>
-      ) : versionAlert?.must_upgrade ? (
-        <div className="flex items-center justify-center min-h-screen">
-          <div className="text-center text-white">
-            <h2 className="text-2xl font-bold mb-4">Update Required</h2>
-            <p className="text-lg text-zinc-300">Please update your AFV client to continue.</p>
           </div>
         </div>
       ) : (
