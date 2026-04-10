@@ -1084,8 +1084,27 @@ export const useCoreStore = create<CoreState>((set: any, get: any) => {
         // Auto-connect to Landline if position has ll: lines and we're not already connected
         if (landlineConfigLines.length > 0 && !landlineStore.isConnected) {
             if (facilityId && posName) {
+                // In sweatbox mode, register all target positions as assumedPositions
+                // so the other party (instructor/student) can receive calls for any position
+                let assumedPositions: string[] = [];
+                if (vnasStore.getState().isSweatbox) {
+                    const targetSet = new Set<string>();
+                    for (const cfg of landlineConfigLines) {
+                        if (cfg.targets && cfg.targets.length > 0) {
+                            for (const t of cfg.targets) {
+                                if (t.position && t.position !== posName) {
+                                    targetSet.add(t.position);
+                                }
+                            }
+                        } else if (cfg.targetPosition && cfg.targetPosition !== posName && cfg.lineType !== 3) {
+                            targetSet.add(cfg.targetPosition);
+                        }
+                    }
+                    assumedPositions = Array.from(targetSet);
+                    console.log('[resetWindow] Sweatbox: registering', assumedPositions.length, 'assumed positions:', assumedPositions);
+                }
                 console.log('[resetWindow] Auto-connecting to Landline as', facilityId, posName);
-                landlineStore.connectLandline(facilityId, posName);
+                landlineStore.connectLandline(facilityId, posName, assumedPositions);
             }
         }
 

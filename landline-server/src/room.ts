@@ -269,7 +269,8 @@ export class SignalingRoom implements DurableObject {
     lineType: 0 | 1 | 2 | 3,
   ): void {
     // Find target client by facility + position (including assumed positions)
-    const target = this.findClientByPosition(targetFacility, targetPosition);
+    // Exclude the initiator so calls don't route back to self
+    const target = this.findClientByPosition(targetFacility, targetPosition, initiator.clientId);
 
     if (!target) {
       this.sendTo(initiator.ws, {
@@ -429,6 +430,7 @@ export class SignalingRoom implements DurableObject {
   private findClientByPosition(
     facility: FacilityId,
     position: PositionName,
+    excludeClientId?: string,
   ): ConnectedClient | undefined {
     const upperPos = position.toUpperCase();
     const upperFac = facility.toUpperCase();
@@ -436,6 +438,7 @@ export class SignalingRoom implements DurableObject {
     // First try exact facility + position match
     for (const [, client] of this.clients) {
       if (!client.registered) continue;
+      if (excludeClientId && client.clientId === excludeClientId) continue;
       if (client.facility?.toUpperCase() !== upperFac) continue;
 
       if (
@@ -449,6 +452,7 @@ export class SignalingRoom implements DurableObject {
     // Fall back to position-only match (cross-facility calls, e.g. ARTCC ↔ TRACON)
     for (const [, client] of this.clients) {
       if (!client.registered) continue;
+      if (excludeClientId && client.clientId === excludeClientId) continue;
 
       if (
         client.position?.toUpperCase() === upperPos ||
