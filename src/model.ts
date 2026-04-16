@@ -837,18 +837,14 @@ export const useCoreStore = create<CoreState>((set: any, get: any) => {
         const { callsign = '', cid = 0 } = get();
         const { selectedPositions: selected_positions } = get();
         const inSweatbox = vnasStore.getState().isSweatbox;
-        // Don't send del/sync until we have both callsign AND positions
-        // to avoid wiping server state before we can re-register lines
-        // In sweatbox mode, callsign may be empty (no AFV) — only require positions
-        if (!inSweatbox && (!callsign || !selected_positions || selected_positions.length === 0)) {
-            return;
-        }
-        if (inSweatbox && (!selected_positions || selected_positions.length === 0)) {
+        // Always require positions to be selected
+        if (!selected_positions || selected_positions.length === 0) {
             return;
         }
         // Cancel any pending sync from a previous resetWindow call
         if (syncTimeout) clearTimeout(syncTimeout);
-        if (!inSweatbox) {
+        // Only send AFV del/sync when we have a callsign (AFV connected)
+        if (!inSweatbox && callsign) {
             sendMessageNow({ type: 'del', cmd1: '', dbl1: 0 });
         }
         // Collect all lines from selected positions, preserving order
@@ -1034,10 +1030,10 @@ export const useCoreStore = create<CoreState>((set: any, get: any) => {
                     });
                 }
             } else {
-                // AFV line — register normally (skip in sweatbox mode since AFV is unavailable)
+                // AFV line — register normally (skip when AFV is unavailable)
                 call_table[line[0]] = [line[2], line[1]];
                 line_order[String(line[0])] = item.originalIndex;
-                if (!vnasStore.getState().isSweatbox) {
+                if (!vnasStore.getState().isSweatbox && callsign) {
                     addCall(line[1], '' + line[0]);
                 }
             }
@@ -1127,7 +1123,7 @@ export const useCoreStore = create<CoreState>((set: any, get: any) => {
             }
         }
 
-        if (!inSweatbox) {
+        if (!inSweatbox && callsign) {
             cid && addIaCall(1, '' + cid)
             syncTimeout = setTimeout(() => {
                 sendMessageNow({ type: 'sync' })
