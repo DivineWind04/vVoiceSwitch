@@ -92,8 +92,10 @@ export class LandlineClient {
           } else {
             call.state = 'connected';
             this.emitEvent({ type: 'callStateChanged', callId, state: 'connected' });
-            // PTT: For non-override calls, mute mic unless PTT is currently held
-            if (call.lineType !== 0 && !landlineSettingsStore.isPttPressed()) {
+            // PTT: For non-override/non-outgoing-shout calls, mute mic unless PTT is held
+            // Override (type 0) and outgoing shout (type 2) are always hot mic
+            const isHotMic = call.lineType === 0 || (call.lineType === 2 && call.direction === 'outgoing');
+            if (!isHotMic && !landlineSettingsStore.isPttPressed()) {
               this.peers.muteLocalTracks(callId);
             }
           }
@@ -115,6 +117,8 @@ export class LandlineClient {
       this.activeCalls.forEach((call, callId) => {
         // Override (type 0) calls are always hot mic — skip them
         if (call.lineType === 0) return;
+        // Outgoing shout (type 2) calls are hot mic — caller pressed button to talk
+        if (call.lineType === 2 && call.direction === 'outgoing') return;
         // Shout lines pending pickup are already muted by their own logic
         if (call.shoutPendingPickup) return;
         // Only affect connected calls

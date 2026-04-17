@@ -256,6 +256,7 @@ export class LandlinePeerManager {
     if (entry.audioElement) {
       entry.audioElement.pause();
       entry.audioElement.srcObject = null;
+      entry.audioElement.remove();
     }
     if ((entry as any)._audioCtx) {
       (entry as any)._audioCtx.close().catch(() => {});
@@ -393,9 +394,11 @@ export class LandlinePeerManager {
         waveshaper.connect(gainNode);
         gainNode.connect(dest);
 
-        const audio = new Audio();
+        const audio = document.createElement('audio');
         audio.srcObject = dest.stream;
         audio.autoplay = true;
+        audio.style.display = 'none';
+        document.body.appendChild(audio);
         audio.play().catch((err) => {
           console.warn('[Landline Peers] Autoplay blocked, retrying on user interaction:', err);
           const resume = () => {

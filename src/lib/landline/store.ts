@@ -554,8 +554,8 @@ class LandlineStore {
         // assumed position), match by which of our positions was targeted.
         // Otherwise fall back to matching by caller position (otherPosition).
         const incomingTarget = (entry.targetPosition || '').toUpperCase();
-        if (incomingTarget) {
-          return targetNames.has(incomingTarget);
+        if (incomingTarget && targetNames.has(incomingTarget)) {
+          return true;
         }
         return targetNames.has(remoteName);
       });
