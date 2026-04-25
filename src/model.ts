@@ -128,9 +128,31 @@ export function findLlDialCodeTable(positionData: Facility, positionCallsign: st
 // dialCode: The 2-digit code entered by the user (e.g., "11", "42")
 export function resolveDialCode(dialCodeTable: DialCodeTable | null, trunkName: string, dialCode: string): string | null {
     if (!dialCodeTable) return null;
-    const trunkCodes = dialCodeTable[trunkName];
+
+    const normalizeTrunk = (value: string): string =>
+        (value || '').trim().replace(/\s+/g, ' ').toUpperCase();
+    const normalizeDialCode = (value: string): string =>
+        (value || '').trim().padStart(2, '0');
+
+    const normalizedTrunk = normalizeTrunk(trunkName);
+    const normalizedCode = normalizeDialCode(dialCode);
+
+    // Prefer exact match first.
+    let trunkCodes = dialCodeTable[trunkName];
+
+    // Fallback: normalize trunk label to avoid whitespace/case mismatches
+    // between panel labels and dialCodeTable keys (e.g., "E/W/V" variants).
+    if (!trunkCodes) {
+        for (const [key, value] of Object.entries(dialCodeTable)) {
+            if (normalizeTrunk(key) === normalizedTrunk) {
+                trunkCodes = value;
+                break;
+            }
+        }
+    }
+
     if (!trunkCodes) return null;
-    return trunkCodes[dialCode] || null;
+    return trunkCodes[normalizedCode] || trunkCodes[(dialCode || '').trim()] || null;
 }
 
 interface CoreState extends VacsStoreState, VvscsStoreState, LandlineStoreState, VnasStoreState {
@@ -675,6 +697,20 @@ export const useCoreStore = create<CoreState>((set: any, get: any) => {
         },
         sendDialCall: (trunkName: string, dialCode: string) => {
             const { positionData, selectedPositions } = get();
+            const normalizedDialCode = (dialCode || '').trim().padStart(2, '0');
+            const normalizedTrunkName = (trunkName || '').trim();
+
+            if (!normalizedTrunkName) {
+                console.error('[dial_call] Missing trunk name');
+                set({ dialCallStatus: 'error' });
+                return;
+            }
+
+            if (!/^\d{2}$/.test(normalizedDialCode)) {
+                console.error('[dial_call] Dial code must be 2 digits:', { dialCode });
+                set({ dialCallStatus: 'error' });
+                return;
+            }
             
             // Get the current position's callsign to find the dialCodeTable
             const currentCallsign = selectedPositions?.[0]?.cs;
@@ -693,14 +729,21 @@ export const useCoreStore = create<CoreState>((set: any, get: any) => {
             }
             
             // Resolve the dial code to the destination line ID
-            const targetLineId = resolveDialCode(dialCodeTable, trunkName, dialCode);
+            const targetLineId = resolveDialCode(dialCodeTable, normalizedTrunkName, normalizedDialCode);
             if (!targetLineId) {
-                console.error('[dial_call] Could not resolve dial code:', { trunkName, dialCode });
+                console.error('[dial_call] Could not resolve dial code:', {
+                    trunkName: normalizedTrunkName,
+                    dialCode: normalizedDialCode,
+                });
                 set({ dialCallStatus: 'error' });
                 return;
             }
             
-            console.log('[dial_call] Resolved:', { trunkName, dialCode, targetLineId });
+            console.log('[dial_call] Resolved:', {
+                trunkName: normalizedTrunkName,
+                dialCode: normalizedDialCode,
+                targetLineId,
+            });
             
             // Set status to dialing, then ringback
             set({ dialCallStatus: 'dialing' });
@@ -720,6 +763,15 @@ export const useCoreStore = create<CoreState>((set: any, get: any) => {
                     set({ dialCallStatus: 'ringback' });
                 }
             }, 200);
+
+            // Fallback timeout so UI doesn't remain in ringback forever if no
+            // dial_call_status arrives from backend.
+            setTimeout(() => {
+                const currentStatus = get().dialCallStatus;
+                if (currentStatus === 'dialing' || currentStatus === 'ringback') {
+                    set({ dialCallStatus: 'error' });
+                }
+            }, 20000);
         },
 
         // VACS integration state

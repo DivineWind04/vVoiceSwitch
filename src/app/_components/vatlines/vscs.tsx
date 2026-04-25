@@ -6,7 +6,7 @@ import VscsButtonComponent from './vscs_button';
 import VscsStaticButton from './vscs_static_button';
 import VscsAG from './vscs_ag';
 import VscsUtil from './vscs_util';
-import { useCoreStore } from '~/model';
+import { findDialCodeTable, resolveDialCode, useCoreStore } from '~/model';
 import { landlineStore } from '~/lib/landline/store';
 import './styles.css';
 
@@ -844,6 +844,9 @@ function VikKeypad() {
   const ringTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   
   const sendMsg = useCoreStore((s: any) => s.sendMessageNow);
+  const sendDialCall = useCoreStore((s: any) => s.sendDialCall);
+  const activeDialLine = useCoreStore((s: any) => s.activeDialLine);
+  const setActiveDialLine = useCoreStore((s: any) => s.setActiveDialLine);
   const vacsHandleButtonPress = useCoreStore((s: any) => s.vacsHandleButtonPress);
   const vvscsHandleButtonPress = useCoreStore((s: any) => s.vvscsHandleButtonPress);
   const landlineHandleButtonPress = useCoreStore((s: any) => s.landlineHandleButtonPress);
@@ -906,6 +909,14 @@ function VikKeypad() {
     return () => { if (ringTimeoutRef.current) clearTimeout(ringTimeoutRef.current); };
   }, []);
 
+  // Ensure each new VSCS dial starts from a clean trunk selection after
+  // release/error/timeout/reset states.
+  useEffect(() => {
+    if (['idle', 'released', 'timeout', 'busy', 'denied'].includes(callState)) {
+      setActiveDialLine(null);
+    }
+  }, [callState, setActiveDialLine]);
+
   // Determine call type prompt based on first digit
   const getCallTypePrompt = (firstDigit: string): string => {
     switch (firstDigit) {
@@ -928,6 +939,11 @@ function VikKeypad() {
   // Returns true if call should be auto-initiated based on dial code format (Table 6-2)
   const shouldAutoInitiate = (buffer: string): boolean => {
     if (buffer.length < 2) return false;
+
+    // VSCS type-3 dial line mode: once trunk is selected, two digits completes dialing.
+    if (activeDialLine && /^\d{2}$/.test(buffer)) {
+      return true;
+    }
     
     const firstDigit = buffer[0];
     const targetCode = buffer.substring(1);
@@ -974,6 +990,55 @@ function VikKeypad() {
     
     const firstDigit = buf[0] || '';
     const targetCode = buf.substring(1);
+
+    // If a type-3 dial line is active, use the shared dial pipeline:
+    // resolve via dialCodeTable and dispatch as AFV type-1 ring call.
+    if (activeDialLine && /^\d{2}$/.test(buf)) {
+      const currentCallsign = currentPosition?.cs;
+      const dialCodeTable = currentCallsign ? findDialCodeTable(positionData, currentCallsign) : null;
+      const resolvedTarget = resolveDialCode(dialCodeTable, activeDialLine.trunkName, buf);
+
+      if (!resolvedTarget) {
+        setDisplayLine1(VIK_MESSAGES.INVALID_CODE);
+        setDisplayLine2(buf);
+        setTimeout(() => {
+          setDisplayLine1('');
+          setDisplayLine2('');
+          setDialBuffer('');
+          setCallState('idle');
+          setKeysIlluminated(false);
+        }, 2000);
+        return;
+      }
+
+      setDisplayLine1(VIK_MESSAGES.CALL_RINGING);
+      setDisplayLine2(`${activeDialLine.trunkName} ${buf}`);
+      setActiveLineId(resolvedTarget);
+      setKeysIlluminated(false);
+      setCallState('ringing');
+      sendDialCall(activeDialLine.trunkName, buf);
+
+      if (ringTimeoutRef.current) clearTimeout(ringTimeoutRef.current);
+      ringTimeoutRef.current = setTimeout(() => {
+        setCallState((currentState) => {
+          if (currentState === 'ringing') {
+            setDisplayLine1(VIK_MESSAGES.RING_TIME_OUT);
+            setDisplayLine2('');
+            setTimeout(() => {
+              setDisplayLine1('');
+              setDisplayLine2('');
+              setDialBuffer('');
+              setActiveLineId(null);
+              setActiveDialLine(null);
+              setCallState('idle');
+            }, 3000);
+            return 'timeout';
+          }
+          return currentState;
+        });
+      }, 30000);
+      return;
+    }
     
     // Helper to set up call with ring timeout handling
     const initiateCallWithTimeout = (lineId: string, displayText: string, dbl1: number) => {
@@ -2011,6 +2076,18 @@ function VscsPanel(props: VscsProps & { panelId?: string; defaultScreenMode?: st
         case 'idle':
         case '':
         case 'off':
+          // Type-3 dial line on VSCS: arm trunk and enter keypad mode.
+          if (lineType === 3) {
+            const trunkName = (buttonData.call_name || buttonData.call || '').split(',')[0]?.trim() || '';
+            setActiveDialLine({ trunkName, lineType: 3 });
+            setDialBuffer('');
+            setDisplayLine1(VIK_MESSAGES.DIAL_CODE);
+            setDisplayLine2(trunkName);
+            setCallState('ready');
+            setKeysIlluminated(true);
+            return;
+          }
+
           // Add immediate "calling" visual feedback
           if (buttonEl) {
             buttonEl.classList.remove('state-active', 'state-busy', 'state-ringing', 'state-hold', 'state-unavailable');
