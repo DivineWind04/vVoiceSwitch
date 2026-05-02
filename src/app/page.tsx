@@ -32,9 +32,10 @@ export default function Page() {
   const positionData = useCoreStore(s => s.positionData);
   const callsign = useCoreStore(s => s.callsign);
   const cid = useCoreStore(s => s.cid);
-  const isSweatbox = useCoreStore(s => s.isSweatbox);
+  const afv_version = useCoreStore(s => s.afv_version);
   const updateSelectedPositions = useCoreStore(s => s.updateSelectedPositions);
   const setCurrentUI = useCoreStore(s => s.setCurrentUI);
+  const [versionAlert, setVersionAlert] = useState<any>(null);
   const [isLocalhost, setIsLocalhost] = useState(false);
 
   // Detect localhost for test bench access
@@ -84,9 +85,33 @@ export default function Page() {
       }
     };
 
+    // Load version info
+    const loadVersionInfo = async () => {
+      try {
+        console.log('Loading version info, current afv_version:', afv_version);
+        const response = await fetch('/html_app/afv_poc/patch/version.json');
+        const version_data = await response.json();
+        console.log('Loaded version data:', version_data);
+        const latest_version = parseFloat(version_data.latest_version);
+        const current_version = parseFloat(afv_version || '1.0.0'); // Default to 1.0.0 if no version
+        const lowest_allowable_version = parseFloat(version_data.lowest_allowable_version);
+        console.log('Version comparison:', { latest_version, current_version, lowest_allowable_version });
+        
+        if (current_version < lowest_allowable_version) {
+          version_data.must_upgrade = true;
+        }
+        const shouldShowAlert = latest_version > current_version;
+        console.log('Should show alert:', shouldShowAlert);
+        setVersionAlert(shouldShowAlert ? version_data : null);
+      } catch (error) {
+        console.error('Failed to load version info:', error);
+      }
+    };
+
     // Always load the data to ensure it's available
     loadPositionData();
-  }, [setPositionData]);
+    loadVersionInfo(); // Always run version check
+  }, [setPositionData, afv_version]);
 
   // Auto-detect position from VATSIM when connected with CID/callsign
   useEffect(() => {
@@ -166,7 +191,7 @@ export default function Page() {
 
   // Track when UI should be considered "loaded"
   useEffect(() => {
-    if (selectedPositions && selectedPositions.length > 0 && currentUI) {
+    if ((connected || isLocalhost) && selectedPositions && selectedPositions.length > 0 && currentUI) {
       // Add a small delay to ensure UI components have time to mount
       const timer = setTimeout(() => {
         setUiLoaded(true);
@@ -176,7 +201,7 @@ export default function Page() {
     } else {
       setUiLoaded(false);
     }
-  }, [selectedPositions, currentUI]);
+  }, [connected, isLocalhost, selectedPositions, currentUI]);
 
   // Update page title to reflect the loaded UI
   useEffect(() => {
@@ -245,10 +270,37 @@ export default function Page() {
 
   return (
     <div className="min-h-screen bg-zinc-700 p-4">
-      {!selectedPositions || selectedPositions.length === 0 || !uiLoaded ? (
+      {/* Version Alert */}
+      {versionAlert && (
+        <Alert 
+          type={versionAlert?.must_upgrade ? "error" : "warning"} 
+          style={{ marginBottom: 10 }} 
+          closable={!versionAlert?.must_upgrade}
+          onClose={() => setVersionAlert(null)} 
+          showIcon 
+          message={
+            <>
+              Latest AFV version {versionAlert.latest_version} is available.
+              {afv_version ? ` Your current version is: ${afv_version}.` : null}
+              {versionAlert?.must_upgrade ? ` Lowest usable version is ${versionAlert.lowest_allowable_version}, you must at least update to that version.` : ""}
+              <br />
+              Download Link: <a href={versionAlert.link?.windows} target='_blank'>[Windows]</a> <a href={versionAlert.link?.macos} target='_blank'>[macOS]</a>
+            </>
+          } 
+        />
+      )}
+      
+      {!connected && !isLocalhost ? (
         <div className="flex items-center justify-center min-h-screen">
           <div className="text-center text-white">
-            <h2 className="text-2xl font-bold mb-4">Welcome to vIVSR</h2>
+            <h2 className="text-2xl font-bold mb-4">AFV Client</h2>
+            <p className="text-lg text-zinc-300">Not Connected</p>
+          </div>
+        </div>
+      ) : !selectedPositions || selectedPositions.length === 0 || !uiLoaded ? (
+        <div className="flex items-center justify-center min-h-screen">
+          <div className="text-center text-white">
+            <h2 className="text-2xl font-bold mb-4">Welcome to AFV Client</h2>
             
             {/* Auto-detection status */}
             {autoDetectStatus === 'detecting' && (
@@ -282,54 +334,32 @@ export default function Page() {
             )}
             
             {(!selectedPositions || selectedPositions.length === 0) && autoDetectStatus !== 'detecting' && (
-              <div className="flex flex-col items-center gap-4">
-                <div className="flex gap-4 justify-center">
-                  {/* Retry auto-detect button (only show if we have CID) */}
-                  {cid !== 0 && autoDetectStatus === 'failed' && (
-                    <button 
-                      onClick={retryAutoDetect}
-                      className="bg-green-600 hover:bg-green-700 text-white font-bold py-2 px-4 rounded"
-                    >
-                      Retry Auto-Detect
-                    </button>
-                  )}
-                  
+              <div className="flex gap-4 justify-center">
+                {/* Retry auto-detect button (only show if we have CID) */}
+                {cid !== 0 && autoDetectStatus === 'failed' && (
                   <button 
-                    onClick={() => setSettingModal(true)}
-                    className="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
+                    onClick={retryAutoDetect}
+                    className="bg-green-600 hover:bg-green-700 text-white font-bold py-2 px-4 rounded"
                   >
-                    Select Position Manually
+                    Retry Auto-Detect
                   </button>
-                </div>
-
-                {/* Sweatbox mode toggle */}
-                {!isSweatbox ? (
-                  <button
-                    onClick={() => useCoreStore.getState().vnasEnableSweatbox()}
-                    className="bg-amber-600 hover:bg-amber-700 text-white font-bold py-2 px-4 rounded text-sm"
-                  >
-                    Enter Sweatbox Mode
-                  </button>
-                ) : (
-                  <div className="flex items-center gap-3">
-                    <span className="text-amber-400 text-sm font-semibold">Sweatbox Mode Active</span>
-                    <button
-                      onClick={() => useCoreStore.getState().vnasDisableSweatbox()}
-                      className="bg-zinc-600 hover:bg-zinc-500 text-white text-xs py-1 px-3 rounded"
-                    >
-                      Exit Sweatbox
-                    </button>
-                  </div>
                 )}
-
-                {/* Connection status indicator */}
-                {!connected && !isSweatbox && (
-                  <p className="text-xs text-zinc-500 mt-2">
-                    AFV not connected — WebRTC landline calls only
-                  </p>
-                )}
+                
+                <button 
+                  onClick={() => setSettingModal(true)}
+                  className="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
+                >
+                  Select Position Manually
+                </button>
               </div>
             )}
+          </div>
+        </div>
+      ) : versionAlert?.must_upgrade ? (
+        <div className="flex items-center justify-center min-h-screen">
+          <div className="text-center text-white">
+            <h2 className="text-2xl font-bold mb-4">Update Required</h2>
+            <p className="text-lg text-zinc-300">Please update your AFV client to continue.</p>
           </div>
         </div>
       ) : (
