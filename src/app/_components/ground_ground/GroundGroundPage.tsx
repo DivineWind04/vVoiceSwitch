@@ -123,7 +123,7 @@ const GroundGroundPage: React.FC<GroundGroundPageProps> = ({
       // Landline WebRTC calls — route through Landline handler
       if (data.isLandline && data.landlineCallId) {
         // LineType 3 dial lines → open keypad instead of direct call
-        if (data.lineType === 3 && (data.status === 'off' || data.status === '' || !data.status)) {
+        if (data.lineType === 3 && (data.status === 'off' || data.status === '' || data.status === 'idle' || !data.status)) {
           const trunkName = data.call_name || data.call || '';
           onClick = () => {
             if (onOpenKeypadForDialLine) {
