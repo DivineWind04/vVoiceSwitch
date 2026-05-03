@@ -64,6 +64,7 @@ const Keypad: React.FC<KeypadProps> = ({ dialLineInfo, onClose }) => {
   const [callState, setCallState] = useState<'ready' | 'dialing' | 'ringback' | 'active' | 'error'>('ready');
   const ringbackAudioRef = useRef<HTMLAudioElement | null>(null);
   const dialToneStartedRef = useRef(false);
+  const dialBufferRef = useRef(''); // ref-based buffer to avoid stale closure issues
   
   // Store access
   const sendDialCall = useCoreStore((s: any) => s.sendDialCall);
@@ -71,6 +72,7 @@ const Keypad: React.FC<KeypadProps> = ({ dialLineInfo, onClose }) => {
   const iaDisplayBuffer = useCoreStore((s: any) => s.iaDisplayBuffer);
   const appendToIaDisplay = useCoreStore((s: any) => s.appendToIaDisplay);
   const clearIaDisplay = useCoreStore((s: any) => s.clearIaDisplay);
+  const resetDialCallStatus = useCoreStore((s: any) => s.resetDialCallStatus);
   
   // Play dial tone when keypad opens for a dial line
   useEffect(() => {
@@ -85,6 +87,8 @@ const Keypad: React.FC<KeypadProps> = ({ dialLineInfo, onClose }) => {
   
   // Clear the IA display when keypad opens
   useEffect(() => {
+    dialBufferRef.current = '';
+    resetDialCallStatus();
     clearIaDisplay();
     setDisplayMessage("READY");
     setCallState('ready');
@@ -96,7 +100,7 @@ const Keypad: React.FC<KeypadProps> = ({ dialLineInfo, onClose }) => {
         ringbackAudioRef.current = null;
       }
     };
-  }, [clearIaDisplay]);
+  }, [clearIaDisplay, resetDialCallStatus]);
   
   // Watch dial call status from store
   useEffect(() => {
@@ -173,7 +177,10 @@ const Keypad: React.FC<KeypadProps> = ({ dialLineInfo, onClose }) => {
     // Append to store (which updates IA DISPLAY)
     appendToIaDisplay(digit);
     
-    const newBuffer = iaDisplayBuffer + digit;
+    // Use ref-based buffer to avoid stale closure — iaDisplayBuffer from the
+    // Zustand subscription may not have updated yet if digits are pressed quickly.
+    dialBufferRef.current = dialBufferRef.current + digit;
+    const newBuffer = dialBufferRef.current;
     setCallState('dialing');
     
     // Auto-dial after 2 digits (dial codes are 2 digits)
@@ -186,6 +193,18 @@ const Keypad: React.FC<KeypadProps> = ({ dialLineInfo, onClose }) => {
   const handleGGPageClick = (page: number) => {
     console.log(`[Keypad] G/G page ${page} clicked`);
     // TODO: Implement G/G page switching if needed
+  };
+
+  const handleCancel = () => {
+    landlineStore.stopDialTone();
+    if (ringbackAudioRef.current) {
+      ringbackAudioRef.current.pause();
+      ringbackAudioRef.current = null;
+    }
+    resetDialCallStatus();
+    clearIaDisplay();
+    dialBufferRef.current = '';
+    if (onClose) onClose();
   };
 
   return (
@@ -241,6 +260,10 @@ const Keypad: React.FC<KeypadProps> = ({ dialLineInfo, onClose }) => {
         <SquareButton topLine="" bottomLine="*" onClick={() => handleDigitPress("*")} />
         <SquareButton topLine="OPER" bottomLine="0" onClick={() => handleDigitPress("0")} />
         <SquareButton topLine="" bottomLine="#" onClick={() => handleDigitPress("#")} />
+      </div>
+      {/* Cancel button — always available to dismiss the keypad */}
+      <div className="mt-1">
+        <SquareButton topLine="" bottomLine="CNCL" onClick={handleCancel} />
       </div>
     </div>
   );

@@ -57,11 +57,14 @@ const Keypad: React.FC<KeypadProps> = ({ dialLineInfo, onClose }) => {
   const ringbackAudioRef = useRef<HTMLAudioElement | null>(null);
   const dialToneStartedRef = useRef(false);
   
+  const dialBufferRef = useRef(''); // ref-based buffer to avoid stale closure issues
+
   // Store access
   const sendDialCall = useCoreStore((s: any) => s.sendDialCall);
   const dialCallStatus = useCoreStore((s: any) => s.dialCallStatus);
   const positionData = useCoreStore((s: any) => s.positionData);
   const selectedPositions = useCoreStore((s: any) => s.selectedPositions);
+  const resetDialCallStatus = useCoreStore((s: any) => s.resetDialCallStatus);
   
   // Get dial code table
   const currentCallsign = selectedPositions?.[0]?.cs;
@@ -69,7 +72,9 @@ const Keypad: React.FC<KeypadProps> = ({ dialLineInfo, onClose }) => {
   
   // Clear buffer on mount
   useEffect(() => {
+    dialBufferRef.current = '';
     setDialBuffer('');
+    resetDialCallStatus();
     setCallState('ready');
     // Play dial tone when keypad opens for a dial line
     if (dialLineInfo) {
@@ -132,14 +137,29 @@ const Keypad: React.FC<KeypadProps> = ({ dialLineInfo, onClose }) => {
       dialToneStartedRef.current = false;
     }
     playDTMFTone(digit);
-    const newBuffer = dialBuffer + digit;
+    // Use ref-based buffer to avoid stale closure — dialBuffer state may not
+    // have updated yet if digits are pressed quickly.
+    dialBufferRef.current = dialBufferRef.current + digit;
+    const newBuffer = dialBufferRef.current;
     setDialBuffer(newBuffer);
     setCallState('dialing');
     // Auto-dial after 2 digits
     if (newBuffer.length >= 2) {
       setTimeout(() => initiateCall(newBuffer), 200);
     }
-  }, [dialBuffer, callState, initiateCall]);
+  }, [callState, initiateCall]);
+
+  const handleCancel = () => {
+    landlineStore.stopDialTone();
+    if (ringbackAudioRef.current) {
+      ringbackAudioRef.current.pause();
+      ringbackAudioRef.current = null;
+    }
+    resetDialCallStatus();
+    dialBufferRef.current = '';
+    setDialBuffer('');
+    if (onClose) onClose();
+  };
 
   return (
     <div className="items-center space-x-2">
@@ -156,6 +176,10 @@ const Keypad: React.FC<KeypadProps> = ({ dialLineInfo, onClose }) => {
         <KeypadButton topLine="*" bottomLine="" onClick={() => handleDigitPress('*')} />
         <KeypadButton topLine="" bottomLine="0" onClick={() => handleDigitPress('0')} />
         <KeypadButton topLine="#" bottomLine="" onClick={() => handleDigitPress('#')} />
+      </div>
+      {/* Cancel button — always available to dismiss the keypad */}
+      <div className="mt-1">
+        <KeypadButton topLine="" bottomLine="CNCL" onClick={handleCancel} />
       </div>
     </div>
   );
