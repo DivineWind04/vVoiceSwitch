@@ -1306,6 +1306,11 @@ export const useCoreStore = create<CoreState>((set: any, get: any) => {
                             const call_id = resolveCallId(k.call || '');
                             k.call_name = call_table[call_id]?.[0] || call_id
                             k.lineType = call_table[call_id]?.[1] ?? 2; // Default to type 2 (regular)
+                            // Normalize type-3 (dial/trunk) lines to use DL_ prefix so renderButtons
+                            // routes them to the dial keypad handler regardless of what prefix AFV used
+                            if (k.lineType === 3 && call_id) {
+                                k.call = `DL_${call_id}`;
+                            }
                             new_gg.push({ ...k })
                             if (k.call?.startsWith('SO_')) {
 
