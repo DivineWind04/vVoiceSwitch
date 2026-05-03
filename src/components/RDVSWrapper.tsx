@@ -378,6 +378,7 @@ export default function RDVSWrapper({ variant = 'default' }: RDVSWrapperProps) {
   const positionData = useCoreStore((s: any) => s.positionData);
   const holdBtn = useCoreStore((s: any) => s.holdBtn);
   const releaseBtn = useCoreStore((s: any) => s.releaseBtn);
+  const cancelDialKeypad = useCoreStore((s: any) => s.cancelDialKeypad);
   const setActiveDialLine = useCoreStore((s: any) => s.setActiveDialLine);
   const sendDialCall = useCoreStore((s: any) => s.sendDialCall);
 
@@ -731,7 +732,7 @@ export default function RDVSWrapper({ variant = 'default' }: RDVSWrapperProps) {
   const handleFunctionKey = (label: string) => {
     switch (label) {
       case 'HOLD': holdBtn(); break;
-      case 'REL': releaseBtn(); break;
+      case 'REL': releaseBtn(); cancelDialKeypad(); setKeypadActive(false); break;
       case 'RECON': {
         // Reconnect: find first held call and re-connect
         const heldCall = gg_status?.find((s: any) => s.status === 'hold');

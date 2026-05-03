@@ -65,6 +65,8 @@ const Keypad: React.FC<KeypadProps> = ({ dialLineInfo, onClose }) => {
   const positionData = useCoreStore((s: any) => s.positionData);
   const selectedPositions = useCoreStore((s: any) => s.selectedPositions);
   const resetDialCallStatus = useCoreStore((s: any) => s.resetDialCallStatus);
+  const activeDialLine = useCoreStore((s: any) => s.activeDialLine);
+  const hasBeenActiveRef = useRef(false);
   
   // Get dial code table
   const currentCallsign = selectedPositions?.[0]?.cs;
@@ -90,6 +92,20 @@ const Keypad: React.FC<KeypadProps> = ({ dialLineInfo, onClose }) => {
     };
   }, []);
   
+  // Watch activeDialLine — if cancelled from outside (REL button), close the keypad
+  useEffect(() => {
+    if (activeDialLine !== null) {
+      hasBeenActiveRef.current = true;
+    } else if (hasBeenActiveRef.current) {
+      landlineStore.stopDialTone();
+      if (ringbackAudioRef.current) {
+        ringbackAudioRef.current.pause();
+        ringbackAudioRef.current = null;
+      }
+      if (onClose) onClose();
+    }
+  }, [activeDialLine, onClose]);
+
   // Watch dial call status
   useEffect(() => {
     if (dialCallStatus === 'ringback') {
@@ -149,18 +165,6 @@ const Keypad: React.FC<KeypadProps> = ({ dialLineInfo, onClose }) => {
     }
   }, [callState, initiateCall]);
 
-  const handleCancel = () => {
-    landlineStore.stopDialTone();
-    if (ringbackAudioRef.current) {
-      ringbackAudioRef.current.pause();
-      ringbackAudioRef.current = null;
-    }
-    resetDialCallStatus();
-    dialBufferRef.current = '';
-    setDialBuffer('');
-    if (onClose) onClose();
-  };
-
   return (
     <div className="items-center space-x-2">
       <div className="grid grid-cols-3 gap-[4px]">
@@ -176,10 +180,6 @@ const Keypad: React.FC<KeypadProps> = ({ dialLineInfo, onClose }) => {
         <KeypadButton topLine="*" bottomLine="" onClick={() => handleDigitPress('*')} />
         <KeypadButton topLine="" bottomLine="0" onClick={() => handleDigitPress('0')} />
         <KeypadButton topLine="#" bottomLine="" onClick={() => handleDigitPress('#')} />
-      </div>
-      {/* Cancel button — always available to dismiss the keypad */}
-      <div className="mt-1">
-        <KeypadButton topLine="" bottomLine="CNCL" onClick={handleCancel} />
       </div>
     </div>
   );

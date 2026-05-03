@@ -86,6 +86,7 @@ const StvsBase: React.FC = () => {
   const landlineHandleButtonPress = useCoreStore((s: any) => s.landlineHandleButtonPress);
   const setActiveDialLine = useCoreStore((s: any) => s.setActiveDialLine);
   const activeDialLine = useCoreStore((s: any) => s.activeDialLine);
+  const cancelDialKeypad = useCoreStore((s: any) => s.cancelDialKeypad);
 
   // REL button: release all active G/G calls
   const handleRelease = useCallback(() => {
@@ -108,9 +109,9 @@ const StvsBase: React.FC = () => {
         }
       }
     }
-    // Also clear any active dial line
-    setActiveDialLine(null);
-  }, [ggData, landlineHandleButtonPress, vvscsHandleButtonPress, vacsHandleButtonPress, sendMsg, setActiveDialLine]);
+    // Also cancel any open dial keypad
+    cancelDialKeypad();
+  }, [ggData, landlineHandleButtonPress, vvscsHandleButtonPress, vacsHandleButtonPress, sendMsg, cancelDialKeypad]);
   
   // Convert ILLUM knob angle (-135 to +135) to brightness (0.1 to 1.0)
   const handleIllumChange = useCallback((angle: number) => {

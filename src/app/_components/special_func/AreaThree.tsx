@@ -23,6 +23,7 @@ const AreaThree: React.FC<AreaThreeProps> = ({ setSettingModal, onToggleKeypad, 
   const landlineHandleButtonPress = useCoreStore((s: any) => s.landlineHandleButtonPress);
   const selectedChime = useCoreStore((s: any) => s.selectedChime);
   const cycleChime = useCoreStore((s: any) => s.cycleChime);
+  const cancelDialKeypad = useCoreStore((s: any) => s.cancelDialKeypad);
 
   // Handle chime type button - cycle and play sample
   const handleChimeType = () => {
@@ -95,6 +96,8 @@ const AreaThree: React.FC<AreaThreeProps> = ({ setSettingModal, onToggleKeypad, 
         sendMsg({ type: 'stop', cmd1: call_id, dbl1 });
       }
     });
+    // Also cancel any open dial keypad
+    cancelDialKeypad();
   };
 
   const buttons = [

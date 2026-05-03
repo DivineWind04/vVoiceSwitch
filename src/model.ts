@@ -187,6 +187,7 @@ interface CoreState extends VacsStoreState, VvscsStoreState, LandlineStoreState,
     appendToIaDisplay: (digit: string) => void;
     clearIaDisplay: () => void;
     resetDialCallStatus: () => void;
+    cancelDialKeypad: () => void;
     backspaceIaDisplay: () => void;
 
     // G/G Chime selection (1-13)
@@ -632,6 +633,7 @@ export const useCoreStore = create<CoreState>((set: any, get: any) => {
     },
     clearIaDisplay: () => set({ iaDisplayBuffer: '' }),
     resetDialCallStatus: () => set({ dialCallStatus: 'idle' }),
+    cancelDialKeypad: () => set({ activeDialLine: null, dialCallStatus: 'idle', iaDisplayBuffer: '' }),
     backspaceIaDisplay: () => {
         const current = get().iaDisplayBuffer;
         set({ iaDisplayBuffer: current.slice(0, -1) });

@@ -11,6 +11,7 @@ const AreaThree: React.FC<{ setSettingModal: (v: boolean) => void }> = ({ setSet
 
   const sendMsg = useCoreStore((s: any) => s.sendMessageNow);
   const gg_status = useCoreStore((s: any) => s.gg_status);
+  const cancelDialKeypad = useCoreStore((s: any) => s.cancelDialKeypad);
 
   const relAction = () => {
     // Release ALL active G/G calls
@@ -44,6 +45,8 @@ const AreaThree: React.FC<{ setSettingModal: (v: boolean) => void }> = ({ setSet
         sendMsg({ type: 'stop', cmd1: call_id, dbl1 });
       }
     });
+    // Also cancel any open dial keypad
+    cancelDialKeypad();
   };
 
   const buttons = [
