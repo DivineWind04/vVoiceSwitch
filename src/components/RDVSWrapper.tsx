@@ -554,7 +554,7 @@ export default function RDVSWrapper({ variant = 'default' }: RDVSWrapperProps) {
     // Landline WebRTC calls — route through Landline handler
     if (statusObj?.isLandline && statusObj?.landlineCallId) {
       // LineType 3 dial lines → open keypad instead of direct call
-      if (statusObj.lineType === 3 && (!status || status === 'off' || status === 'idle')) {
+      if (statusObj.lineType === 3 && (status !== 'ok' && status !== 'active' && status !== 'ringing' && status !== 'chime' && status !== 'busy' && status !== 'hold')) {
         const trunkName = btn.line1 || '';
         setActiveDialLine({ trunkName, lineType: 3 });
         setKeypadActive(true);
