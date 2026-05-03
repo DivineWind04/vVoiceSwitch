@@ -261,6 +261,7 @@ interface CoreState extends VacsStoreState, VvscsStoreState, LandlineStoreState,
 let call_table: Record<string, [string, number]> = {}
 let line_order: Record<string, number> = {} // Track original line order for sorting
 let placeholder_indices: number[] = [] // Track indices where empty placeholder buttons should appear
+let type3AfvStubs: any[] = [] // Type-3 AFV dial line stubs, preserved so they survive AFV channel_status syncs
 let ag_freq_order: number[] = [] // Track A/G frequency insertion order (preserves CRC add order)
 
 // Helper to extract line ID from server call field (handles varying prefix formats)
@@ -1114,6 +1115,7 @@ export const useCoreStore = create<CoreState>((set: any, get: any) => {
 
         // Pre-seed gg_status with type-3 AFV dial line stubs so buttons appear immediately
         // (before AFV sends channel_status). Replaced by real AFV data when channel_status arrives.
+        type3AfvStubs = []; // Reset before re-populating
         if (type3AfvLines.length > 0) {
             const preSeeded = type3AfvLines.map(({ lineId, label }) => ({
                 call: `DL_${lineId}`,
@@ -1126,6 +1128,7 @@ export const useCoreStore = create<CoreState>((set: any, get: any) => {
                 const bOrder = line_order[b.call.substring(3)] ?? 9999;
                 return aOrder - bOrder;
             });
+            type3AfvStubs = [...preSeeded]; // Persist at module level so channel_status handler can re-inject them
             // Keep existing landline/vacs/vvscs entries; prepend type-3 AFV stubs
             const currentGg = get().gg_status || [];
             const storeEntries = currentGg.filter((e: any) => e.isLandline || e.isVacs || e.isVvscs);
@@ -1333,6 +1336,15 @@ export const useCoreStore = create<CoreState>((set: any, get: any) => {
                     const overrideCallStatus = new_override.length > 0 ? new_override[0].status : 'off';
 
                     // Sort gg_status based on original line order from config
+                    // First, re-inject any type-3 AFV dial line stubs that AFV didn't report
+                    // (AFV only reports type-3 lines when active/ringing; idle ones are omitted)
+                    const reportedCallIds = new Set(new_gg.map((e: any) => resolveCallId(e.call || '')));
+                    for (const stub of type3AfvStubs) {
+                        const stubId = resolveCallId(stub.call);
+                        if (!reportedCallIds.has(stubId)) {
+                            new_gg.push({ ...stub });
+                        }
+                    }
                     new_gg.sort((a: any, b: any) => {
                         const aId = resolveCallId(a.call || '');
                         const bId = resolveCallId(b.call || '');
