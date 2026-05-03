@@ -214,7 +214,7 @@ const GroundGroundPage: React.FC<GroundGroundPageProps> = ({
         const isDialLine = lineType === 3;
         const trunkName = data.call_name || data.call || '';
         
-        if (isDialLine && (data.status === 'off' || data.status === '' || data.status === 'idle')) {
+        if (isDialLine && (!data.status || data.status === 'off' || data.status === '' || data.status === 'idle')) {
           // Dial lines open the keypad when clicked
           onClick = () => {
             if (onOpenKeypadForDialLine) {

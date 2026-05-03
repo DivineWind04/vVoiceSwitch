@@ -180,7 +180,7 @@ const GroundGroundPage: React.FC<GroundGroundPageProps> = ({ onGG3Toggle }) => {
         const isDialLine = lineType === 3;
         const trunkName = data.call_name || data.call || '';
         
-        if (isDialLine && (data.status === 'off' || data.status === '' || data.status === 'idle')) {
+        if (isDialLine && (!data.status || data.status === 'off' || data.status === '' || data.status === 'idle')) {
           // Dial lines open the keypad when clicked
           onClick = () => openKeypadForDialLine(trunkName, lineType);
         } else if (data.status === 'off' || data.status === '') {

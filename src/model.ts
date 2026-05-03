@@ -951,6 +951,7 @@ export const useCoreStore = create<CoreState>((set: any, get: any) => {
         const vacsConfigLines: Array<{ target: string; targetType: 'position' | 'station' | 'client'; label: string; lineType: number; sortIndex: number }> = [];
         const vvscsConfigLines: Array<{ target: string; targetType: 'position' | 'shout'; remoteFacility?: string; label: string; lineType: number; sortIndex: number }> = [];
         const landlineConfigLines: LandlineConfiguredLine[] = [];
+        const type3AfvLines: Array<{ lineId: string; label: string }> = [];
 
         // Derive facility ID for landline lines (all targets share the position's parent facility)
         let llFacilityId = '';
@@ -1085,6 +1086,10 @@ export const useCoreStore = create<CoreState>((set: any, get: any) => {
                 // AFV line — register normally (skip when AFV is unavailable)
                 call_table[line[0]] = [line[2], line[1]];
                 line_order[String(line[0])] = item.originalIndex;
+                if (line[1] === 3) {
+                    // Collect type-3 dial lines for pre-seeding gg_status
+                    type3AfvLines.push({ lineId: String(line[0]), label: String(line[2] || line[0]) });
+                }
                 if (!vnasStore.getState().isSweatbox && callsign) {
                     addCall(line[1], '' + line[0]);
                 }
@@ -1102,6 +1107,26 @@ export const useCoreStore = create<CoreState>((set: any, get: any) => {
         // Pass landline dial code table if present
         const llDialTable = findLlDialCodeTable(get().positionData, callsign);
         landlineStore.setLlDialCodeTable(llDialTable);
+
+        // Pre-seed gg_status with type-3 AFV dial line stubs so buttons appear immediately
+        // (before AFV sends channel_status). Replaced by real AFV data when channel_status arrives.
+        if (type3AfvLines.length > 0) {
+            const preSeeded = type3AfvLines.map(({ lineId, label }) => ({
+                call: `DL_${lineId}`,
+                call_name: label,
+                lineType: 3,
+                status: 'off',
+            }));
+            preSeeded.sort((a: any, b: any) => {
+                const aOrder = line_order[a.call.substring(3)] ?? 9999;
+                const bOrder = line_order[b.call.substring(3)] ?? 9999;
+                return aOrder - bOrder;
+            });
+            // Keep existing landline/vacs/vvscs entries; prepend type-3 AFV stubs
+            const currentGg = get().gg_status || [];
+            const storeEntries = currentGg.filter((e: any) => e.isLandline || e.isVacs || e.isVvscs);
+            set({ gg_status: [...preSeeded, ...storeEntries] });
+        }
 
         // Derive facility ID by walking positionData tree to find which facility owns this position
         const selectedPos = selected_positions[0] as any;

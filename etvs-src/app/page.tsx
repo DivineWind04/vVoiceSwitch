@@ -11,6 +11,7 @@ import SettingModal from '../../src/pages/setting';
 import { useState, useEffect } from "react";
 import axios from "axios";
 import { useCoreStore } from '../model';
+import { isReliefCallsign } from '../../src/lib/facilityLoader';
 
 // VATSIM controllers feed URL (proxied through API to avoid CORS)
 const VATSIM_CONTROLLERS_URL = '/api/vatsim/controllers';
@@ -32,7 +33,7 @@ export default function HomePage() {
       if (!stp) return results;
       if (Array.isArray(stp.positions)) {
         for (const e of stp.positions) {
-          if (e.cs === callsign) {
+          if (e.cs === callsign || isReliefCallsign(callsign, e.cs)) {
             results.push({ facility: stp, position: e });
           }
         }
@@ -50,7 +51,7 @@ export default function HomePage() {
       if (!stp) return null;
       if (Array.isArray(stp.positions)) {
         for (const e of stp.positions) {
-          if (e.cs === callsign) return stp;
+          if (e.cs === callsign || isReliefCallsign(callsign, e.cs)) return stp;
         }
       }
       if (Array.isArray(stp.childFacilities)) {

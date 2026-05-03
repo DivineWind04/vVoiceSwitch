@@ -127,6 +127,33 @@ export async function loadAllFacilities(): Promise<{
 }
 
 /**
+ * Check if `actual` is a relief variant of `config`.
+ * A relief callsign has exactly one segment with a single digit appended to the config segment.
+ * Examples: "SFO_W1_APP" is relief of "SFO_W_APP", "OAK_161_CTR" is relief of "OAK_16_CTR"
+ */
+export function isReliefCallsign(actual: string, config: string): boolean {
+  if (!actual || !config || actual === config) return false;
+  const a = actual.split('_');
+  const c = config.split('_');
+  if (a.length !== c.length) return false;
+  let diffCount = 0;
+  for (let i = 0; i < c.length; i++) {
+    if (a[i] === c[i]) continue;
+    // actual segment must be config segment + exactly one trailing digit
+    if (
+      a[i].length === c[i].length + 1 &&
+      a[i].startsWith(c[i]) &&
+      /\d/.test(a[i][a[i].length - 1])
+    ) {
+      diffCount++;
+    } else {
+      return false;
+    }
+  }
+  return diffCount === 1;
+}
+
+/**
  * Find a position by callsign across all loaded facilities
  */
 export function findPositionByCallsign(data: Facility, callsign: string): {
@@ -159,12 +186,9 @@ export function findPositionByCallsign(data: Facility, callsign: string): {
   const exact = search(data, (cs) => cs === callsign);
   if (exact) return exact;
 
-  // Relief position matching: "PAO_1_TWR" → "PAO_TWR"
-  const baseCallsign = callsign.replace(/_\d+_/, '_');
-  if (baseCallsign !== callsign) {
-    const relief = search(data, (cs) => cs === baseCallsign);
-    if (relief) return relief;
-  }
+  // Relief position matching: e.g. "SFO_W1_APP" → "SFO_W_APP", "OAK_161_CTR" → "OAK_16_CTR"
+  const relief = search(data, (cs) => isReliefCallsign(callsign, cs));
+  if (relief) return relief;
 
   return null;
 }

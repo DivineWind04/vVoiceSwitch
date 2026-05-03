@@ -9,6 +9,8 @@
 // Use local API proxy to avoid CORS issues
 const VATSIM_CONTROLLERS_URL = '/api/vatsim/controllers';
 
+import { isReliefCallsign } from './facilityLoader';
+
 export interface VatsimPosition {
   facilityId: string;
   facilityName: string;
@@ -180,20 +182,10 @@ export function matchControllerToPosition(
       return posBase === baseCallsign || p.cs === baseCallsign;
     });
 
-    // Strategy 2: Strip trailing digit from sector designator
-    // e.g., "OAK_S1_APP" → "OAK_S_APP", "OAK_621_CTR" → "OAK_62_CTR"
+    // Strategy 2: Relief callsign matching
+    // e.g., "SFO_W1_APP" → "SFO_W_APP", "OAK_161_CTR" → "OAK_16_CTR"
     if (!match) {
-      const parts = controllerCallsign.split('_');
-      if (parts.length >= 3) {
-        const sectorIdx = parts.length - 2;
-        const sector = parts[sectorIdx];
-        if (sector.length > 1 && /\d$/.test(sector)) {
-          const newParts = [...parts];
-          newParts[sectorIdx] = sector.slice(0, -1);
-          const strippedCallsign = newParts.join('_');
-          match = positions.find(p => p.cs === strippedCallsign);
-        }
-      }
+      match = positions.find(p => isReliefCallsign(controllerCallsign, p.cs));
     }
   }
   
