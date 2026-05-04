@@ -39,10 +39,14 @@ export interface Facility {
 // Helper function to find a dialCodeTable for a given position
 // Searches up the facility tree from the position's parent facility
 export function findDialCodeTable(positionData: Facility, positionCallsign: string): DialCodeTable | null {
+    // Normalize callsign: spaces → underscores, uppercase for matching
+    const normalizedCallsign = positionCallsign.replace(/\s+/g, '_').toUpperCase();
     // Recursive search through facility tree
     function searchFacility(facility: Facility): { dialCodeTable?: DialCodeTable; hasPosition: boolean } {
-        // Check if this facility has the position
-        const hasPosition = facility.positions?.some(p => p.cs === positionCallsign);
+        // Check if this facility has the position (normalize both sides for comparison)
+        const hasPosition = facility.positions?.some(p =>
+            p.cs?.replace(/\s+/g, '_').toUpperCase() === normalizedCallsign
+        );
         
         // If this facility has the position and a dialCodeTable, return it
         if (hasPosition && facility.dialCodeTable) {
