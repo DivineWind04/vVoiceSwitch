@@ -724,6 +724,7 @@ export const useCoreStore = create<CoreState>((set: any, get: any) => {
             // Get the current position's callsign to find the dialCodeTable
             const currentCallsign = selectedPositions?.[0]?.cs;
             console.log('[dial_call] Attempting:', { trunkName: normalizedTrunkName, dialCode: normalizedDialCode, currentCallsign });
+            console.log('[dial_call] positionData:', { id: (positionData as any)?.id, childCount: (positionData as any)?.childFacilities?.length, firstChildId: (positionData as any)?.childFacilities?.[0]?.id });
             if (!currentCallsign) {
                 console.error('[dial_call] No current position selected');
                 set({ dialCallStatus: 'error' });
