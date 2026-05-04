@@ -719,6 +719,7 @@ export const useCoreStore = create<CoreState>((set: any, get: any) => {
             
             // Get the current position's callsign to find the dialCodeTable
             const currentCallsign = selectedPositions?.[0]?.cs;
+            console.log('[dial_call] Attempting:', { trunkName: normalizedTrunkName, dialCode: normalizedDialCode, currentCallsign });
             if (!currentCallsign) {
                 console.error('[dial_call] No current position selected');
                 set({ dialCallStatus: 'error' });
@@ -728,10 +729,12 @@ export const useCoreStore = create<CoreState>((set: any, get: any) => {
             // Find the dialCodeTable for this position
             const dialCodeTable = findDialCodeTable(positionData, currentCallsign);
             if (!dialCodeTable) {
-                console.error('[dial_call] No dialCodeTable found for position:', currentCallsign);
+                console.error('[dial_call] No dialCodeTable found for position:', currentCallsign, '| positionData id:', (positionData as any)?.id);
                 set({ dialCallStatus: 'error' });
                 return;
             }
+            
+            console.log('[dial_call] dialCodeTable keys:', Object.keys(dialCodeTable), '| trunkName:', normalizedTrunkName, '| dialCode:', normalizedDialCode);
             
             // Resolve the dial code to the destination line ID
             const targetLineId = resolveDialCode(dialCodeTable, normalizedTrunkName, normalizedDialCode);
@@ -739,6 +742,8 @@ export const useCoreStore = create<CoreState>((set: any, get: any) => {
                 console.error('[dial_call] Could not resolve dial code:', {
                     trunkName: normalizedTrunkName,
                     dialCode: normalizedDialCode,
+                    tableKeys: Object.keys(dialCodeTable),
+                    trunkEntry: dialCodeTable[normalizedTrunkName],
                 });
                 set({ dialCallStatus: 'error' });
                 return;
@@ -754,11 +759,11 @@ export const useCoreStore = create<CoreState>((set: any, get: any) => {
             set({ dialCallStatus: 'dialing' });
             
             // Send the call command with the destination line ID
-            // dbl1 = 1 for ring-type call (plays chime at destination)
+            // dbl1 = line type of the destination (type-3 = trunk/dial line)
             sendMessageNow({ 
                 type: 'call', 
                 cmd1: targetLineId,     // The destination CRC line ID
-                dbl1: 1                 // Call type 1 = ring call
+                dbl1: 3                 // Call type 3 = trunk/dial line
             });
             
             // Set to ringback after a short delay (simulating call routing)
