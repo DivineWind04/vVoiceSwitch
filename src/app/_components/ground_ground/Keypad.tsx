@@ -252,18 +252,18 @@ const Keypad: React.FC<KeypadProps> = ({ dialLineInfo, onClose }) => {
 
       {/* Keypad grid - 4 rows of 3 columns */}
       <div className="grid grid-cols-3 gap-1" style={{ width: '100%' }}>
-        <SquareButton topLine="" bottomLine="1" onClick={() => handleDigitPress("1")} />
-        <SquareButton topLine="ABC" bottomLine="2" onClick={() => handleDigitPress("2")} />
-        <SquareButton topLine="DEF" bottomLine="3" onClick={() => handleDigitPress("3")} />
-        <SquareButton topLine="GHI" bottomLine="4" onClick={() => handleDigitPress("4")} />
-        <SquareButton topLine="JKL" bottomLine="5" onClick={() => handleDigitPress("5")} />
-        <SquareButton topLine="MNO" bottomLine="6" onClick={() => handleDigitPress("6")} />
-        <SquareButton topLine="PRS" bottomLine="7" onClick={() => handleDigitPress("7")} />
-        <SquareButton topLine="TUV" bottomLine="8" onClick={() => handleDigitPress("8")} />
-        <SquareButton topLine="WXY" bottomLine="9" onClick={() => handleDigitPress("9")} />
-        <SquareButton topLine="" bottomLine="*" onClick={() => handleDigitPress("*")} />
-        <SquareButton topLine="OPER" bottomLine="0" onClick={() => handleDigitPress("0")} />
-        <SquareButton topLine="" bottomLine="#" onClick={() => handleDigitPress("#")} />
+        <SquareButton topLine="" bottomLine="1" onClick={() => handleDigitPress("1")} controlledIndicator={false} />
+        <SquareButton topLine="ABC" bottomLine="2" onClick={() => handleDigitPress("2")} controlledIndicator={false} />
+        <SquareButton topLine="DEF" bottomLine="3" onClick={() => handleDigitPress("3")} controlledIndicator={false} />
+        <SquareButton topLine="GHI" bottomLine="4" onClick={() => handleDigitPress("4")} controlledIndicator={false} />
+        <SquareButton topLine="JKL" bottomLine="5" onClick={() => handleDigitPress("5")} controlledIndicator={false} />
+        <SquareButton topLine="MNO" bottomLine="6" onClick={() => handleDigitPress("6")} controlledIndicator={false} />
+        <SquareButton topLine="PRS" bottomLine="7" onClick={() => handleDigitPress("7")} controlledIndicator={false} />
+        <SquareButton topLine="TUV" bottomLine="8" onClick={() => handleDigitPress("8")} controlledIndicator={false} />
+        <SquareButton topLine="WXY" bottomLine="9" onClick={() => handleDigitPress("9")} controlledIndicator={false} />
+        <SquareButton topLine="" bottomLine="*" onClick={() => handleDigitPress("*")} controlledIndicator={false} />
+        <SquareButton topLine="OPER" bottomLine="0" onClick={() => handleDigitPress("0")} controlledIndicator={false} />
+        <SquareButton topLine="" bottomLine="#" onClick={() => handleDigitPress("#")} controlledIndicator={false} />
       </div>
     </div>
   );

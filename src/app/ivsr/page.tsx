@@ -16,6 +16,8 @@ export default function IVSRPage() {
 	const [showKeypad, setShowKeypad] = useState(false);
 	const [dialLineInfo, setDialLineInfo] = useState<{ trunkName: string; lineType: number } | null>(null);
 	const brightness = useCoreStore((s) => s.brightness);
+	const setActiveDialLine = useCoreStore((s: any) => s.setActiveDialLine);
+	const cancelDialKeypad = useCoreStore((s: any) => s.cancelDialKeypad);
 	
 	// Get selected position from store
 	const selectedPositions = useCoreStore((s: any) => s.selectedPositions);
@@ -33,12 +35,15 @@ export default function IVSRPage() {
 	const openKeypadForDialLine = (trunkName: string, lineType: number) => {
 		setDialLineInfo({ trunkName, lineType });
 		setShowKeypad(true);
+		// Also set activeDialLine in store so REL button can cancel the keypad
+		setActiveDialLine({ trunkName, lineType });
 	};
 
 	// Close keypad
 	const closeKeypad = () => {
 		setShowKeypad(false);
 		setDialLineInfo(null);
+		cancelDialKeypad();
 	};
 	
 	// Get the filtered position - use selectedPositions first, fallback to positionData
