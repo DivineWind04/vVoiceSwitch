@@ -213,41 +213,28 @@ const Keypad: React.FC<KeypadProps> = ({ dialLineInfo, onClose }) => {
 
   return (
     <div className="flex flex-col p-2" style={{ marginTop: '8px' }}>
-      {/* Top indicator bar */}
-      <div 
-        className="flex items-center mb-1"
-        style={{ 
-          width: '100%',
-          height: '14px',
-        }}
-      >
-        <div 
-
-        />
-        <div 
-          style={{ 
-            flex: 1, 
-            height: '34px', 
-            backgroundColor: '#003399',
-          }}
-        />
-      </div>
-
-      {/* Status display showing dialed digits or status */}
-      <div 
-        className="w-full text-center mb-3"
+      {/* Status display — text lives inside the blue bar */}
+      <div
+        className="flex items-center justify-center mb-2"
         style={{
-          color: '#CCCC00',
-          fontFamily: 'monospace',
-          fontWeight: 'bold',
-          fontSize: '14px',
-          letterSpacing: '1px',
-          minHeight: '18px'
+          width: '100%',
+          height: '34px',
+          backgroundColor: '#003399',
         }}
       >
-        {callState === 'ready' || callState === 'dialing'
-          ? iaDisplayBuffer || ''
-          : displayMessage}
+        <span
+          style={{
+            color: '#CCCC00',
+            fontFamily: 'monospace',
+            fontWeight: 'bold',
+            fontSize: '18px',
+            letterSpacing: '2px',
+          }}
+        >
+          {callState === 'ready' || callState === 'dialing'
+            ? iaDisplayBuffer || ''
+            : displayMessage}
+        </span>
       </div>
 
       {/* Keypad grid - 4 rows of 3 columns */}
