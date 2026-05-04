@@ -1117,9 +1117,20 @@ export const useCoreStore = create<CoreState>((set: any, get: any) => {
         // (before AFV sends channel_status). Replaced by real AFV data when channel_status arrives.
         type3AfvStubs = []; // Reset before re-populating
         if (type3AfvLines.length > 0) {
+            // Build a reverse map from lineId → trunk name using the dialCodeTable
+            const afvDialCodeTable = findDialCodeTable(get().positionData, callsign);
+            const lineIdToTrunk: Record<string, string> = {};
+            if (afvDialCodeTable) {
+                for (const [trunk, codes] of Object.entries(afvDialCodeTable)) {
+                    for (const lineId of Object.values(codes as Record<string, string>)) {
+                        lineIdToTrunk[String(lineId)] = trunk;
+                    }
+                }
+            }
             const preSeeded = type3AfvLines.map(({ lineId, label }) => ({
                 call: `DL_${lineId}`,
                 call_name: label,
+                trunkName: lineIdToTrunk[lineId] || label, // resolved trunk key for dialCodeTable lookup
                 lineType: 3,
                 status: 'off',
             }));
@@ -1307,10 +1318,15 @@ export const useCoreStore = create<CoreState>((set: any, get: any) => {
                             k.call_name = call_table[call_id]?.[0] || call_id
                             k.lineType = call_table[call_id]?.[1] ?? 2; // Default to type 2 (regular)
                             // Normalize type-3 (dial/trunk) lines to use DL_ prefix so renderButtons
-                            // routes them to the dial keypad handler regardless of what prefix AFV used
+                            // routes them to the dial keypad handler regardless of what prefix AFV used.
+                            // Also carry over the trunkName from the pre-seeded stub so sendDialCall
+                            // can look up the correct dialCodeTable entry.
                             if (k.lineType === 3 && call_id) {
                                 console.log(`[channel_status] type-3 line: raw call="${k.call}" resolved="${call_id}" status="${k.status}" → normalizing to DL_${call_id}`);
                                 k.call = `DL_${call_id}`;
+                                // Carry trunkName from the matching stub (resolved from dialCodeTable)
+                                const matchingStub = type3AfvStubs.find((s: any) => resolveCallId(s.call) === call_id);
+                                if (matchingStub?.trunkName) k.trunkName = matchingStub.trunkName;
                             }
                             new_gg.push({ ...k })
                             if (k.call?.startsWith('SO_')) {

@@ -212,7 +212,9 @@ const GroundGroundPage: React.FC<GroundGroundPageProps> = ({
       } else {
         // Check if this is a dial line (lineType === 3)
         const isDialLine = lineType === 3;
-        const trunkName = data.call_name || data.call || '';
+        // Use resolved trunkName (from dialCodeTable reverse-lookup) if available,
+        // otherwise fall back to call_name/call (which may be a raw label like "MULTI,,DIAL,122")
+        const trunkName = data.trunkName || data.call_name || data.call || '';
         
         if (isDialLine && (data.status !== 'ok' && data.status !== 'active' && data.status !== 'ringing' && data.status !== 'chime' && data.status !== 'busy' && data.status !== 'hold')) {
           // Dial lines open the keypad when clicked (any non-active status)
