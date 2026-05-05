@@ -760,13 +760,6 @@ export const useCoreStore = create<CoreState>((set: any, get: any) => {
             
             // Get the current position's callsign to find the dialCodeTable
             const currentCallsign = selectedPositions?.[0]?.cs;
-            console.log('[dial_call] Attempting:', { trunkName: normalizedTrunkName, dialCode: normalizedDialCode, currentCallsign });
-            console.log('[dial_call] positionData:', { id: (positionData as any)?.id, childCount: (positionData as any)?.childFacilities?.length, firstChildId: (positionData as any)?.childFacilities?.[0]?.id });
-            // Diagnostic: inspect the ZOA subtree to verify dialCodeTable is reachable
-            const _zoa = (positionData as any)?.childFacilities?.find((c: any) => c.id === 'ZOA');
-            const _nct = _zoa?.childFacilities?.find((c: any) => c.id === 'NCT');
-            const _sjc = _nct?.childFacilities?.find((c: any) => c.id === 'SJC');
-            console.log('[dial_call] ZOA present:', !!_zoa, '| NCT present:', !!_nct, '| NCT.dialCodeTable present:', !!_nct?.dialCodeTable, '| NCT.childFacilities:', _nct?.childFacilities?.map((c: any) => c.id), '| SJC present:', !!_sjc, '| SJC positions:', _sjc?.positions?.map((p: any) => p.cs));
             if (!currentCallsign) {
                 console.error('[dial_call] No current position selected');
                 set({ dialCallStatus: 'error' });
@@ -796,11 +789,7 @@ export const useCoreStore = create<CoreState>((set: any, get: any) => {
                 return;
             }
             
-            console.log('[dial_call] Resolved:', {
-                trunkName: normalizedTrunkName,
-                dialCode: normalizedDialCode,
-                targetLineId,
-            });
+            console.log('[dial_call] Sending call:', { trunkName: normalizedTrunkName, dialCode: normalizedDialCode, targetLineId });
             
             // Set status to dialing, then ringback
             set({ dialCallStatus: 'dialing', activeDialCallTarget: targetLineId });
