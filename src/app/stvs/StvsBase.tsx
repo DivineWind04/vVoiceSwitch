@@ -332,7 +332,11 @@ const StvsBase: React.FC = () => {
                   } else {
                     onClick = () => setActiveDialLine({ trunkName: trunkName3, lineType: 3 });
                   }
-                } else if (ggItem.status === 'ok' || ggItem.status === 'active' || ggItem.status === 'ringing' || ggItem.status === 'chime') {
+                } else if (ggItem.status === 'chime' || ggItem.status === 'ringing') {
+                  // Incoming call — answer it
+                  onClick = () => sendMsg({ type: 'call', cmd1: call_id, dbl1: 3 });
+                } else if (ggItem.status === 'ok' || ggItem.status === 'active') {
+                  // Active call — hang up
                   onClick = () => sendMsg({ type: 'stop', cmd1: call_id, dbl1: 3 });
                 }
               } else if (ggItem.status === 'off' || ggItem.status === '' || ggItem.status === 'idle') {

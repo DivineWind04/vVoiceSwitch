@@ -343,25 +343,25 @@ interface AudioConfig {
 
 const audioConfigs: Record<string, AudioConfig> = {
     vscs: {
-        ringback: 'Ringback.wav',
-        ggchime: 'GGChime.mp3',
-        override: 'Override.mp3'
+        ringback: '/Ringback.wav',
+        ggchime: '/GGChime.mp3',
+        override: '/Override.mp3'
     },
     etvs: {
-        ringback: 'Override_Term.wav',
-        ggchime: 'RDVS_Chime.m4a'
+        ringback: '/Override_Term.wav',
+        ggchime: '/RDVS_Chime.m4a'
     },
     stvs: {
-        ringback: 'Override_Term.wav',
-        ggchime: 'RDVS_Chime.m4a'
+        ringback: '/Override_Term.wav',
+        ggchime: '/RDVS_Chime.m4a'
     },
     ivsr: {
-        ringback: 'Override_Term.wav',
-        ggchime: 'RDVS_Chime.m4a'
+        ringback: '/Override_Term.wav',
+        ggchime: '/RDVS_Chime.m4a'
     },
     rdvs: {
-        ringback: 'Ringback.wav',
-        ggchime: 'GGChime.mp3'
+        ringback: '/Ringback.wav',
+        ggchime: '/GGChime.mp3'
     }
 };
 
