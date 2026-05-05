@@ -1347,6 +1347,9 @@ export const useCoreStore = create<CoreState>((set: any, get: any) => {
                     const new_gg: any[] = []
                     const new_vscs: any[] = []
                     const new_override: any[] = [] // Track OV_ prefixed calls
+            let audioAction: 'chime' | 'ringback' | 'stop' = 'stop';
+            let chimeCallerId: string | undefined;
+            let hasType3Cleared = false;
             cns.map((k: any) => {
                         if (k.call === 'A/G') {
                             new_ag.push({ ...k })
@@ -1385,23 +1388,34 @@ export const useCoreStore = create<CoreState>((set: any, get: any) => {
 
                             } else {
                                 if (k.status === 'chime') {
-                                    chime(getAudioElement('ggchime'));
+                                    audioAction = 'chime';
                                     // For dial lines (type 3), show caller ID from who's calling us
                                     if (k.lineType === 3 && k.otherPosition) {
-                                        set({ callerIdBuffer: k.otherPosition });
+                                        chimeCallerId = k.otherPosition;
                                     }
                                 } else if (k.status == 'ringing') {
-                                    chime(getAudioElement('ringback'))
+                                    if (audioAction !== 'chime') audioAction = 'ringback';
                                 } else {
-                                    stopAudio();
                                     // Clear caller ID when call ends or connects
                                     if (k.lineType === 3) {
-                                        set({ callerIdBuffer: '' });
+                                        hasType3Cleared = true;
                                     }
                                 }
                             }
                         }
                     })
+                    
+                    // Apply audio decision once after all lines are processed,
+                    // so a single chime/ringing line isn't silenced by subsequent idle lines.
+                    if (audioAction === 'chime') {
+                        chime(getAudioElement('ggchime'));
+                        if (chimeCallerId) set({ callerIdBuffer: chimeCallerId });
+                    } else if (audioAction === 'ringback') {
+                        chime(getAudioElement('ringback'));
+                    } else {
+                        stopAudio();
+                        if (hasType3Cleared) set({ callerIdBuffer: '' });
+                    }
                     
                     // Check if there's an active or held override (OV_ call)
                     const hasActiveOverride = new_override.some((ov: any) =>
