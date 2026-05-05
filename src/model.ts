@@ -348,11 +348,11 @@ const audioConfigs: Record<string, AudioConfig> = {
         override: '/Override.mp3'
     },
     etvs: {
-        ringback: '/Override_Term.wav',
+        ringback: '/DialLine.wav',
         ggchime: '/RDVS_Chime.m4a'
     },
     stvs: {
-        ringback: '/Override_Term.wav',
+        ringback: '/DialLine.wav',
         ggchime: '/RDVS_Chime.m4a'
     },
     ivsr: {

@@ -3,7 +3,7 @@
 
 import React, { useState, useCallback, useRef, useEffect } from "react";
 import StvsKeypadButton from "./StvsKeypadButton";
-import { useCoreStore, findDialCodeTable, resolveDialCode } from "~/model";
+import { useCoreStore, findDialCodeTable, resolveDialCode, getAudioElement } from "~/model";
 import { landlineStore } from '~/lib/landline/store';
 
 // DTMF frequency pairs for each key
@@ -125,12 +125,14 @@ const StvsKeypad: React.FC<StvsKeypadProps> = ({ brightness = 1.0, trunkName, on
   useEffect(() => {
     if (dialCallStatus === 'ringback') {
       setCallStatus('ringback');
-      // Play ringback audio
-      if (!ringbackAudioRef.current) {
-        ringbackAudioRef.current = new Audio('/Ringback.wav');
+      // Play DialLine ringback audio (looped) via the config system
+      const ringbackEl = getAudioElement('ringback');
+      if (ringbackEl) {
+        ringbackAudioRef.current = ringbackEl;
         ringbackAudioRef.current.loop = true;
+        ringbackAudioRef.current.currentTime = 0;
+        ringbackAudioRef.current.play().catch(() => {});
       }
-      ringbackAudioRef.current.play().catch(() => {});
     } else if (dialCallStatus === 'connected') {
       setCallStatus('connected');
       // Stop ringback
