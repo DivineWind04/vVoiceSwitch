@@ -4,23 +4,15 @@ import React, { useState, useEffect } from "react";
 import StvsBase from "./StvsBase";
 import axios from "axios";
 import { useCoreStore } from "~/model";
-import { loadAllFacilities, findPositionByCallsign } from "~/lib/facilityLoader";
+import { loadAllFacilities } from "~/lib/facilityLoader";
 
 export default function StvsPage() {
   const setPosData = useCoreStore((s: any) => s.setPositionData);
-  const callsign = useCoreStore((s: any) => s.callsign);
 
   useEffect(() => {
-    // Load all facilities and find the one containing the current position
+    // Always use the full merged data so findDialCodeTable can traverse
+    // ancestor facilities (e.g. NCT.dialCodeTable for SJC_TWR)
     loadAllFacilities().then(({ merged }) => {
-      if (callsign) {
-        const result = findPositionByCallsign(merged, callsign);
-        if (result?.facility) {
-          setPosData(result.facility);
-          return;
-        }
-      }
-      // Fallback to full merged data
       setPosData(merged);
     }).catch(() => {
       // Fallback to ZOA only
@@ -28,7 +20,7 @@ export default function StvsPage() {
         setPosData(r.data);
       });
     });
-  }, [setPosData, callsign]);
+  }, [setPosData]);
 
   return <StvsBase />;
 }
