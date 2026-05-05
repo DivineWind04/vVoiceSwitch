@@ -149,8 +149,15 @@ const StvsKeypad: React.FC<StvsKeypadProps> = ({ brightness = 1.0, trunkName, on
         ringbackAudioRef.current.pause();
         ringbackAudioRef.current = null;
       }
+    } else if (dialCallStatus === 'idle') {
+      // REL pressed or cancelled — stop ringback and reset
+      if (ringbackAudioRef.current) {
+        ringbackAudioRef.current.pause();
+        ringbackAudioRef.current = null;
+      }
+      setDialBuffer('');
+      setCallStatus('idle');
     }
-  }, [dialCallStatus]);
   
   // Cleanup on unmount
   useEffect(() => {

@@ -210,6 +210,7 @@ interface CoreState extends VacsStoreState, VvscsStoreState, LandlineStoreState,
     
     // Dial call state for type 3 lines
     activeDialLine: { trunkName: string; lineType: number } | null;
+    activeDialCallTarget: string | null; // The resolved line ID of the in-progress outgoing dial call
     dialCallStatus: 'idle' | 'dialing' | 'ringback' | 'connected' | 'busy' | 'error';
 
     // IA DISPLAY area state
@@ -654,6 +655,7 @@ export const useCoreStore = create<CoreState>((set: any, get: any) => {
     
     // Dial call state defaults
     activeDialLine: null,
+    activeDialCallTarget: null,
     dialCallStatus: 'idle' as const,
 
     // IA DISPLAY area state
@@ -667,7 +669,13 @@ export const useCoreStore = create<CoreState>((set: any, get: any) => {
     },
     clearIaDisplay: () => set({ iaDisplayBuffer: '' }),
     resetDialCallStatus: () => set({ dialCallStatus: 'idle' }),
-    cancelDialKeypad: () => set({ activeDialLine: null, dialCallStatus: 'idle', iaDisplayBuffer: '' }),
+    cancelDialKeypad: () => {
+        const { activeDialCallTarget } = get();
+        if (activeDialCallTarget) {
+            sendMessageNow({ type: 'stop', cmd1: activeDialCallTarget, dbl1: 3 });
+        }
+        set({ activeDialLine: null, activeDialCallTarget: null, dialCallStatus: 'idle', iaDisplayBuffer: '' });
+    },
     backspaceIaDisplay: () => {
         const current = get().iaDisplayBuffer;
         set({ iaDisplayBuffer: current.slice(0, -1) });
@@ -754,6 +762,11 @@ export const useCoreStore = create<CoreState>((set: any, get: any) => {
             const currentCallsign = selectedPositions?.[0]?.cs;
             console.log('[dial_call] Attempting:', { trunkName: normalizedTrunkName, dialCode: normalizedDialCode, currentCallsign });
             console.log('[dial_call] positionData:', { id: (positionData as any)?.id, childCount: (positionData as any)?.childFacilities?.length, firstChildId: (positionData as any)?.childFacilities?.[0]?.id });
+            // Diagnostic: inspect the ZOA subtree to verify dialCodeTable is reachable
+            const _zoa = (positionData as any)?.childFacilities?.find((c: any) => c.id === 'ZOA');
+            const _nct = _zoa?.childFacilities?.find((c: any) => c.id === 'NCT');
+            const _sjc = _nct?.childFacilities?.find((c: any) => c.id === 'SJC');
+            console.log('[dial_call] ZOA present:', !!_zoa, '| NCT present:', !!_nct, '| NCT.dialCodeTable present:', !!_nct?.dialCodeTable, '| NCT.childFacilities:', _nct?.childFacilities?.map((c: any) => c.id), '| SJC present:', !!_sjc, '| SJC positions:', _sjc?.positions?.map((p: any) => p.cs));
             if (!currentCallsign) {
                 console.error('[dial_call] No current position selected');
                 set({ dialCallStatus: 'error' });
@@ -790,7 +803,7 @@ export const useCoreStore = create<CoreState>((set: any, get: any) => {
             });
             
             // Set status to dialing, then ringback
-            set({ dialCallStatus: 'dialing' });
+            set({ dialCallStatus: 'dialing', activeDialCallTarget: targetLineId });
             
             // Send the call command with the destination line ID
             // dbl1 = line type of the destination (type-3 = trunk/dial line)
@@ -804,7 +817,7 @@ export const useCoreStore = create<CoreState>((set: any, get: any) => {
             setTimeout(() => {
                 const currentStatus = get().dialCallStatus;
                 if (currentStatus === 'dialing') {
-                    set({ dialCallStatus: 'ringback' });
+                    set({ dialCallStatus: 'ringback' }); // activeDialCallTarget remains set until call ends
                 }
             }, 200);
 
@@ -813,7 +826,7 @@ export const useCoreStore = create<CoreState>((set: any, get: any) => {
             setTimeout(() => {
                 const currentStatus = get().dialCallStatus;
                 if (currentStatus === 'dialing' || currentStatus === 'ringback') {
-                    set({ dialCallStatus: 'error' });
+                    set({ dialCallStatus: 'error', activeDialCallTarget: null });
                 }
             }, 20000);
         },
@@ -1482,13 +1495,13 @@ export const useCoreStore = create<CoreState>((set: any, get: any) => {
                         chime(getAudioElement('ringback'));
                     } else if (status === 'connected' || status === 'idle') {
                         stopAudio();
-                        // Clear the active dial line when connected or idle
+                        // Clear the active dial line and target when connected or idle
                         if (status === 'connected') {
-                            set({ activeDialLine: null });
+                            set({ activeDialLine: null, activeDialCallTarget: null });
                         }
                     } else if (status === 'busy' || status === 'error') {
                         stopAudio();
-                        // Play error tone if available
+                        set({ activeDialCallTarget: null });
                     }
                 }
                 return
