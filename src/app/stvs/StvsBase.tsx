@@ -87,31 +87,13 @@ const StvsBase: React.FC = () => {
   const setActiveDialLine = useCoreStore((s: any) => s.setActiveDialLine);
   const activeDialLine = useCoreStore((s: any) => s.activeDialLine);
   const cancelDialKeypad = useCoreStore((s: any) => s.cancelDialKeypad);
+  const releaseBtn = useCoreStore((s: any) => s.releaseBtn);
 
-  // REL button: release all active G/G calls
+  // REL button: release all active G/G calls + cancel any open dial keypad
   const handleRelease = useCallback(() => {
-    const activeCalls = (ggData || []).filter((call: any) =>
-      call && (call.status === 'ok' || call.status === 'active' || call.status === 'ringing' || call.status === 'chime')
-    );
-    console.log('[STVS REL] Releasing', activeCalls.length, 'active calls');
-    for (const call of activeCalls) {
-      if (call.isLandline && call.landlineCallId) {
-        landlineHandleButtonPress(call.landlineCallId, call.status);
-      } else if (call.isVvscs && call.vvscsLineId) {
-        vvscsHandleButtonPress(call.vvscsLineId, call.status);
-      } else if (call.isVacs && call.vacsCallId) {
-        vacsHandleButtonPress(call.vacsCallId, call.status);
-      } else {
-        const call_id = call.call?.substring(3) || '';
-        const lineType = call.lineType ?? 2;
-        if (call_id) {
-          sendMsg({ type: 'stop', cmd1: call_id, dbl1: lineType });
-        }
-      }
-    }
-    // Also cancel any open dial keypad
+    releaseBtn();
     cancelDialKeypad();
-  }, [ggData, landlineHandleButtonPress, vvscsHandleButtonPress, vacsHandleButtonPress, sendMsg, cancelDialKeypad]);
+  }, [releaseBtn, cancelDialKeypad]);
   
   // Convert ILLUM knob angle (-135 to +135) to brightness (0.1 to 1.0)
   const handleIllumChange = useCallback((angle: number) => {

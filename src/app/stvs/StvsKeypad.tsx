@@ -160,6 +160,7 @@ const StvsKeypad: React.FC<StvsKeypadProps> = ({ brightness = 1.0, trunkName, on
       setDialBuffer('');
       setCallStatus('idle');
     }
+  }, [dialCallStatus]);
   
   // Cleanup on unmount
   useEffect(() => {
