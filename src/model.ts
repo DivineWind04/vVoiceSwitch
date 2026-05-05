@@ -582,8 +582,8 @@ export const useCoreStore = create<CoreState>((set: any, get: any) => {
 
         activeCalls.forEach((call: any) => {
             const fullCall = call.call;
-            // Strip variable-length prefixes: gg_05_, OV_, SO_, etc.
-            const call_id = fullCall?.replace(/^(?:gg_\d+_|OV_|SO_)/, '') || '';
+            // Strip variable-length prefixes: gg_05_, OV_, SO_, DL_, etc.
+            const call_id = fullCall?.replace(/^(?:gg_\d+_|OV_|SO_|DL_)/, '') || '';
 
             if (call_id && sendMessageNow) {
                 console.log('[holdBtn] Holding call:', call_id);
@@ -595,7 +595,7 @@ export const useCoreStore = create<CoreState>((set: any, get: any) => {
         // Release all active G/G calls
         const { gg_status, sendMessageNow } = get();
         const activeCalls = (gg_status || []).filter((call: any) =>
-            call && (call.status === 'ok' || call.status === 'active')
+            call && (call.status === 'ok' || call.status === 'active' || call.status === 'ringing' || call.status === 'chime')
         );
 
         console.log('[releaseBtn] Releasing', activeCalls.length, 'active calls');
@@ -627,8 +627,8 @@ export const useCoreStore = create<CoreState>((set: any, get: any) => {
             }
 
             const fullCall = call.call;
-            // Strip variable-length prefixes: gg_05_, OV_, SO_, etc.
-            const call_id = fullCall?.replace(/^(?:gg_\d+_|OV_|SO_)/, '') || '';
+            // Strip variable-length prefixes: gg_05_, OV_, SO_, DL_, etc.
+            const call_id = fullCall?.replace(/^(?:gg_\d+_|OV_|SO_|DL_)/, '') || '';
 
             if (call_id && sendMessageNow) {
                 // Look up the original line type from call_table to use matching dbl1 value
