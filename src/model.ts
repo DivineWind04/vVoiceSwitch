@@ -48,8 +48,9 @@ export function findDialCodeTable(positionData: Facility, positionCallsign: stri
             p.cs?.replace(/\s+/g, '_').toUpperCase() === normalizedCallsign
         );
         
-        // If this facility has the position and a dialCodeTable, return it
-        if (hasPosition && facility.dialCodeTable) {
+        if (hasPosition) {
+            // Position found at this level — return this facility's dialCodeTable (may be undefined).
+            // The caller will cascade its own dialCodeTable if this returns undefined.
             return { dialCodeTable: facility.dialCodeTable, hasPosition: true };
         }
         
@@ -69,7 +70,22 @@ export function findDialCodeTable(positionData: Facility, positionCallsign: stri
     }
     
     const result = searchFacility(positionData);
-    return result.dialCodeTable || null;
+    if (!result.hasPosition) return null;
+    if (result.dialCodeTable) return result.dialCodeTable;
+
+    // Fallback: position was found but no ancestor has a dialCodeTable.
+    // This covers en-route CTR positions that live at the ARTCC root level while
+    // the shared dialCodeTable is in a sibling approach/TRACON child facility.
+    // Search the entire subtree for any dialCodeTable.
+    function findAnyDialCodeTable(facility: Facility): DialCodeTable | null {
+        if (facility.dialCodeTable) return facility.dialCodeTable;
+        for (const child of facility.childFacilities || []) {
+            const found = findAnyDialCodeTable(child);
+            if (found) return found;
+        }
+        return null;
+    }
+    return findAnyDialCodeTable(positionData);
 }
 
 // Helper function to find the rdvsColorPattern for a given position
@@ -109,7 +125,8 @@ export function findRdvsColorPattern(positionData: Facility, positionCallsign: s
 export function findLlDialCodeTable(positionData: Facility, positionCallsign: string): LandlineDialCodeTable | null {
     function searchFacility(facility: Facility): { llDialCodeTable?: LandlineDialCodeTable; hasPosition: boolean } {
         const hasPosition = facility.positions?.some(p => p.cs === positionCallsign);
-        if (hasPosition && facility.llDialCodeTable) {
+        if (hasPosition) {
+            // Position found — return this facility's llDialCodeTable (may be undefined).
             return { llDialCodeTable: facility.llDialCodeTable, hasPosition: true };
         }
         for (const child of facility.childFacilities || []) {
@@ -124,7 +141,19 @@ export function findLlDialCodeTable(positionData: Facility, positionCallsign: st
         return { hasPosition: false };
     }
     const result = searchFacility(positionData);
-    return result.llDialCodeTable || null;
+    if (!result.hasPosition) return null;
+    if (result.llDialCodeTable) return result.llDialCodeTable;
+
+    // Fallback: search entire subtree for any llDialCodeTable
+    function findAny(facility: Facility): LandlineDialCodeTable | null {
+        if (facility.llDialCodeTable) return facility.llDialCodeTable;
+        for (const child of facility.childFacilities || []) {
+            const found = findAny(child);
+            if (found) return found;
+        }
+        return null;
+    }
+    return findAny(positionData);
 }
 
 // Helper function to resolve a dial code to a destination CRC line ID

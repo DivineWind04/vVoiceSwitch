@@ -322,7 +322,20 @@ const StvsBase: React.FC = () => {
               }
             } else {
               // Direct Line calls (DL_xxx) and others
-              if (ggItem.status === 'off' || ggItem.status === '' || ggItem.status === 'idle') {
+              if (lineType === 3) {
+                // Type-3 = dial/trunk line — arm the keypad instead of sending a direct call
+                const trunkName3 = ggItem.trunkName || ggItem.call_name || '';
+                if (!ggItem.status || ggItem.status === 'off' || ggItem.status === 'idle') {
+                  // Toggle: if same trunk already active, deactivate; otherwise arm keypad
+                  if (activeDialLine?.trunkName === trunkName3) {
+                    onClick = () => setActiveDialLine(null);
+                  } else {
+                    onClick = () => setActiveDialLine({ trunkName: trunkName3, lineType: 3 });
+                  }
+                } else if (ggItem.status === 'ok' || ggItem.status === 'active' || ggItem.status === 'ringing' || ggItem.status === 'chime') {
+                  onClick = () => sendMsg({ type: 'stop', cmd1: call_id, dbl1: 3 });
+                }
+              } else if (ggItem.status === 'off' || ggItem.status === '' || ggItem.status === 'idle') {
                 onClick = () => sendMsg({ type: 'call', cmd1: call_id, dbl1: lineType }); // Initiate call
               } else if (ggItem.status === 'busy' || ggItem.status === 'hold') {
                 onClick = undefined; // No action available
