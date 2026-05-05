@@ -356,11 +356,11 @@ const audioConfigs: Record<string, AudioConfig> = {
         ggchime: '/RDVS_Chime.m4a'
     },
     ivsr: {
-        ringback: '/Override_Term.wav',
+        ringback: '/DialLine.wav',
         ggchime: '/RDVS_Chime.m4a'
     },
     rdvs: {
-        ringback: '/Ringback.wav',
+        ringback: '/DialLine.wav',
         ggchime: '/GGChime.mp3'
     }
 };
