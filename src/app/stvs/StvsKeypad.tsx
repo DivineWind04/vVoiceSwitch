@@ -129,7 +129,7 @@ const StvsKeypad: React.FC<StvsKeypadProps> = ({ brightness = 1.0, trunkName, on
       const ringbackEl = getAudioElement('ringback');
       if (ringbackEl) {
         ringbackAudioRef.current = ringbackEl;
-        ringbackAudioRef.current.loop = true;
+        ringbackAudioRef.current.loop = false;
         ringbackAudioRef.current.currentTime = 0;
         ringbackAudioRef.current.play().catch(() => {});
       }
