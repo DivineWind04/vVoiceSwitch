@@ -552,7 +552,8 @@ const StvsBase: React.FC = () => {
             width: `${(180/899.16)*100}%`, 
             height: `${(140/164.4)*100}%`, 
             transform: 'scale(1.5)',       
-            transformOrigin: 'top left'
+            transformOrigin: 'top left',
+            pointerEvents: 'none',
           }}
         >
           <StvsKeypad brightness={brightness} />

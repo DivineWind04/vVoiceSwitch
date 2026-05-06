@@ -238,7 +238,7 @@ const StvsKeypad: React.FC<StvsKeypadProps> = ({ brightness = 1.0, trunkName, on
 
   // Keypad container: position absolute, scale/size set by parent (StvsBase)
   return (
-    <div style={{ position: 'absolute', width: '103%', height: '103%' }}>
+    <div style={{ position: 'absolute', width: '103%', height: '103%', pointerEvents: 'none' }}>
       {buttonPositions.map((pos, idx) => (
         <StvsKeypadButton
           key={idx}
@@ -254,6 +254,7 @@ const StvsKeypad: React.FC<StvsKeypadProps> = ({ brightness = 1.0, trunkName, on
             height: '13%',
             minWidth: 0,
             minHeight: 0,
+            pointerEvents: 'auto',
           }}
         />
       ))}
