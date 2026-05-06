@@ -315,11 +315,11 @@ const StvsBase: React.FC = () => {
                     onClick = () => setActiveDialLine({ trunkName: trunkName3, lineType: 3 });
                   }
                 } else if (ggItem.status === 'chime' || ggItem.status === 'ringing') {
-                  // Incoming call — answer it
-                  onClick = () => sendMsg({ type: 'call', cmd1: call_id, dbl1: 3 });
+                  // Incoming call — answer it (type-3 is front-end only; AFV uses dbl1:1)
+                  onClick = () => sendMsg({ type: 'call', cmd1: call_id, dbl1: 1 });
                 } else if (ggItem.status === 'ok' || ggItem.status === 'active') {
-                  // Active call — hang up
-                  onClick = () => sendMsg({ type: 'stop', cmd1: call_id, dbl1: 3 });
+                  // Active call — hang up (type-3 is front-end only; AFV uses dbl1:1)
+                  onClick = () => sendMsg({ type: 'stop', cmd1: call_id, dbl1: 1 });
                 }
               } else if (ggItem.status === 'off' || ggItem.status === '' || ggItem.status === 'idle') {
                 onClick = () => sendMsg({ type: 'call', cmd1: call_id, dbl1: lineType }); // Initiate call

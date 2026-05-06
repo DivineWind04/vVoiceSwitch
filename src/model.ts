@@ -635,9 +635,9 @@ export const useCoreStore = create<CoreState>((set: any, get: any) => {
                 const lineInfo = call_table[call_id];
                 const lineType = lineInfo ? lineInfo[1] : 2; // Default to 2 if not found
                 
-                // SO_ lines always use dbl1: 1, others use their original line type
+                // SO_ and type-3 dial lines always use dbl1: 1 (AFV doesn't support type-3)
                 const isShoutOverride = fullCall?.startsWith('SO_');
-                const dbl1 = isShoutOverride ? 1 : lineType;
+                const dbl1 = (isShoutOverride || lineType === 3) ? 1 : lineType;
                 
                 console.log('[releaseBtn] Stopping call:', call_id, 'lineType:', lineType, 'dbl1:', dbl1);
                 sendMessageNow({ type: 'stop', cmd1: call_id, dbl1: dbl1 });
@@ -672,7 +672,7 @@ export const useCoreStore = create<CoreState>((set: any, get: any) => {
     cancelDialKeypad: () => {
         const { activeDialCallTarget } = get();
         if (activeDialCallTarget) {
-            sendMessageNow({ type: 'stop', cmd1: activeDialCallTarget, dbl1: 3 });
+            sendMessageNow({ type: 'stop', cmd1: activeDialCallTarget, dbl1: 1 }); // type-3 is front-end only; AFV uses type-1
         }
         set({ activeDialLine: null, activeDialCallTarget: null, dialCallStatus: 'idle', iaDisplayBuffer: '' });
     },
@@ -794,11 +794,8 @@ export const useCoreStore = create<CoreState>((set: any, get: any) => {
             // Set status to dialing, then ringback
             set({ dialCallStatus: 'dialing', activeDialCallTarget: targetLineId });
             
-            // Send the call command with the destination line ID.
-            // AFV doesn't natively support dbl1:3, so we send two messages:
-            //   dbl1:3 → our own channel_status handler identifies this as a dial call
-            //   dbl1:1 → AFV understands this as a type-1 ring and forwards it to the receiver
-            sendMessageNow({ type: 'call', cmd1: targetLineId, dbl1: 3 });
+            // Send the call command to AFV as type-1 (ring).
+            // Type-3 is a front-end-only concept; AFV only understands type-1 for these lines.
             sendMessageNow({ type: 'call', cmd1: targetLineId, dbl1: 1 });
             
             // Set to ringback after a short delay (simulating call routing)
