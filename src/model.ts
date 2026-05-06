@@ -1373,8 +1373,10 @@ export const useCoreStore = create<CoreState>((set: any, get: any) => {
                                 if (matchingStub?.trunkName) k.trunkName = matchingStub.trunkName;
                             }
                             new_gg.push({ ...k })
-                            if (k.call?.startsWith('SO_')) {
-
+                            // SO_ prefix is used by AFV for shout/override lines (type 0/1/2) — skip audio for those.
+                            // But type-3 dial lines can also arrive with SO_ prefix when incoming; allow audio for them.
+                            if (k.call?.startsWith('SO_') && k.lineType !== 3) {
+                                // shout/override line — audio handled separately
                             } else {
                                 if (k.status === 'chime') {
                                     audioAction = 'chime';
