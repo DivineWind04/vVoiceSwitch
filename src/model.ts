@@ -794,13 +794,12 @@ export const useCoreStore = create<CoreState>((set: any, get: any) => {
             // Set status to dialing, then ringback
             set({ dialCallStatus: 'dialing', activeDialCallTarget: targetLineId });
             
-            // Send the call command with the destination line ID
-            // dbl1 = line type of the destination (type-3 = trunk/dial line)
-            sendMessageNow({ 
-                type: 'call', 
-                cmd1: targetLineId,     // The destination CRC line ID
-                dbl1: 3                 // Call type 3 = trunk/dial line
-            });
+            // Send the call command with the destination line ID.
+            // AFV doesn't natively support dbl1:3, so we send two messages:
+            //   dbl1:3 → our own channel_status handler identifies this as a dial call
+            //   dbl1:1 → AFV understands this as a type-1 ring and forwards it to the receiver
+            sendMessageNow({ type: 'call', cmd1: targetLineId, dbl1: 3 });
+            sendMessageNow({ type: 'call', cmd1: targetLineId, dbl1: 1 });
             
             // Set to ringback after a short delay (simulating call routing)
             setTimeout(() => {
@@ -1137,7 +1136,9 @@ export const useCoreStore = create<CoreState>((set: any, get: any) => {
                     type3AfvLines.push({ lineId: String(line[0]), label: String(line[2] || line[0]) });
                 }
                 if (!vnasStore.getState().isSweatbox && callsign) {
-                    addCall(line[1], '' + line[0]);
+                    // AFV doesn't support type-3; register dial lines as type-1 so AFV treats them as ring-capable
+                    const afvLineType = line[1] === 3 ? 1 : line[1];
+                    addCall(afvLineType, '' + line[0]);
                 }
             }
         }
