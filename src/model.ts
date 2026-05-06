@@ -310,8 +310,9 @@ function resolveCallId(call: string): string {
     for (const id of Object.keys(call_table)) {
         if (call.endsWith(id)) return id;
     }
-    // Fallback: return the 3-char stripped version
-    return stripped3;
+    // Fallback: return the full call string (not stripped) so callers can match
+    // activeDialCallTarget against unknown-table lines (e.g. target's line ID).
+    return call;
 }
 
 // RDVS-specific types
@@ -638,9 +639,15 @@ export const useCoreStore = create<CoreState>((set: any, get: any) => {
                 // SO_ and type-3 dial lines always use dbl1: 1 (AFV doesn't support type-3)
                 const isShoutOverride = fullCall?.startsWith('SO_');
                 const dbl1 = (isShoutOverride || lineType === 3) ? 1 : lineType;
-                
-                console.log('[releaseBtn] Stopping call:', call_id, 'lineType:', lineType, 'dbl1:', dbl1);
-                sendMessageNow({ type: 'stop', cmd1: call_id, dbl1: dbl1 });
+
+                // For type-3 dial calls the active call is on the *target's* line (e.g. 916224),
+                // not our own endpoint (e.g. 916264). Use activeDialCallTarget if set.
+                const stopTarget = (lineType === 3 && get().activeDialCallTarget)
+                    ? (get().activeDialCallTarget as string)
+                    : call_id;
+
+                console.log('[releaseBtn] Stopping call:', stopTarget, 'lineType:', lineType, 'dbl1:', dbl1);
+                sendMessageNow({ type: 'stop', cmd1: stopTarget, dbl1: dbl1 });
             }
         });
     },
@@ -795,6 +802,12 @@ export const useCoreStore = create<CoreState>((set: any, get: any) => {
             set({ dialCallStatus: 'dialing', activeDialCallTarget: targetLineId });
             
             // Send the call command to AFV as type-1 (ring).
+            // Each side registers their OWN line with `add` at startup (resetWindow).
+            // To initiate a call, the caller sends `call <target_line_id>` — AFV routes
+            // this to whichever client has `add`-ed that line (the receiver).
+            // Do NOT send `add` for the target line here: registering the target from the
+            // caller side would make AFV treat the caller as a second subscriber of that
+            // frequency, preventing it from routing the ring notification to the receiver.
             // Type-3 is a front-end-only concept; AFV only understands type-1 for these lines.
             sendMessageNow({ type: 'call', cmd1: targetLineId, dbl1: 1 });
             
@@ -1334,7 +1347,9 @@ export const useCoreStore = create<CoreState>((set: any, get: any) => {
                     const new_gg: any[] = []
                     const new_vscs: any[] = []
                     const new_override: any[] = [] // Track OV_ prefixed calls
-            let audioAction: 'chime' | 'ringback' | 'stop' = 'stop';
+            // Use 'as' cast to prevent TypeScript from narrowing audioAction to 'stop'
+            // after the cns.map() callback (TypeScript doesn't track closure mutations).
+            let audioAction = 'stop' as 'chime' | 'ringback' | 'stop';
             let chimeCallerId: string | undefined;
             let hasType3Cleared = false;
             cns.map((k: any) => {
@@ -1359,6 +1374,32 @@ export const useCoreStore = create<CoreState>((set: any, get: any) => {
                             const call_id = resolveCallId(k.call || '');
                             k.call_name = call_table[call_id]?.[0] || call_id
                             k.lineType = call_table[call_id]?.[1] ?? 2; // Default to type 2 (regular)
+
+                            // If this line isn't in our call_table it was temporarily registered
+                            // for an outgoing dial call (sendDialCall sends `add` for the target).
+                            // Map its status onto our own type-3 stub so the button reflects outgoing
+                            // call state, then skip adding a raw mystery entry to new_gg.
+                            if (!(call_id in call_table)) {
+                                const { activeDialCallTarget, activeDialLine } = get();
+                                if (call_id === activeDialCallTarget && activeDialLine) {
+                                    const matchingStub = type3AfvStubs.find((s: any) => s.trunkName === activeDialLine.trunkName);
+                                    if (matchingStub && k.status !== 'off') {
+                                        const updatedEntry = { ...matchingStub, status: k.status };
+                                        new_gg.push(updatedEntry);
+                                        if (k.status === 'chime') {
+                                            audioAction = 'chime';
+                                        } else if (k.status === 'ringing') {
+                                            if (audioAction !== 'chime') audioAction = 'ringback';
+                                        } else if (k.status === 'ok' || k.status === 'active') {
+                                            set({ dialCallStatus: 'connected' });
+                                        } else {
+                                            hasType3Cleared = true;
+                                        }
+                                    }
+                                }
+                                return; // skip — don't add unknown entries as mystery buttons
+                            }
+
                             // Normalize type-3 (dial/trunk) lines to use DL_ prefix so renderButtons
                             // routes them to the dial keypad handler regardless of what prefix AFV used.
                             // Also carry over the trunkName from the pre-seeded stub so sendDialCall
