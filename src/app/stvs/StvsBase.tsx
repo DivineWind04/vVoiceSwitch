@@ -323,12 +323,14 @@ const StvsBase: React.FC = () => {
                 }
               } else if (ggItem.status === 'off' || ggItem.status === '' || ggItem.status === 'idle') {
                 onClick = () => sendMsg({ type: 'call', cmd1: call_id, dbl1: lineType }); // Initiate call
+              } else if (ggItem.status === 'chime' || ggItem.status === 'ringing') {
+                onClick = () => sendMsg({ type: 'call', cmd1: call_id, dbl1: lineType }); // Answer incoming
+              } else if (ggItem.status === 'ok' || ggItem.status === 'active') {
+                onClick = () => sendMsg({ type: 'stop', cmd1: call_id, dbl1: lineType }); // Hangup
               } else if (ggItem.status === 'busy' || ggItem.status === 'hold') {
                 onClick = undefined; // No action available
               } else if (ggItem.status === 'pending' || ggItem.status === 'terminate' || ggItem.status === 'overridden') {
                 onClick = undefined; // No action available
-              } else if (ggItem.status === 'ok' || ggItem.status === 'active' || ggItem.status === 'chime' || ggItem.status === 'ringing') {
-                onClick = () => sendMsg({ type: 'stop', cmd1: call_id, dbl1: lineType }); // Hangup DL
               }
             }
             } // end else (non-VACS)
