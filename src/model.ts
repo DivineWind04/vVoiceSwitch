@@ -48,8 +48,9 @@ export function findDialCodeTable(positionData: Facility, positionCallsign: stri
             p.cs?.replace(/\s+/g, '_').toUpperCase() === normalizedCallsign
         );
         
-        // If this facility has the position and a dialCodeTable, return it
-        if (hasPosition && facility.dialCodeTable) {
+        // If this facility directly owns the position, return immediately (with or without dialCodeTable).
+        // The caller will substitute its own dialCodeTable if this one is undefined.
+        if (hasPosition) {
             return { dialCodeTable: facility.dialCodeTable, hasPosition: true };
         }
         
