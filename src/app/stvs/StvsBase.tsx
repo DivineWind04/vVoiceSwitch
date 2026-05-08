@@ -87,31 +87,13 @@ const StvsBase: React.FC = () => {
   const setActiveDialLine = useCoreStore((s: any) => s.setActiveDialLine);
   const activeDialLine = useCoreStore((s: any) => s.activeDialLine);
   const cancelDialKeypad = useCoreStore((s: any) => s.cancelDialKeypad);
+  const releaseBtn = useCoreStore((s: any) => s.releaseBtn);
 
-  // REL button: release all active G/G calls
+  // REL button: release all active G/G calls + cancel any open dial keypad
   const handleRelease = useCallback(() => {
-    const activeCalls = (ggData || []).filter((call: any) =>
-      call && (call.status === 'ok' || call.status === 'active' || call.status === 'ringing' || call.status === 'chime')
-    );
-    console.log('[STVS REL] Releasing', activeCalls.length, 'active calls');
-    for (const call of activeCalls) {
-      if (call.isLandline && call.landlineCallId) {
-        landlineHandleButtonPress(call.landlineCallId, call.status);
-      } else if (call.isVvscs && call.vvscsLineId) {
-        vvscsHandleButtonPress(call.vvscsLineId, call.status);
-      } else if (call.isVacs && call.vacsCallId) {
-        vacsHandleButtonPress(call.vacsCallId, call.status);
-      } else {
-        const call_id = call.call?.substring(3) || '';
-        const lineType = call.lineType ?? 2;
-        if (call_id) {
-          sendMsg({ type: 'stop', cmd1: call_id, dbl1: lineType });
-        }
-      }
-    }
-    // Also cancel any open dial keypad
+    releaseBtn();
     cancelDialKeypad();
-  }, [ggData, landlineHandleButtonPress, vvscsHandleButtonPress, vacsHandleButtonPress, sendMsg, cancelDialKeypad]);
+  }, [releaseBtn, cancelDialKeypad]);
   
   // Convert ILLUM knob angle (-135 to +135) to brightness (0.1 to 1.0)
   const handleIllumChange = useCallback((angle: number) => {
@@ -322,14 +304,33 @@ const StvsBase: React.FC = () => {
               }
             } else {
               // Direct Line calls (DL_xxx) and others
-              if (ggItem.status === 'off' || ggItem.status === '' || ggItem.status === 'idle') {
+              if (lineType === 3) {
+                // Type-3 = dial/trunk line — arm the keypad instead of sending a direct call
+                const trunkName3 = ggItem.trunkName || ggItem.call_name || '';
+                if (!ggItem.status || ggItem.status === 'off' || ggItem.status === 'idle') {
+                  // Toggle: if same trunk already active, deactivate; otherwise arm keypad
+                  if (activeDialLine?.trunkName === trunkName3) {
+                    onClick = () => setActiveDialLine(null);
+                  } else {
+                    onClick = () => setActiveDialLine({ trunkName: trunkName3, lineType: 3 });
+                  }
+                } else if (ggItem.status === 'chime' || ggItem.status === 'ringing') {
+                  // Incoming call — answer it (type-3 is front-end only; AFV uses dbl1:1)
+                  onClick = () => sendMsg({ type: 'call', cmd1: call_id, dbl1: 1 });
+                } else if (ggItem.status === 'ok' || ggItem.status === 'active') {
+                  // Active call — hang up (type-3 is front-end only; AFV uses dbl1:1)
+                  onClick = () => sendMsg({ type: 'stop', cmd1: call_id, dbl1: 1 });
+                }
+              } else if (ggItem.status === 'off' || ggItem.status === '' || ggItem.status === 'idle') {
                 onClick = () => sendMsg({ type: 'call', cmd1: call_id, dbl1: lineType }); // Initiate call
+              } else if (ggItem.status === 'chime' || ggItem.status === 'ringing') {
+                onClick = () => sendMsg({ type: 'call', cmd1: call_id, dbl1: lineType }); // Answer incoming
+              } else if (ggItem.status === 'ok' || ggItem.status === 'active') {
+                onClick = () => sendMsg({ type: 'stop', cmd1: call_id, dbl1: lineType }); // Hangup
               } else if (ggItem.status === 'busy' || ggItem.status === 'hold') {
                 onClick = undefined; // No action available
               } else if (ggItem.status === 'pending' || ggItem.status === 'terminate' || ggItem.status === 'overridden') {
                 onClick = undefined; // No action available
-              } else if (ggItem.status === 'ok' || ggItem.status === 'active' || ggItem.status === 'chime' || ggItem.status === 'ringing') {
-                onClick = () => sendMsg({ type: 'stop', cmd1: call_id, dbl1: lineType }); // Hangup DL
               }
             }
             } // end else (non-VACS)
@@ -553,7 +554,8 @@ const StvsBase: React.FC = () => {
             width: `${(180/899.16)*100}%`, 
             height: `${(140/164.4)*100}%`, 
             transform: 'scale(1.5)',       
-            transformOrigin: 'top left'
+            transformOrigin: 'top left',
+            pointerEvents: 'none',
           }}
         >
           <StvsKeypad brightness={brightness} />

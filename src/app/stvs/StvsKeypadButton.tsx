@@ -43,7 +43,6 @@ const StvsKeypadButton: React.FC<StvsKeypadButtonProps> = ({
       onMouseDown={handleMouseDown}
       onMouseUp={handleMouseUp}
       onMouseLeave={() => setIsActive(false)}
-      onClick={onClick}
     >
       {/* Letters on top, smaller */}
       {topLine && (

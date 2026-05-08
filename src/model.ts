@@ -48,9 +48,9 @@ export function findDialCodeTable(positionData: Facility, positionCallsign: stri
             p.cs?.replace(/\s+/g, '_').toUpperCase() === normalizedCallsign
         );
         
-        // If this facility directly owns the position, return immediately (with or without dialCodeTable).
-        // The caller will substitute its own dialCodeTable if this one is undefined.
         if (hasPosition) {
+            // Position found at this level — return this facility's dialCodeTable (may be undefined).
+            // The caller will cascade its own dialCodeTable if this returns undefined.
             return { dialCodeTable: facility.dialCodeTable, hasPosition: true };
         }
         
@@ -70,7 +70,22 @@ export function findDialCodeTable(positionData: Facility, positionCallsign: stri
     }
     
     const result = searchFacility(positionData);
-    return result.dialCodeTable || null;
+    if (!result.hasPosition) return null;
+    if (result.dialCodeTable) return result.dialCodeTable;
+
+    // Fallback: position was found but no ancestor has a dialCodeTable.
+    // This covers en-route CTR positions that live at the ARTCC root level while
+    // the shared dialCodeTable is in a sibling approach/TRACON child facility.
+    // Search the entire subtree for any dialCodeTable.
+    function findAnyDialCodeTable(facility: Facility): DialCodeTable | null {
+        if (facility.dialCodeTable) return facility.dialCodeTable;
+        for (const child of facility.childFacilities || []) {
+            const found = findAnyDialCodeTable(child);
+            if (found) return found;
+        }
+        return null;
+    }
+    return findAnyDialCodeTable(positionData);
 }
 
 // Helper function to find the rdvsColorPattern for a given position
@@ -110,7 +125,8 @@ export function findRdvsColorPattern(positionData: Facility, positionCallsign: s
 export function findLlDialCodeTable(positionData: Facility, positionCallsign: string): LandlineDialCodeTable | null {
     function searchFacility(facility: Facility): { llDialCodeTable?: LandlineDialCodeTable; hasPosition: boolean } {
         const hasPosition = facility.positions?.some(p => p.cs === positionCallsign);
-        if (hasPosition && facility.llDialCodeTable) {
+        if (hasPosition) {
+            // Position found — return this facility's llDialCodeTable (may be undefined).
             return { llDialCodeTable: facility.llDialCodeTable, hasPosition: true };
         }
         for (const child of facility.childFacilities || []) {
@@ -125,7 +141,19 @@ export function findLlDialCodeTable(positionData: Facility, positionCallsign: st
         return { hasPosition: false };
     }
     const result = searchFacility(positionData);
-    return result.llDialCodeTable || null;
+    if (!result.hasPosition) return null;
+    if (result.llDialCodeTable) return result.llDialCodeTable;
+
+    // Fallback: search entire subtree for any llDialCodeTable
+    function findAny(facility: Facility): LandlineDialCodeTable | null {
+        if (facility.llDialCodeTable) return facility.llDialCodeTable;
+        for (const child of facility.childFacilities || []) {
+            const found = findAny(child);
+            if (found) return found;
+        }
+        return null;
+    }
+    return findAny(positionData);
 }
 
 // Helper function to resolve a dial code to a destination CRC line ID
@@ -182,6 +210,7 @@ interface CoreState extends VacsStoreState, VvscsStoreState, LandlineStoreState,
     
     // Dial call state for type 3 lines
     activeDialLine: { trunkName: string; lineType: number } | null;
+    activeDialCallTarget: string | null; // The resolved line ID of the in-progress outgoing dial call
     dialCallStatus: 'idle' | 'dialing' | 'ringback' | 'connected' | 'busy' | 'error';
 
     // IA DISPLAY area state
@@ -281,8 +310,9 @@ function resolveCallId(call: string): string {
     for (const id of Object.keys(call_table)) {
         if (call.endsWith(id)) return id;
     }
-    // Fallback: return the 3-char stripped version
-    return stripped3;
+    // Fallback: return the full call string (not stripped) so callers can match
+    // activeDialCallTarget against unknown-table lines (e.g. target's line ID).
+    return call;
 }
 
 // RDVS-specific types
@@ -314,25 +344,25 @@ interface AudioConfig {
 
 const audioConfigs: Record<string, AudioConfig> = {
     vscs: {
-        ringback: 'Ringback.wav',
-        ggchime: 'GGChime.mp3',
-        override: 'Override.mp3'
+        ringback: '/Ringback.wav',
+        ggchime: '/GGChime.mp3',
+        override: '/Override.mp3'
     },
     etvs: {
-        ringback: 'Override_Term.wav',
-        ggchime: 'RDVS_Chime.m4a'
+        ringback: '/DialLine.wav',
+        ggchime: '/RDVS_Chime.m4a'
     },
     stvs: {
-        ringback: 'Override_Term.wav',
-        ggchime: 'RDVS_Chime.m4a'
+        ringback: '/DialLine.wav',
+        ggchime: '/RDVS_Chime.m4a'
     },
     ivsr: {
-        ringback: 'Override_Term.wav',
-        ggchime: 'RDVS_Chime.m4a'
+        ringback: '/DialLine.wav',
+        ggchime: '/RDVS_Chime.m4a'
     },
     rdvs: {
-        ringback: 'Ringback.wav',
-        ggchime: 'GGChime.mp3'
+        ringback: '/DialLine.wav',
+        ggchime: '/GGChime.mp3'
     }
 };
 
@@ -553,8 +583,8 @@ export const useCoreStore = create<CoreState>((set: any, get: any) => {
 
         activeCalls.forEach((call: any) => {
             const fullCall = call.call;
-            // Strip variable-length prefixes: gg_05_, OV_, SO_, etc.
-            const call_id = fullCall?.replace(/^(?:gg_\d+_|OV_|SO_)/, '') || '';
+            // Strip variable-length prefixes: gg_05_, OV_, SO_, DL_, etc.
+            const call_id = fullCall?.replace(/^(?:gg_\d+_|OV_|SO_|DL_)/, '') || '';
 
             if (call_id && sendMessageNow) {
                 console.log('[holdBtn] Holding call:', call_id);
@@ -566,7 +596,7 @@ export const useCoreStore = create<CoreState>((set: any, get: any) => {
         // Release all active G/G calls
         const { gg_status, sendMessageNow } = get();
         const activeCalls = (gg_status || []).filter((call: any) =>
-            call && (call.status === 'ok' || call.status === 'active')
+            call && (call.status === 'ok' || call.status === 'active' || call.status === 'ringing' || call.status === 'chime')
         );
 
         console.log('[releaseBtn] Releasing', activeCalls.length, 'active calls');
@@ -598,20 +628,26 @@ export const useCoreStore = create<CoreState>((set: any, get: any) => {
             }
 
             const fullCall = call.call;
-            // Strip variable-length prefixes: gg_05_, OV_, SO_, etc.
-            const call_id = fullCall?.replace(/^(?:gg_\d+_|OV_|SO_)/, '') || '';
+            // Strip variable-length prefixes: gg_05_, OV_, SO_, DL_, etc.
+            const call_id = fullCall?.replace(/^(?:gg_\d+_|OV_|SO_|DL_)/, '') || '';
 
             if (call_id && sendMessageNow) {
                 // Look up the original line type from call_table to use matching dbl1 value
                 const lineInfo = call_table[call_id];
                 const lineType = lineInfo ? lineInfo[1] : 2; // Default to 2 if not found
                 
-                // SO_ lines always use dbl1: 1, others use their original line type
+                // SO_ and type-3 dial lines always use dbl1: 1 (AFV doesn't support type-3)
                 const isShoutOverride = fullCall?.startsWith('SO_');
-                const dbl1 = isShoutOverride ? 1 : lineType;
-                
-                console.log('[releaseBtn] Stopping call:', call_id, 'lineType:', lineType, 'dbl1:', dbl1);
-                sendMessageNow({ type: 'stop', cmd1: call_id, dbl1: dbl1 });
+                const dbl1 = (isShoutOverride || lineType === 3) ? 1 : lineType;
+
+                // For type-3 dial calls the active call is on the *target's* line (e.g. 916224),
+                // not our own endpoint (e.g. 916264). Use activeDialCallTarget if set.
+                const stopTarget = (lineType === 3 && get().activeDialCallTarget)
+                    ? (get().activeDialCallTarget as string)
+                    : call_id;
+
+                console.log('[releaseBtn] Stopping call:', stopTarget, 'lineType:', lineType, 'dbl1:', dbl1);
+                sendMessageNow({ type: 'stop', cmd1: stopTarget, dbl1: dbl1 });
             }
         });
     },
@@ -626,6 +662,7 @@ export const useCoreStore = create<CoreState>((set: any, get: any) => {
     
     // Dial call state defaults
     activeDialLine: null,
+    activeDialCallTarget: null,
     dialCallStatus: 'idle' as const,
 
     // IA DISPLAY area state
@@ -639,7 +676,13 @@ export const useCoreStore = create<CoreState>((set: any, get: any) => {
     },
     clearIaDisplay: () => set({ iaDisplayBuffer: '' }),
     resetDialCallStatus: () => set({ dialCallStatus: 'idle' }),
-    cancelDialKeypad: () => set({ activeDialLine: null, dialCallStatus: 'idle', iaDisplayBuffer: '' }),
+    cancelDialKeypad: () => {
+        const { activeDialCallTarget } = get();
+        if (activeDialCallTarget) {
+            sendMessageNow({ type: 'stop', cmd1: activeDialCallTarget, dbl1: 1 }); // type-3 is front-end only; AFV uses type-1
+        }
+        set({ activeDialLine: null, activeDialCallTarget: null, dialCallStatus: 'idle', iaDisplayBuffer: '' });
+    },
     backspaceIaDisplay: () => {
         const current = get().iaDisplayBuffer;
         set({ iaDisplayBuffer: current.slice(0, -1) });
@@ -724,8 +767,6 @@ export const useCoreStore = create<CoreState>((set: any, get: any) => {
             
             // Get the current position's callsign to find the dialCodeTable
             const currentCallsign = selectedPositions?.[0]?.cs;
-            console.log('[dial_call] Attempting:', { trunkName: normalizedTrunkName, dialCode: normalizedDialCode, currentCallsign });
-            console.log('[dial_call] positionData:', { id: (positionData as any)?.id, childCount: (positionData as any)?.childFacilities?.length, firstChildId: (positionData as any)?.childFacilities?.[0]?.id });
             if (!currentCallsign) {
                 console.error('[dial_call] No current position selected');
                 set({ dialCallStatus: 'error' });
@@ -755,28 +796,26 @@ export const useCoreStore = create<CoreState>((set: any, get: any) => {
                 return;
             }
             
-            console.log('[dial_call] Resolved:', {
-                trunkName: normalizedTrunkName,
-                dialCode: normalizedDialCode,
-                targetLineId,
-            });
+            console.log('[dial_call] Sending call:', { trunkName: normalizedTrunkName, dialCode: normalizedDialCode, targetLineId });
             
             // Set status to dialing, then ringback
-            set({ dialCallStatus: 'dialing' });
+            set({ dialCallStatus: 'dialing', activeDialCallTarget: targetLineId });
             
-            // Send the call command with the destination line ID
-            // dbl1 = line type of the destination (type-3 = trunk/dial line)
-            sendMessageNow({ 
-                type: 'call', 
-                cmd1: targetLineId,     // The destination CRC line ID
-                dbl1: 3                 // Call type 3 = trunk/dial line
-            });
+            // Send the call command to AFV as type-1 (ring).
+            // Each side registers their OWN line with `add` at startup (resetWindow).
+            // To initiate a call, the caller sends `call <target_line_id>` — AFV routes
+            // this to whichever client has `add`-ed that line (the receiver).
+            // Do NOT send `add` for the target line here: registering the target from the
+            // caller side would make AFV treat the caller as a second subscriber of that
+            // frequency, preventing it from routing the ring notification to the receiver.
+            // Type-3 is a front-end-only concept; AFV only understands type-1 for these lines.
+            sendMessageNow({ type: 'call', cmd1: targetLineId, dbl1: 1 });
             
             // Set to ringback after a short delay (simulating call routing)
             setTimeout(() => {
                 const currentStatus = get().dialCallStatus;
                 if (currentStatus === 'dialing') {
-                    set({ dialCallStatus: 'ringback' });
+                    set({ dialCallStatus: 'ringback' }); // activeDialCallTarget remains set until call ends
                 }
             }, 200);
 
@@ -785,7 +824,7 @@ export const useCoreStore = create<CoreState>((set: any, get: any) => {
             setTimeout(() => {
                 const currentStatus = get().dialCallStatus;
                 if (currentStatus === 'dialing' || currentStatus === 'ringback') {
-                    set({ dialCallStatus: 'error' });
+                    set({ dialCallStatus: 'error', activeDialCallTarget: null });
                 }
             }, 20000);
         },
@@ -1107,7 +1146,9 @@ export const useCoreStore = create<CoreState>((set: any, get: any) => {
                     type3AfvLines.push({ lineId: String(line[0]), label: String(line[2] || line[0]) });
                 }
                 if (!vnasStore.getState().isSweatbox && callsign) {
-                    addCall(line[1], '' + line[0]);
+                    // AFV doesn't support type-3; register dial lines as type-1 so AFV treats them as ring-capable
+                    const afvLineType = line[1] === 3 ? 1 : line[1];
+                    addCall(afvLineType, '' + line[0]);
                 }
             }
         }
@@ -1306,6 +1347,11 @@ export const useCoreStore = create<CoreState>((set: any, get: any) => {
                     const new_gg: any[] = []
                     const new_vscs: any[] = []
                     const new_override: any[] = [] // Track OV_ prefixed calls
+            // Use 'as' cast to prevent TypeScript from narrowing audioAction to 'stop'
+            // after the cns.map() callback (TypeScript doesn't track closure mutations).
+            let audioAction = 'stop' as 'chime' | 'ringback' | 'stop';
+            let chimeCallerId: string | undefined;
+            let hasType3Cleared = false;
             cns.map((k: any) => {
                         if (k.call === 'A/G') {
                             new_ag.push({ ...k })
@@ -1328,6 +1374,32 @@ export const useCoreStore = create<CoreState>((set: any, get: any) => {
                             const call_id = resolveCallId(k.call || '');
                             k.call_name = call_table[call_id]?.[0] || call_id
                             k.lineType = call_table[call_id]?.[1] ?? 2; // Default to type 2 (regular)
+
+                            // If this line isn't in our call_table it was temporarily registered
+                            // for an outgoing dial call (sendDialCall sends `add` for the target).
+                            // Map its status onto our own type-3 stub so the button reflects outgoing
+                            // call state, then skip adding a raw mystery entry to new_gg.
+                            if (!(call_id in call_table)) {
+                                const { activeDialCallTarget, activeDialLine } = get();
+                                if (call_id === activeDialCallTarget && activeDialLine) {
+                                    const matchingStub = type3AfvStubs.find((s: any) => s.trunkName === activeDialLine.trunkName);
+                                    if (matchingStub && k.status !== 'off') {
+                                        const updatedEntry = { ...matchingStub, status: k.status };
+                                        new_gg.push(updatedEntry);
+                                        if (k.status === 'chime') {
+                                            audioAction = 'chime';
+                                        } else if (k.status === 'ringing') {
+                                            if (audioAction !== 'chime') audioAction = 'ringback';
+                                        } else if (k.status === 'ok' || k.status === 'active') {
+                                            set({ dialCallStatus: 'connected' });
+                                        } else {
+                                            hasType3Cleared = true;
+                                        }
+                                    }
+                                }
+                                return; // skip — don't add unknown entries as mystery buttons
+                            }
+
                             // Normalize type-3 (dial/trunk) lines to use DL_ prefix so renderButtons
                             // routes them to the dial keypad handler regardless of what prefix AFV used.
                             // Also carry over the trunkName from the pre-seeded stub so sendDialCall
@@ -1340,27 +1412,40 @@ export const useCoreStore = create<CoreState>((set: any, get: any) => {
                                 if (matchingStub?.trunkName) k.trunkName = matchingStub.trunkName;
                             }
                             new_gg.push({ ...k })
-                            if (k.call?.startsWith('SO_')) {
-
+                            // SO_ prefix is used by AFV for shout/override lines (type 0/1/2) — skip audio for those.
+                            // But type-3 dial lines can also arrive with SO_ prefix when incoming; allow audio for them.
+                            if (k.call?.startsWith('SO_') && k.lineType !== 3) {
+                                // shout/override line — audio handled separately
                             } else {
                                 if (k.status === 'chime') {
-                                    chime(getAudioElement('ggchime'));
+                                    audioAction = 'chime';
                                     // For dial lines (type 3), show caller ID from who's calling us
                                     if (k.lineType === 3 && k.otherPosition) {
-                                        set({ callerIdBuffer: k.otherPosition });
+                                        chimeCallerId = k.otherPosition;
                                     }
                                 } else if (k.status == 'ringing') {
-                                    chime(getAudioElement('ringback'))
+                                    if (audioAction !== 'chime') audioAction = 'ringback';
                                 } else {
-                                    stopAudio();
                                     // Clear caller ID when call ends or connects
                                     if (k.lineType === 3) {
-                                        set({ callerIdBuffer: '' });
+                                        hasType3Cleared = true;
                                     }
                                 }
                             }
                         }
                     })
+                    
+                    // Apply audio decision once after all lines are processed,
+                    // so a single chime/ringing line isn't silenced by subsequent idle lines.
+                    if (audioAction === 'chime') {
+                        chime(getAudioElement('ggchime'));
+                        if (chimeCallerId) set({ callerIdBuffer: chimeCallerId });
+                    } else if (audioAction === 'ringback') {
+                        chime(getAudioElement('ringback'));
+                    } else {
+                        stopAudio();
+                        if (hasType3Cleared) set({ callerIdBuffer: '' });
+                    }
                     
                     // Check if there's an active or held override (OV_ call)
                     const hasActiveOverride = new_override.some((ov: any) =>
@@ -1454,13 +1539,13 @@ export const useCoreStore = create<CoreState>((set: any, get: any) => {
                         chime(getAudioElement('ringback'));
                     } else if (status === 'connected' || status === 'idle') {
                         stopAudio();
-                        // Clear the active dial line when connected or idle
+                        // Clear the active dial line and target when connected or idle
                         if (status === 'connected') {
-                            set({ activeDialLine: null });
+                            set({ activeDialLine: null, activeDialCallTarget: null });
                         }
                     } else if (status === 'busy' || status === 'error') {
                         stopAudio();
-                        // Play error tone if available
+                        set({ activeDialCallTarget: null });
                     }
                 }
                 return

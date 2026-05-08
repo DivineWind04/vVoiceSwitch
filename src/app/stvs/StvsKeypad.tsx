@@ -3,7 +3,7 @@
 
 import React, { useState, useCallback, useRef, useEffect } from "react";
 import StvsKeypadButton from "./StvsKeypadButton";
-import { useCoreStore, findDialCodeTable, resolveDialCode } from "~/model";
+import { useCoreStore, findDialCodeTable, resolveDialCode, getAudioElement } from "~/model";
 import { landlineStore } from '~/lib/landline/store';
 
 // DTMF frequency pairs for each key
@@ -125,12 +125,14 @@ const StvsKeypad: React.FC<StvsKeypadProps> = ({ brightness = 1.0, trunkName, on
   useEffect(() => {
     if (dialCallStatus === 'ringback') {
       setCallStatus('ringback');
-      // Play ringback audio
-      if (!ringbackAudioRef.current) {
-        ringbackAudioRef.current = new Audio('/Ringback.wav');
-        ringbackAudioRef.current.loop = true;
+      // Play DialLine ringback audio (looped) via the config system
+      const ringbackEl = getAudioElement('ringback');
+      if (ringbackEl) {
+        ringbackAudioRef.current = ringbackEl;
+        ringbackAudioRef.current.loop = false;
+        ringbackAudioRef.current.currentTime = 0;
+        ringbackAudioRef.current.play().catch(() => {});
       }
-      ringbackAudioRef.current.play().catch(() => {});
     } else if (dialCallStatus === 'connected') {
       setCallStatus('connected');
       // Stop ringback
@@ -149,6 +151,14 @@ const StvsKeypad: React.FC<StvsKeypadProps> = ({ brightness = 1.0, trunkName, on
         ringbackAudioRef.current.pause();
         ringbackAudioRef.current = null;
       }
+    } else if (dialCallStatus === 'idle') {
+      // REL pressed or cancelled — stop ringback and reset
+      if (ringbackAudioRef.current) {
+        ringbackAudioRef.current.pause();
+        ringbackAudioRef.current = null;
+      }
+      setDialBuffer('');
+      setCallStatus('idle');
     }
   }, [dialCallStatus]);
   
@@ -228,7 +238,7 @@ const StvsKeypad: React.FC<StvsKeypadProps> = ({ brightness = 1.0, trunkName, on
 
   // Keypad container: position absolute, scale/size set by parent (StvsBase)
   return (
-    <div style={{ position: 'absolute', width: '103%', height: '103%' }}>
+    <div style={{ position: 'absolute', width: '103%', height: '103%', pointerEvents: 'none' }}>
       {buttonPositions.map((pos, idx) => (
         <StvsKeypadButton
           key={idx}
@@ -244,6 +254,7 @@ const StvsKeypad: React.FC<StvsKeypadProps> = ({ brightness = 1.0, trunkName, on
             height: '13%',
             minWidth: 0,
             minHeight: 0,
+            pointerEvents: 'auto',
           }}
         />
       ))}

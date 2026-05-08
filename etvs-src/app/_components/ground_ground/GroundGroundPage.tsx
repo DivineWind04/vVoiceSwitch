@@ -194,11 +194,13 @@ const GroundGroundPage: React.FC<GroundGroundPageProps> = ({ onGG3Toggle }) => {
         } else if (data.status === 'pending' || data.status === 'terminate' || data.status === 'overridden') {
           onClick = undefined;
         } else if (data.status === 'ok' || data.status === 'active') {
-          onClick = () => sendMsg({ type: 'stop', cmd1: call_id, dbl1: lineType });
+          // type-3 is front-end only; AFV uses dbl1:1
+          onClick = () => sendMsg({ type: 'stop', cmd1: call_id, dbl1: isDialLine ? 1 : lineType });
           indicator = ptt || data.status === 'active';
           indicatorClassName = indicator ? 'flutter active' : 'steady green'; // Flutter when active/PTT, steady when connected
         } else if (data.status === 'chime' || data.status === 'ringing') {
-          onClick = () => sendMsg({ type: 'stop', cmd1: call_id, dbl1: lineType });
+          // Incoming call — answer it. type-3 is front-end only; AFV uses dbl1:1
+          onClick = () => sendMsg({ type: 'call', cmd1: call_id, dbl1: isDialLine ? 1 : lineType });
           indicator = true;
           indicatorClassName = 'flutter receive flashing'; // Flash green for incoming calls
         }

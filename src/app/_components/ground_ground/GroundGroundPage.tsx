@@ -212,12 +212,10 @@ const GroundGroundPage: React.FC<GroundGroundPageProps> = ({
       } else {
         // Check if this is a dial line (lineType === 3)
         const isDialLine = lineType === 3;
-        // Use resolved trunkName (from dialCodeTable reverse-lookup) if available,
-        // otherwise fall back to call_name/call (which may be a raw label like "MULTI,,DIAL,122")
-        const trunkName = data.trunkName || data.call_name || data.call || '';
+        const trunkName = data.call_name || data.call || '';
         
-        if (isDialLine && (data.status !== 'ok' && data.status !== 'active' && data.status !== 'ringing' && data.status !== 'chime' && data.status !== 'busy' && data.status !== 'hold')) {
-          // Dial lines open the keypad when clicked (any non-active status)
+        if (isDialLine && (data.status === 'off' || data.status === '' || data.status === 'idle')) {
+          // Dial lines open the keypad when clicked
           onClick = () => {
             if (onOpenKeypadForDialLine) {
               onOpenKeypadForDialLine(trunkName, lineType);
@@ -234,11 +232,13 @@ const GroundGroundPage: React.FC<GroundGroundPageProps> = ({
         } else if (data.status === 'pending' || data.status === 'terminate' || data.status === 'overridden') {
           onClick = undefined;
         } else if (data.status === 'ok' || data.status === 'active') {
-          onClick = () => sendMsg({ type: 'stop', cmd1: call_id, dbl1: lineType });
+          // type-3 is front-end only; AFV uses dbl1:1
+          onClick = () => sendMsg({ type: 'stop', cmd1: call_id, dbl1: isDialLine ? 1 : lineType });
           indicator = ptt || data.status === 'active';
           indicatorClassName = indicator ? 'flutter active' : 'steady green';
         } else if (data.status === 'chime' || data.status === 'ringing') {
-          onClick = () => sendMsg({ type: 'stop', cmd1: call_id, dbl1: lineType });
+          // Incoming call — answer it. type-3 is front-end only; AFV uses dbl1:1
+          onClick = () => sendMsg({ type: 'call', cmd1: call_id, dbl1: isDialLine ? 1 : lineType });
           indicator = true;
           indicatorClassName = 'flutter receive flashing';
         }
