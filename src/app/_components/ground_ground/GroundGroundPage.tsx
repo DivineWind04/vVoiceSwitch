@@ -28,6 +28,7 @@ const GroundGroundPage: React.FC<GroundGroundPageProps> = ({
   onOpenKeypadForDialLine,
 }) => {
   const [internalPage, setInternalPage] = useState(1); // State to track current page
+  const [showTooltips, setShowTooltips] = useState(false);
   
   const currentPage = externalPage !== undefined ? externalPage : internalPage;
   const setCurrentPage = externalOnPageChange || setInternalPage;
@@ -89,6 +90,13 @@ const GroundGroundPage: React.FC<GroundGroundPageProps> = ({
   let indicator = false;
   let indicatorClassName = '';
 
+      // Build tooltip text based on line type and destination
+      const buildTooltip = (typeLabel: string, dest?: string) => {
+        if (!showTooltips) return undefined;
+        const displayName = dest || data.call_name || call_id || '';
+        return `${typeLabel} — ${displayName}`;
+      };
+
       // v-VSCS WebRTC calls — route through v-VSCS handler
       if (data.isVvscs && data.vvscsLineId) {
         if (data.status === 'ok' || data.status === 'active') {
@@ -115,6 +123,7 @@ const GroundGroundPage: React.FC<GroundGroundPageProps> = ({
             onClick={onClick}
             controlledIndicator={indicator}
             indicatorClassName={indicatorClassName}
+            tooltip={buildTooltip('RING')}
           />
         );
         return;
@@ -145,6 +154,7 @@ const GroundGroundPage: React.FC<GroundGroundPageProps> = ({
         const callNameParts = callNameStr.includes(',')
           ? callNameStr.split(',').map((part: string) => part.trim())
           : [callNameStr];
+        const landlineTypeLabel = data.lineType === 3 ? 'DIAL' : 'RING';
 
         buttons.push(
           <DAButton
@@ -156,6 +166,7 @@ const GroundGroundPage: React.FC<GroundGroundPageProps> = ({
             onClick={onClick}
             controlledIndicator={indicator}
             indicatorClassName={indicatorClassName}
+            tooltip={buildTooltip(landlineTypeLabel)}
           />
         );
         return;
@@ -187,13 +198,16 @@ const GroundGroundPage: React.FC<GroundGroundPageProps> = ({
             onClick={onClick}
             controlledIndicator={indicator}
             indicatorClassName={indicatorClassName}
+            tooltip={buildTooltip('RING')}
           />
         );
         return;
       }
 
       // Simplified mapping; follow panel.tsx behavior
+      let tooltipTypeLabel = 'RING';
       if (call_type === 'SO') {
+        tooltipTypeLabel = 'SHOUT';
         if (data.status === 'idle') {
           onClick = () => sendMsg({ type: 'call', cmd1: call_id, dbl1: 2 });
         } else if (data.status === 'online' || data.status === 'chime') {
@@ -212,6 +226,10 @@ const GroundGroundPage: React.FC<GroundGroundPageProps> = ({
       } else {
         // Check if this is a dial line (lineType === 3)
         const isDialLine = lineType === 3;
+        if (isDialLine) tooltipTypeLabel = 'DIAL';
+        else if (lineType === 0) tooltipTypeLabel = 'OVERRIDE';
+        else tooltipTypeLabel = 'RING';
+
         // Use resolved trunkName (from dialCodeTable reverse-lookup) if available,
         // otherwise fall back to call_name/call (which may be a raw label like "MULTI,,DIAL,122")
         const trunkName = data.trunkName || data.call_name || data.call || '';
@@ -267,6 +285,7 @@ const GroundGroundPage: React.FC<GroundGroundPageProps> = ({
           onClick={onClick}
           controlledIndicator={indicator}
           indicatorClassName={indicatorClassName}
+          tooltip={buildTooltip(tooltipTypeLabel)}
         />
       );
     });
@@ -290,7 +309,7 @@ const GroundGroundPage: React.FC<GroundGroundPageProps> = ({
           </div>
         </>
       )}
-      {/* Navigation buttons */}
+      {/* Navigation buttons + tooltip toggle */}
       <div className={`flex gap-1 mb-0.5 ${showKeypad ? 'mt-[69px] ml-2' : 'mt-1'}`}>
         {[1, 2, 3].map((page) => (
           <SquareSelectorButton
@@ -300,6 +319,23 @@ const GroundGroundPage: React.FC<GroundGroundPageProps> = ({
             useRdvsFont={true}
           />
         ))}
+        <button
+          onClick={() => setShowTooltips(v => !v)}
+          style={{
+            fontSize: '9px',
+            fontFamily: 'monospace',
+            padding: '2px 5px',
+            marginLeft: 'auto',
+            background: showTooltips ? '#2a4a2a' : '#1a1a2e',
+            color: showTooltips ? '#7fff7f' : '#888',
+            border: `1px solid ${showTooltips ? '#4a8a4a' : '#444'}`,
+            borderRadius: '2px',
+            cursor: 'pointer',
+            alignSelf: 'center',
+          }}
+        >
+          {showTooltips ? 'INFO ON' : 'INFO'}
+        </button>
       </div>
       {/* Selected page */}
       <div className="text-center text-sm text-white mt-0.5 rdvs-label">

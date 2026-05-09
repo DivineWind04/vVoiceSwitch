@@ -14,11 +14,13 @@ type DAButtonProps = {
   style?: React.CSSProperties;
   controlledIndicator?: boolean;
   indicatorClassName?: string;
+  tooltip?: string; // Hover tooltip text
 };
 
-const DAButton: React.FC<DAButtonProps> = ({ topLine, middleLine, bottomLine, onClick, showIndicator = false, style, latching, dialLine, controlledIndicator, indicatorClassName }) => {
+const DAButton: React.FC<DAButtonProps> = ({ topLine, middleLine, bottomLine, onClick, showIndicator = false, style, latching, dialLine, controlledIndicator, indicatorClassName, tooltip }) => {
   const [isActive, setIsActive] = useState(false);
   const [isIndicatorVisible, setIndicatorVisible] = useState(showIndicator);
+  const [isHovered, setIsHovered] = useState(false);
 
   const handleMouseDown = () => {
     setIsActive(true);
@@ -34,6 +36,7 @@ const DAButton: React.FC<DAButtonProps> = ({ topLine, middleLine, bottomLine, on
 
   const indicatorVisible = controlledIndicator ?? isIndicatorVisible;
   return (
+    <div className="relative inline-block">
     <button
       className={`relative w-16 h-16 bg-customBlue text-customYellow 
     border-2 border-customGray flex items-center justify-center text-center
@@ -45,7 +48,8 @@ const DAButton: React.FC<DAButtonProps> = ({ topLine, middleLine, bottomLine, on
       }}
       onMouseDown={handleMouseDown}
       onMouseUp={handleMouseUp}
-      onMouseLeave={() => setIsActive(false)} // Handle case where mouse leaves without release
+      onMouseLeave={() => { setIsActive(false); setIsHovered(false); }}
+      onMouseEnter={() => setIsHovered(true)}
     >
       {/* Centered and styled text */}
       {!middleLine && !bottomLine ? (
@@ -80,6 +84,30 @@ const DAButton: React.FC<DAButtonProps> = ({ topLine, middleLine, bottomLine, on
         <div className="absolute bottom-0 left-0 right-0 h-3 bg-customGreen"></div>
       )}
     </button>
+    {tooltip && isHovered && (
+      <div
+        style={{
+          position: 'absolute',
+          bottom: '100%',
+          left: '50%',
+          transform: 'translateX(-50%)',
+          marginBottom: '4px',
+          backgroundColor: '#1a1a2e',
+          color: '#e0e0e0',
+          fontSize: '10px',
+          fontFamily: 'monospace',
+          whiteSpace: 'nowrap',
+          padding: '3px 6px',
+          border: '1px solid #555',
+          borderRadius: '2px',
+          pointerEvents: 'none',
+          zIndex: 9999,
+        }}
+      >
+        {tooltip}
+      </div>
+    )}
+    </div>
   );
 };
 
