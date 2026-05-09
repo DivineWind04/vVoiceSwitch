@@ -1278,14 +1278,17 @@ export const useCoreStore = create<CoreState>((set: any, get: any) => {
             }, 4000)
         }
     }
-    setInterval(() => {
-        if (!socket) {
-            connect()
-        }
-    }, 1000)
+    if (typeof window !== 'undefined') {
+        setInterval(() => {
+            if (!socket) {
+                connect()
+            }
+        }, 1000)
+    }
 
     const debounce_set = debounce(set, 50)
     function connect() {
+        if (typeof window === 'undefined') return;
         const wsUrl = 'ws://localhost:9002';
         try {
             socket = new WebSocket(wsUrl);
