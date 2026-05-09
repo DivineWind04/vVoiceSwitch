@@ -18,6 +18,7 @@ export default function VscsButtonComponent(props: {
   typeString: string;
   callback: Callback | undefined;
   className: string;
+  tooltip?: string;
   multiLineData?: {
     line1?: string;
     line2?: string;
@@ -48,6 +49,7 @@ export default function VscsButtonComponent(props: {
     <button
       type="button"
       disabled={!props.callback}
+      title={props.tooltip}
       onMouseDown={handleMouseDown}
       onMouseUp={handleMouseUp}
       onMouseLeave={handleMouseLeave}
