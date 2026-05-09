@@ -801,14 +801,10 @@ export const useCoreStore = create<CoreState>((set: any, get: any) => {
             // Set status to dialing, then ringback
             set({ dialCallStatus: 'dialing', activeDialCallTarget: targetLineId });
             
-            // Send the call command to AFV as type-1 (ring).
-            // Each side registers their OWN line with `add` at startup (resetWindow).
-            // To initiate a call, the caller sends `call <target_line_id>` — AFV routes
-            // this to whichever client has `add`-ed that line (the receiver).
-            // Do NOT send `add` for the target line here: registering the target from the
-            // caller side would make AFV treat the caller as a second subscriber of that
-            // frequency, preventing it from routing the ring notification to the receiver.
-            // Type-3 is a front-end-only concept; AFV only understands type-1 for these lines.
+            // Register the target line with AFV as type-1 before calling it.
+            // AFV requires a client to have `add`-ed a line before it can initiate a `call`
+            // on that line. Type-3 is a front-end-only concept; AFV uses type-1 for these lines.
+            sendMessageNow({ type: 'add', cmd1: targetLineId, dbl1: 1 });
             sendMessageNow({ type: 'call', cmd1: targetLineId, dbl1: 1 });
             
             // Set to ringback after a short delay (simulating call routing)
