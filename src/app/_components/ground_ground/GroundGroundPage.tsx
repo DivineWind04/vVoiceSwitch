@@ -28,7 +28,6 @@ const GroundGroundPage: React.FC<GroundGroundPageProps> = ({
   onOpenKeypadForDialLine,
 }) => {
   const [internalPage, setInternalPage] = useState(1); // State to track current page
-  const [showTooltips, setShowTooltips] = useState(false);
   
   const currentPage = externalPage !== undefined ? externalPage : internalPage;
   const setCurrentPage = externalOnPageChange || setInternalPage;
@@ -43,6 +42,7 @@ const GroundGroundPage: React.FC<GroundGroundPageProps> = ({
   const vacsHandleButtonPress = useCoreStore((s: any) => s.vacsHandleButtonPress);
   const vvscsHandleButtonPress = useCoreStore((s: any) => s.vvscsHandleButtonPress);
   const landlineHandleButtonPress = useCoreStore((s: any) => s.landlineHandleButtonPress);
+  const showTooltips = useCoreStore((s: any) => s.showLineTooltips);
   const ITEM_PER_PAGE = 18;
   const currentSlice = useMemo(() => {
     // Implement overflow logic: if there are more G/G entries than can fit on page 1,
@@ -309,7 +309,7 @@ const GroundGroundPage: React.FC<GroundGroundPageProps> = ({
           </div>
         </>
       )}
-      {/* Navigation buttons + tooltip toggle */}
+      {/* Navigation buttons */}
       <div className={`flex gap-1 mb-0.5 ${showKeypad ? 'mt-[69px] ml-2' : 'mt-1'}`}>
         {[1, 2, 3].map((page) => (
           <SquareSelectorButton
@@ -319,23 +319,6 @@ const GroundGroundPage: React.FC<GroundGroundPageProps> = ({
             useRdvsFont={true}
           />
         ))}
-        <button
-          onClick={() => setShowTooltips(v => !v)}
-          style={{
-            fontSize: '9px',
-            fontFamily: 'monospace',
-            padding: '2px 5px',
-            marginLeft: 'auto',
-            background: showTooltips ? '#2a4a2a' : '#1a1a2e',
-            color: showTooltips ? '#7fff7f' : '#888',
-            border: `1px solid ${showTooltips ? '#4a8a4a' : '#444'}`,
-            borderRadius: '2px',
-            cursor: 'pointer',
-            alignSelf: 'center',
-          }}
-        >
-          {showTooltips ? 'INFO ON' : 'INFO'}
-        </button>
       </div>
       {/* Selected page */}
       <div className="text-center text-sm text-white mt-0.5 rdvs-label">

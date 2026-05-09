@@ -15,6 +15,7 @@ import { Alert } from 'antd';
 import { loadAllFacilities, SUPPORTED_FACILITIES } from '../lib/facilityLoader';
 import { autoDetectPosition } from '../lib/vatsimController';
 import TestBenchIcon from '../testbench/TestBenchIcon';
+import LineTooltipToggleIcon from './_components/global/LineTooltipToggleIcon';
 
 function normalizeVersion(version: string): string {
   return (version || '')
@@ -402,6 +403,7 @@ export default function Page() {
       )}
       <SettingModal open={settingModal} setModal={setSettingModal} />
       <GeneralSettingsModal open={generalSettingsModal} setModal={setGeneralSettingsModal} />
+      <LineTooltipToggleIcon />
       <TestBenchIcon />
     </div>
   );

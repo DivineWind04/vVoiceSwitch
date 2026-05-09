@@ -234,6 +234,10 @@ interface CoreState extends VacsStoreState, VvscsStoreState, LandlineStoreState,
     setBrightness: (brightness: number) => void;
     adjustBrightness: (delta: number) => void;
 
+    // Global line tooltip visibility (shared across all UIs)
+    showLineTooltips: boolean;
+    setShowLineTooltips: (show: boolean) => void;
+
     // VSCS-specific props
     activeLandlines: any[];
     incomingLandlines: any[];
@@ -704,6 +708,10 @@ export const useCoreStore = create<CoreState>((set: any, get: any) => {
         const current = get().brightness;
         set({ brightness: Math.max(20, Math.min(100, current + delta)) });
     },
+
+    // Global tooltip controls
+    showLineTooltips: false,
+    setShowLineTooltips: (show: boolean) => set({ showLineTooltips: !!show }),
     
         setConnected: (status: boolean) => {
             set({
