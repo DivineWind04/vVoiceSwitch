@@ -9,6 +9,7 @@ import STVSWrapper from '../components/STVSWrapper';
 import IVSRPage from './ivsr/page';
 import RDVSWrapper from '../components/RDVSWrapper';
 import LSTARWrapper from '../components/LSTARWrapper';
+import CVCSWrapper from '../components/CVCSWrapper';
 import SettingModal from '../pages/setting';
 import GeneralSettingsModal from '../pages/generalSettings';
 import { Alert } from 'antd';
@@ -279,6 +280,8 @@ export default function Page() {
         return <IVSRPage />;
       case 'lstar':
         return <LSTARWrapper />;
+      case 'cvcs':
+        return <CVCSWrapper />;
       case 'vscs':
       default:
         return (

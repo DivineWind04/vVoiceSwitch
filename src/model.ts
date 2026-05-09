@@ -196,7 +196,7 @@ interface CoreState extends VacsStoreState, VvscsStoreState, LandlineStoreState,
     positionData: Facility;
     callsign: string;
     selectedPositions: Position[],
-    currentUI: string; // Current UI context (vscs, etvs, stvs, ivsr, rdvs, lstar)
+    currentUI: string; // Current UI context (vscs, etvs, stvs, ivsr, rdvs, lstar, cvcs)
     currentConfig: any; // The current config for the selected position
 
     ag_status: any[],
@@ -367,6 +367,14 @@ const audioConfigs: Record<string, AudioConfig> = {
     rdvs: {
         ringback: '/DialLine.wav',
         ggchime: '/GGChime.mp3'
+    },
+    lstar: {
+        ringback: '/DialLine.wav',
+        ggchime: '/GGChime.mp3'
+    },
+    cvcs: {
+        ringback: '/DialLine.wav',
+        ggchime: '/GGChime.mp3'
     }
 };
 
@@ -381,6 +389,8 @@ export function getCurrentUIContext(): string {
     if (path.includes('/stvs')) return 'stvs';
     if (path.includes('/ivsr')) return 'ivsr';
     if (path.includes('/rdvs')) return 'rdvs';
+    if (path.includes('/lstar')) return 'lstar';
+    if (path.includes('/cvcs')) return 'cvcs';
     
     // If no URL-based detection, try to get from position data in store
     try {
