@@ -353,7 +353,7 @@ const audioConfigs: Record<string, AudioConfig> = {
         ggchime: '/RDVS_Chime.m4a'
     },
     stvs: {
-        ringback: '/DialLine.wav',
+        ringback: '/rdvs/RDVS1000_Chime.wav',
         ggchime: '/RDVS_Chime.m4a'
     },
     ivsr: {
