@@ -13,11 +13,13 @@ interface CoreState {
     ag_status: any[];
     gg_status: any[];
     vscs_status: any[];
+    showLineTooltips: boolean;
 
     setPositionData: (data: Facility) => void;
     setConnected: (status: boolean) => void;
     updateSelectedPositions: (poss: Position[]) => void;
     setCallsign: (call_sign: string, cid: number) => void;
+    setShowLineTooltips: (show: boolean) => void;
     sendMessageNow: (data: any) => void;
 }
 
@@ -99,6 +101,7 @@ export const useCoreStore = create<CoreState>((set: any, get: any) => {
         ag_status: [],
     gg_status: [],
     vscs_status: [],
+    showLineTooltips: false,
     sendMessageNow: () => {},
         setConnected: (status: boolean) => {
             set({
@@ -122,6 +125,11 @@ export const useCoreStore = create<CoreState>((set: any, get: any) => {
                 cid
             })
             resetWindow();
+        },
+    setShowLineTooltips: (show: boolean) => {
+            set({
+                showLineTooltips: !!show
+            })
         }
     }
 

@@ -375,6 +375,7 @@ export default function RDVSWrapper({ variant = 'default' }: RDVSWrapperProps) {
   const gg_status = useCoreStore((s: any) => s.gg_status);
   const ag_status = useCoreStore((s: any) => s.ag_status);
   const ptt = useCoreStore((s: any) => s.ptt);
+  const showLineTooltips = useCoreStore((s: any) => s.showLineTooltips);
   const positionData = useCoreStore((s: any) => s.positionData);
   const holdBtn = useCoreStore((s: any) => s.holdBtn);
   const releaseBtn = useCoreStore((s: any) => s.releaseBtn);
@@ -616,6 +617,22 @@ export default function RDVSWrapper({ variant = 'default' }: RDVSWrapperProps) {
       setIaMode(false);
       setDialBuffer('');
     }
+  };
+
+  const getLineTooltip = (btn: any) => {
+    if (!showLineTooltips || !btn) return undefined;
+    const lineType = btn.lineType;
+    const typeLabel =
+      lineType === 3 ? 'DIAL'
+      : lineType === 0 ? 'OVERRIDE'
+      : lineType === 2 ? 'SHOUT'
+      : 'RING';
+    const destination =
+      btn?.statusObj?.call_name ||
+      [btn?.line1, btn?.line2].filter(Boolean).join(', ') ||
+      btn?.call_id ||
+      '';
+    return `${typeLabel} — ${destination}`;
   };
 
   // Get colors for a DA button based on line type
@@ -985,6 +1002,7 @@ export default function RDVSWrapper({ variant = 'default' }: RDVSWrapperProps) {
         style={{ cursor: 'pointer' }}
         onClick={() => handleLineClick(btn)}
       >
+        {getLineTooltip(btn) && <title>{getLineTooltip(btn)}</title>}
         {/* Include pattern definitions for this button's border color */}
         <FillPatternDefs color={strokeColor} />
         <rect x="0" y="0" width={w} height={h} fill={fillValue} stroke={strokeColor} strokeWidth="4" />
@@ -1455,6 +1473,7 @@ export default function RDVSWrapper({ variant = 'default' }: RDVSWrapperProps) {
             style={{ cursor: 'pointer' }}
             onClick={() => handleLineClick(btn)}
           >
+            {getLineTooltip(btn) && <title>{getLineTooltip(btn)}</title>}
             <FillPatternDefs color={strokeColor} />
             <rect x="0" y="0" width={w} height={h} fill={fillValue} stroke={strokeColor} strokeWidth="4" />
             <text x={w / 2} y={line1Y} textAnchor="middle" fill={textColor} fontSize={16} fontFamily="RDVSimulated, monospace" fontWeight="100">

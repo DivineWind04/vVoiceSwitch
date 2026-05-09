@@ -2,6 +2,7 @@ import React, { useState } from "react";
 
 interface StvsButtonProps {
   label: string;
+  tooltip?: string;
   active?: boolean;
   hasFreq?: boolean;
   pttActive?: boolean;
@@ -11,7 +12,7 @@ interface StvsButtonProps {
   style?: React.CSSProperties;
 }
 
-const StvsButton: React.FC<StvsButtonProps> = ({ label, active = false, hasFreq = false, pttActive = false, callStatus, brightness = 1.0, onClick, style }) => {
+const StvsButton: React.FC<StvsButtonProps> = ({ label, tooltip, active = false, hasFreq = false, pttActive = false, callStatus, brightness = 1.0, onClick, style }) => {
   const [pressed, setPressed] = useState(false);
   
   // Function to play button press sound
@@ -91,6 +92,7 @@ const StvsButton: React.FC<StvsButtonProps> = ({ label, active = false, hasFreq 
 
   return (
     <button
+      title={tooltip || label}
       className="absolute flex flex-col items-center justify-center rounded-md border-2 border-gray-700 transition-all select-none bg-zinc-950"
       style={{
         boxShadow: pressed ? '0 1px 2px #111' : '0 2px 8px #111',

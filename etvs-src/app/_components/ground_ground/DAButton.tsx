@@ -14,9 +14,10 @@ type DAButtonProps = {
   style?: React.CSSProperties;
   controlledIndicator?: boolean;
   indicatorClassName?: string;
+  tooltip?: string;
 };
 
-const DAButton: React.FC<DAButtonProps> = ({ topLine, middleLine, bottomLine, onClick, showIndicator = false, style, latching, dialLine, controlledIndicator, indicatorClassName }) => {
+const DAButton: React.FC<DAButtonProps> = ({ topLine, middleLine, bottomLine, onClick, showIndicator = false, style, latching, dialLine, controlledIndicator, indicatorClassName, tooltip }) => {
   const [isActive, setIsActive] = useState(false);
   const [isIndicatorVisible, setIndicatorVisible] = useState(showIndicator);
 
@@ -54,6 +55,7 @@ const DAButton: React.FC<DAButtonProps> = ({ topLine, middleLine, bottomLine, on
   
   return (
     <button
+      title={tooltip}
       className={`etvs-btn relative flex items-center justify-center text-center select-none ${isActive ? 'etvs-btn-active' : 'etvs-btn-inactive'}`}
       style={style}
       onMouseDown={handleMouseDown}
