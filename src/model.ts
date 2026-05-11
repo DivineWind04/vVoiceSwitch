@@ -196,7 +196,7 @@ interface CoreState extends VacsStoreState, VvscsStoreState, LandlineStoreState,
     positionData: Facility;
     callsign: string;
     selectedPositions: Position[],
-    currentUI: string; // Current UI context (vscs, etvs, stvs, ivsr, rdvs, lstar)
+    currentUI: string; // Current UI context (vscs, etvs, stvs, ivsr, rdvs, lstar, cvcs)
     currentConfig: any; // The current config for the selected position
 
     ag_status: any[],
@@ -233,6 +233,10 @@ interface CoreState extends VacsStoreState, VvscsStoreState, LandlineStoreState,
     brightness: number;
     setBrightness: (brightness: number) => void;
     adjustBrightness: (delta: number) => void;
+
+    // Global line tooltip visibility (shared across all UIs)
+    showLineTooltips: boolean;
+    setShowLineTooltips: (show: boolean) => void;
 
     // VSCS-specific props
     activeLandlines: any[];
@@ -363,6 +367,14 @@ const audioConfigs: Record<string, AudioConfig> = {
     rdvs: {
         ringback: '/DialLine.wav',
         ggchime: '/GGChime.mp3'
+    },
+    lstar: {
+        ringback: '/DialLine.wav',
+        ggchime: '/GGChime.mp3'
+    },
+    cvcs: {
+        ringback: '/DialLine.wav',
+        ggchime: '/GGChime.mp3'
     }
 };
 
@@ -377,6 +389,8 @@ export function getCurrentUIContext(): string {
     if (path.includes('/stvs')) return 'stvs';
     if (path.includes('/ivsr')) return 'ivsr';
     if (path.includes('/rdvs')) return 'rdvs';
+    if (path.includes('/lstar')) return 'lstar';
+    if (path.includes('/cvcs')) return 'cvcs';
     
     // If no URL-based detection, try to get from position data in store
     try {
@@ -704,6 +718,10 @@ export const useCoreStore = create<CoreState>((set: any, get: any) => {
         const current = get().brightness;
         set({ brightness: Math.max(20, Math.min(100, current + delta)) });
     },
+
+    // Global tooltip controls
+    showLineTooltips: false,
+    setShowLineTooltips: (show: boolean) => set({ showLineTooltips: !!show }),
     
         setConnected: (status: boolean) => {
             set({

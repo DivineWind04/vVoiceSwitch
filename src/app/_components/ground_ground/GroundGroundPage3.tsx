@@ -13,6 +13,7 @@ const GroundGroundPage3: React.FC = () => {
   const vacsHandleButtonPress = useCoreStore((s: any) => s.vacsHandleButtonPress);
   const vvscsHandleButtonPress = useCoreStore((s: any) => s.vvscsHandleButtonPress);
   const landlineHandleButtonPress = useCoreStore((s: any) => s.landlineHandleButtonPress);
+  const showTooltips = useCoreStore((s: any) => s.showLineTooltips);
   
   const ITEM_PER_PAGE_3 = 30; // 6 rows x 5 columns
   
@@ -40,6 +41,11 @@ const GroundGroundPage3: React.FC = () => {
       let onClick: (() => void) | undefined = undefined;
       let indicator = false;
       let indicatorClassName = '';
+      const buildTooltip = (typeLabel: string, dest?: string) => {
+        if (!showTooltips) return undefined;
+        const displayName = dest || data.call_name || call_id || '';
+        return `${typeLabel} — ${displayName}`;
+      };
 
       // v-VSCS WebRTC calls — route through v-VSCS handler
       if (data.isVvscs && data.vvscsLineId) {
@@ -53,7 +59,7 @@ const GroundGroundPage3: React.FC = () => {
         onClick = () => vvscsHandleButtonPress(data.vvscsLineId, data.status);
         buttons.push(
           <DAButton key={index} topLine={data.call_name || data.call} latching={false}
-            onClick={onClick} controlledIndicator={indicator} indicatorClassName={indicatorClassName} />
+            onClick={onClick} controlledIndicator={indicator} indicatorClassName={indicatorClassName} tooltip={buildTooltip('RING')} />
         );
         return;
       }
@@ -70,7 +76,7 @@ const GroundGroundPage3: React.FC = () => {
         onClick = () => landlineHandleButtonPress(data.landlineCallId, data.status);
         buttons.push(
           <DAButton key={index} topLine={data.call_name || data.call} latching={false}
-            onClick={onClick} controlledIndicator={indicator} indicatorClassName={indicatorClassName} />
+            onClick={onClick} controlledIndicator={indicator} indicatorClassName={indicatorClassName} tooltip={buildTooltip(data.lineType === 3 ? 'DIAL' : 'RING')} />
         );
         return;
       }
@@ -87,7 +93,7 @@ const GroundGroundPage3: React.FC = () => {
         onClick = () => vacsHandleButtonPress(data.vacsCallId, data.status);
         buttons.push(
           <DAButton key={index} topLine={data.call_name || data.call} latching={false}
-            onClick={onClick} controlledIndicator={indicator} indicatorClassName={indicatorClassName} />
+            onClick={onClick} controlledIndicator={indicator} indicatorClassName={indicatorClassName} tooltip={buildTooltip('RING')} />
         );
         return;
       }
@@ -138,6 +144,7 @@ const GroundGroundPage3: React.FC = () => {
           onClick={onClick}
           controlledIndicator={indicator}
           indicatorClassName={indicatorClassName}
+          tooltip={buildTooltip(call_type === 'SO' ? 'SHOUT' : lineType === 3 ? 'DIAL' : lineType === 0 ? 'OVERRIDE' : 'RING')}
         />
       );
     });

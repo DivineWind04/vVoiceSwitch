@@ -1721,6 +1721,7 @@ function VscsPanel(props: VscsProps & { panelId?: string; defaultScreenMode?: st
   const vacsHandleButtonPress = useCoreStore((s: any) => s.vacsHandleButtonPress);
   const vvscsHandleButtonPress = useCoreStore((s: any) => s.vvscsHandleButtonPress);
   const landlineHandleButtonPress = useCoreStore((s: any) => s.landlineHandleButtonPress);
+  const showLineTooltips = useCoreStore((s: any) => s.showLineTooltips);
   const positionData = useCoreStore((s: any) => s.positionData);
   const overrideStatus = useCoreStore((s: any) => s.overrideStatus); // OV_ calls from WebSocket
   const selectedPositions = useCoreStore((s: any) => s.selectedPositions);
@@ -1986,6 +1987,20 @@ function VscsPanel(props: VscsProps & { panelId?: string; defaultScreenMode?: st
       line5: line5Content // Fourth part of call name or type indicator (RING, OVRD, etc.)
     };
   };
+
+  const getVscsTooltip = (data: any) => {
+    if (!showLineTooltips || !data || data.isPlaceholder) return undefined;
+
+    const typeLabel =
+      data.lineType === 3 ? 'DIAL'
+      : data.lineType === 0 ? 'OVERRIDE'
+      : (data.call?.startsWith('SO_') || data.lineType === 2) ? 'SHOUT'
+      : 'RING';
+
+    const destination = data.call_name || data.call?.substring(5) || data.call?.substring(3) || '';
+    return `${typeLabel} — ${destination}`;
+  };
+
   const [buttons, setButtons] = useState(btns);
   const testFunc = (a: string, b: ButtonType) => {
     console.log('testFunc called with:', { target: a, type: b });
@@ -2734,6 +2749,7 @@ function VscsPanel(props: VscsProps & { panelId?: string; defaultScreenMode?: st
                     ? 'cursor-pointer'
                     : 'cursor-not-allowed'
                 }`}
+                tooltip={getVscsTooltip(currentSlice[i])}
                 multiLineData={generateGGMultiLineData(currentSlice[i], i + ITEMS_PER_PAGE)}
               />
             ))
@@ -2760,6 +2776,7 @@ function VscsPanel(props: VscsProps & { panelId?: string; defaultScreenMode?: st
                     ? 'cursor-pointer'
                     : 'cursor-not-allowed'
                 }`}
+                tooltip={getVscsTooltip(currentSlice[i])}
                 multiLineData={generateGGMultiLineData(currentSlice[i], i)}
               />
             ))

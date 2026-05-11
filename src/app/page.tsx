@@ -9,12 +9,36 @@ import STVSWrapper from '../components/STVSWrapper';
 import IVSRPage from './ivsr/page';
 import RDVSWrapper from '../components/RDVSWrapper';
 import LSTARWrapper from '../components/LSTARWrapper';
+import CVCSWrapper from '../components/CVCSWrapper';
 import SettingModal from '../pages/setting';
 import GeneralSettingsModal from '../pages/generalSettings';
 import { Alert } from 'antd';
 import { loadAllFacilities, SUPPORTED_FACILITIES } from '../lib/facilityLoader';
 import { autoDetectPosition } from '../lib/vatsimController';
 import TestBenchIcon from '../testbench/TestBenchIcon';
+import LineTooltipToggleIcon from './_components/global/LineTooltipToggleIcon';
+
+function normalizeVersion(version: string): string {
+  return (version || '')
+    .trim()
+    .replace(/^v/i, '')
+    .split(/[+-]/)[0] || '0.0.0';
+}
+
+function compareSemver(a: string, b: string): number {
+  const aParts = normalizeVersion(a).split('.').map((part) => Number.parseInt(part, 10) || 0);
+  const bParts = normalizeVersion(b).split('.').map((part) => Number.parseInt(part, 10) || 0);
+  const len = Math.max(aParts.length, bParts.length);
+
+  for (let i = 0; i < len; i += 1) {
+    const av = aParts[i] ?? 0;
+    const bv = bParts[i] ?? 0;
+    if (av > bv) return 1;
+    if (av < bv) return -1;
+  }
+
+  return 0;
+}
 
 export default function Page() {
   const [settingModal, setSettingModal] = useState(false);
@@ -89,18 +113,31 @@ export default function Page() {
     const loadVersionInfo = async () => {
       try {
         console.log('Loading version info, current afv_version:', afv_version);
+        if (!afv_version || !afv_version.trim()) {
+          // AFV has not reported its version yet. Avoid false "update required" banners.
+          setVersionAlert(null);
+          return;
+        }
+
         const response = await fetch('/html_app/afv_poc/patch/version.json');
         const version_data = await response.json();
         console.log('Loaded version data:', version_data);
-        const latest_version = parseFloat(version_data.latest_version);
-        const current_version = parseFloat(afv_version || '1.0.0'); // Default to 1.0.0 if no version
-        const lowest_allowable_version = parseFloat(version_data.lowest_allowable_version);
-        console.log('Version comparison:', { latest_version, current_version, lowest_allowable_version });
+        const latestVersion = `${version_data.latest_version || '0.0.0'}`;
+        const lowestAllowableVersion = `${version_data.lowest_allowable_version || '0.0.0'}`;
+        const currentVersion = `${afv_version}`;
+
+        console.log('Version comparison:', {
+          latestVersion,
+          currentVersion,
+          lowestAllowableVersion,
+          latestVsCurrent: compareSemver(latestVersion, currentVersion),
+          currentVsLowest: compareSemver(currentVersion, lowestAllowableVersion),
+        });
         
-        if (current_version < lowest_allowable_version) {
+        if (compareSemver(currentVersion, lowestAllowableVersion) < 0) {
           version_data.must_upgrade = true;
         }
-        const shouldShowAlert = latest_version > current_version;
+        const shouldShowAlert = compareSemver(latestVersion, currentVersion) > 0;
         console.log('Should show alert:', shouldShowAlert);
         setVersionAlert(shouldShowAlert ? version_data : null);
       } catch (error) {
@@ -243,6 +280,8 @@ export default function Page() {
         return <IVSRPage />;
       case 'lstar':
         return <LSTARWrapper />;
+      case 'cvcs':
+        return <CVCSWrapper />;
       case 'vscs':
       default:
         return (
@@ -372,6 +411,7 @@ export default function Page() {
       )}
       <SettingModal open={settingModal} setModal={setSettingModal} />
       <GeneralSettingsModal open={generalSettingsModal} setModal={setGeneralSettingsModal} />
+      <LineTooltipToggleIcon />
       <TestBenchIcon />
     </div>
   );
