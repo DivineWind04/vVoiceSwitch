@@ -295,6 +295,11 @@ export default function Page() {
           <div className="text-center text-white">
             <h2 className="text-2xl font-bold mb-4">AFV Client</h2>
             <p className="text-lg text-zinc-300">Not Connected</p>
+            <p className="text-sm text-zinc-400 mt-4">
+              Download AFV Client:{' '}
+              <a href="https://static.zhener.pw/html_app/afv_poc/patch/afv_patch_windows_latest.zip" target="_blank" rel="noopener noreferrer" className="text-blue-400 hover:underline">[Windows]</a>{' '}
+              <a href="https://static.zhener.pw/html_app/afv_poc/patch/afv_patch_macos_latest.zip" target="_blank" rel="noopener noreferrer" className="text-blue-400 hover:underline">[macOS]</a>
+            </p>
           </div>
         </div>
       ) : !selectedPositions || selectedPositions.length === 0 || !uiLoaded ? (
