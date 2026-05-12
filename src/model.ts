@@ -1409,6 +1409,11 @@ export const useCoreStore = create<CoreState>((set: any, get: any) => {
                                             if (audioAction !== 'chime') audioAction = 'ringback';
                                         } else if (k.status === 'ok' || k.status === 'active') {
                                             set({ dialCallStatus: 'connected' });
+                                            // Update stub so fallback re-injections reflect connected state
+                                            const stubIdx = type3AfvStubs.findIndex((s: any) => s.trunkName === activeDialLine.trunkName);
+                                            if (stubIdx >= 0) {
+                                                type3AfvStubs[stubIdx] = { ...type3AfvStubs[stubIdx], status: 'ok' };
+                                            }
                                         } else {
                                             hasType3Cleared = true;
                                         }
@@ -1427,6 +1432,11 @@ export const useCoreStore = create<CoreState>((set: any, get: any) => {
                                 // Carry trunkName from the matching stub (resolved from dialCodeTable)
                                 const matchingStub = type3AfvStubs.find((s: any) => resolveCallId(s.call) === call_id);
                                 if (matchingStub?.trunkName) k.trunkName = matchingStub.trunkName;
+                                // AFV lags updating caller-side ringback after remote answers.
+                                // If we already know the call is connected, don't show ringing.
+                                if (k.status === 'ringing' && get().dialCallStatus === 'connected') {
+                                    k.status = 'ok';
+                                }
                             }
                             new_gg.push({ ...k })
                             // SO_ prefix is used by AFV for shout/override lines (type 0/1/2) — skip audio for those.
@@ -1558,6 +1568,8 @@ export const useCoreStore = create<CoreState>((set: any, get: any) => {
                         stopAudio();
                         // Clear the active dial line and target when connected or idle
                         if (status === 'connected') {
+                            // Update stubs to 'ok' so fallback re-injection shows connected state
+                            type3AfvStubs = type3AfvStubs.map((s: any) => ({ ...s, status: 'ok' }));
                             set({ activeDialLine: null, activeDialCallTarget: null });
                         }
                     } else if (status === 'busy' || status === 'error') {
