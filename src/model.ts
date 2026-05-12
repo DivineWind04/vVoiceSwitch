@@ -343,6 +343,7 @@ export interface RDVSPage {
 interface AudioConfig {
     ringback: string;
     ggchime: string;
+    dialline?: string;
     override?: string;
 }
 
@@ -350,31 +351,38 @@ const audioConfigs: Record<string, AudioConfig> = {
     vscs: {
         ringback: '/Ringback.wav',
         ggchime: '/GGChime.mp3',
+        dialline: '/DialLine.wav',
         override: '/Override.mp3'
     },
     etvs: {
-        ringback: '/DialLine.wav',
-        ggchime: '/RDVS_Chime.m4a'
+        ringback: '/Ringback.wav',
+        ggchime: '/RDVS_Chime.m4a',
+        dialline: '/DialLine.wav'
     },
     stvs: {
         ringback: '/rdvs/RDVS1000_Chime.wav',
-        ggchime: '/rdvs/RDVS1000_Chime.wav'
+        ggchime: '/rdvs/RDVS1000_Chime.wav',
+        dialline: '/DialLine.wav'
     },
     ivsr: {
-        ringback: '/DialLine.wav',
-        ggchime: '/RDVS_Chime.m4a'
+        ringback: '/Ringback.wav',
+        ggchime: '/RDVS_Chime.m4a',
+        dialline: '/DialLine.wav'
     },
     rdvs: {
-        ringback: '/DialLine.wav',
-        ggchime: '/GGChime.mp3'
+        ringback: '/Ringback.wav',
+        ggchime: '/GGChime.mp3',
+        dialline: '/DialLine.wav'
     },
     lstar: {
-        ringback: '/DialLine.wav',
-        ggchime: '/GGChime.mp3'
+        ringback: '/Ringback.wav',
+        ggchime: '/GGChime.mp3',
+        dialline: '/DialLine.wav'
     },
     cvcs: {
-        ringback: '/DialLine.wav',
-        ggchime: '/GGChime.mp3'
+        ringback: '/Ringback.wav',
+        ggchime: '/GGChime.mp3',
+        dialline: '/DialLine.wav'
     }
 };
 
@@ -417,8 +425,22 @@ export function getCurrentUIContext(): string {
 }
 
 // Function to create or get audio element for specific UI
-export function getAudioElement(audioType: 'ringback' | 'ggchime'): HTMLAudioElement | null {
+export function getAudioElement(audioType: 'ringback' | 'ggchime' | 'dialline'): HTMLAudioElement | null {
     if (typeof document === 'undefined') return null;
+
+    // 'dialline' is always /DialLine.wav regardless of UI context
+    if (audioType === 'dialline') {
+        const audioId = 'global_dialline';
+        let el = document.getElementById(audioId) as HTMLAudioElement | null;
+        if (!el) {
+            el = document.createElement('audio');
+            el.id = audioId;
+            el.src = '/DialLine.wav';
+            el.preload = 'auto';
+            document.body.appendChild(el);
+        }
+        return el;
+    }
     
     const uiContext = getCurrentUIContext();
     const config = audioConfigs[uiContext];
@@ -499,9 +521,11 @@ export function stopAudio() {
         // Get current audio elements in case UI context changed
         const currentRingback = getAudioElement('ringback');
         const currentGgchime = getAudioElement('ggchime');
+        const currentDialline = getAudioElement('dialline');
         
         currentRingback?.pause?.();
         currentGgchime?.pause?.();
+        currentDialline?.pause?.();
         
         // Also stop the cached references
         ringback_audio?.pause?.();
@@ -1366,9 +1390,22 @@ export const useCoreStore = create<CoreState>((set: any, get: any) => {
                     const new_override: any[] = [] // Track OV_ prefixed calls
             // Use 'as' cast to prevent TypeScript from narrowing audioAction to 'stop'
             // after the cns.map() callback (TypeScript doesn't track closure mutations).
-            let audioAction = 'stop' as 'chime' | 'ringback' | 'stop';
+            let audioAction = 'stop' as 'chime' | 'ringback' | 'dialline' | 'stop';
             let chimeCallerId: string | undefined;
             let hasType3Cleared = false;
+
+            // Pre-scan: check if the active dial target answered in THIS batch so the
+            // caller's own type-3 line (which may appear first in the array) can be
+            // immediately overridden from 'ringing' → 'ok' without waiting for the next frame.
+            const { activeDialCallTarget: preScanTarget } = get();
+            const targetAnsweredThisBatch = !!preScanTarget && cns.some((k: any) => {
+                const rid = resolveCallId(k.call || '');
+                return rid === preScanTarget && (k.status === 'ok' || k.status === 'active');
+            });
+            if (targetAnsweredThisBatch) {
+                type3AfvStubs = type3AfvStubs.map((s: any) => ({ ...s, status: 'ok' }));
+            }
+
             cns.map((k: any) => {
                         if (k.call === 'A/G') {
                             new_ag.push({ ...k })
@@ -1406,7 +1443,7 @@ export const useCoreStore = create<CoreState>((set: any, get: any) => {
                                         if (k.status === 'chime') {
                                             audioAction = 'chime';
                                         } else if (k.status === 'ringing') {
-                                            if (audioAction !== 'chime') audioAction = 'ringback';
+                                            if (audioAction !== 'chime') audioAction = 'dialline';
                                         } else if (k.status === 'ok' || k.status === 'active') {
                                             set({ dialCallStatus: 'connected' });
                                             // Update stub so fallback re-injections reflect connected state
@@ -1433,8 +1470,8 @@ export const useCoreStore = create<CoreState>((set: any, get: any) => {
                                 const matchingStub = type3AfvStubs.find((s: any) => resolveCallId(s.call) === call_id);
                                 if (matchingStub?.trunkName) k.trunkName = matchingStub.trunkName;
                                 // AFV lags updating caller-side ringback after remote answers.
-                                // If we already know the call is connected, don't show ringing.
-                                if (k.status === 'ringing' && get().dialCallStatus === 'connected') {
+                                // Override ringing→ok if target answered in this batch OR we already know connected.
+                                if (k.status === 'ringing' && (targetAnsweredThisBatch || get().dialCallStatus === 'connected')) {
                                     k.status = 'ok';
                                 }
                             }
@@ -1451,7 +1488,10 @@ export const useCoreStore = create<CoreState>((set: any, get: any) => {
                                         chimeCallerId = k.otherPosition;
                                     }
                                 } else if (k.status == 'ringing') {
-                                    if (audioAction !== 'chime') audioAction = 'ringback';
+                                    // Type-3 dial lines use DialLine.wav; type-1/2 use Ringback.wav
+                                    if (audioAction !== 'chime') {
+                                        audioAction = k.lineType === 3 ? 'dialline' : 'ringback';
+                                    }
                                 } else {
                                     // Clear caller ID when call ends or connects
                                     if (k.lineType === 3) {
@@ -1469,6 +1509,8 @@ export const useCoreStore = create<CoreState>((set: any, get: any) => {
                         if (chimeCallerId) set({ callerIdBuffer: chimeCallerId });
                     } else if (audioAction === 'ringback') {
                         chime(getAudioElement('ringback'));
+                    } else if (audioAction === 'dialline') {
+                        chime(getAudioElement('dialline'));
                     } else {
                         stopAudio();
                         if (hasType3Cleared) set({ callerIdBuffer: '' });
