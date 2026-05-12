@@ -10977,7 +10977,629 @@
             ["916173", 3, "E/W/V"],
             ["916273", 3, "S-BAY"],
             ["916473", 3, "NTWRS"]
+          ],
+        "tedPattern": {
+          "patternName": "Area B Cedar_TED",
+          "display": "LEFT",
+          "dimPercent": 50,
+          "pages": [
+            {
+              "pageNumber": 1,
+              "footer": "DRP",
+              "cells": [
+                {
+                  "quad": 1,
+                  "row": 1,
+                  "col": 1,
+                  "type": "IA"
+                },
+                {
+                  "quad": 1,
+                  "row": 2,
+                  "col": 1,
+                  "type": "IA"
+                },
+                {
+                  "quad": 1,
+                  "row": 3,
+                  "col": 1,
+                  "type": "IA"
+                },
+                {
+                  "quad": 1,
+                  "row": 4,
+                  "col": 1,
+                  "type": "IA"
+                },
+                {
+                  "quad": 1,
+                  "row": 4,
+                  "col": 4,
+                  "type": "DA",
+                  "lineId": "811056"
+                },
+                {
+                  "quad": 1,
+                  "row": 1,
+                  "col": 5,
+                  "type": "DA",
+                  "lineId": "811074"
+                },
+                {
+                  "quad": 1,
+                  "row": 2,
+                  "col": 5,
+                  "type": "DA",
+                  "lineId": "811094"
+                },
+                {
+                  "quad": 1,
+                  "row": 3,
+                  "col": 5,
+                  "type": "DA",
+                  "lineId": "811064"
+                },
+                {
+                  "quad": 1,
+                  "row": 4,
+                  "col": 5,
+                  "type": "DA",
+                  "lineId": "811088"
+                },
+                {
+                  "quad": 3,
+                  "row": 1,
+                  "col": 1,
+                  "type": "DA",
+                  "lineId": "2100440"
+                },
+                {
+                  "quad": 3,
+                  "row": 2,
+                  "col": 1,
+                  "type": "DA",
+                  "lineId": "2100315"
+                },
+                {
+                  "quad": 3,
+                  "row": 3,
+                  "col": 1,
+                  "type": "DA",
+                  "lineId": "2100545"
+                },
+                {
+                  "quad": 3,
+                  "row": 1,
+                  "col": 2,
+                  "type": "DA",
+                  "lineId": "2100462"
+                },
+                {
+                  "quad": 3,
+                  "row": 3,
+                  "col": 2,
+                  "type": "DA",
+                  "lineId": "2100546"
+                },
+                {
+                  "quad": 3,
+                  "row": 4,
+                  "col": 2,
+                  "type": "DA",
+                  "lineId": "2100558"
+                },
+                {
+                  "quad": 3,
+                  "row": 1,
+                  "col": 3,
+                  "type": "DA",
+                  "lineId": "2100483"
+                },
+                {
+                  "quad": 3,
+                  "row": 2,
+                  "col": 3,
+                  "type": "DA",
+                  "lineId": "2100541"
+                },
+                {
+                  "quad": 3,
+                  "row": 3,
+                  "col": 3,
+                  "type": "DA",
+                  "lineId": "2100547"
+                },
+                {
+                  "quad": 3,
+                  "row": 4,
+                  "col": 3,
+                  "type": "DA",
+                  "lineId": "2100557"
+                },
+                {
+                  "quad": 3,
+                  "row": 1,
+                  "col": 4,
+                  "type": "DA",
+                  "lineId": "2100287"
+                },
+                {
+                  "quad": 3,
+                  "row": 2,
+                  "col": 4,
+                  "type": "DA",
+                  "lineId": "2100542"
+                },
+                {
+                  "quad": 3,
+                  "row": 3,
+                  "col": 4,
+                  "type": "DA",
+                  "lineId": "2100548"
+                },
+                {
+                  "quad": 3,
+                  "row": 1,
+                  "col": 5,
+                  "type": "DA",
+                  "lineId": "2100503"
+                },
+                {
+                  "quad": 3,
+                  "row": 2,
+                  "col": 5,
+                  "type": "DA",
+                  "lineId": "2100543"
+                },
+                {
+                  "quad": 3,
+                  "row": 3,
+                  "col": 5,
+                  "type": "DA",
+                  "lineId": "2100549"
+                },
+                {
+                  "quad": 3,
+                  "row": 4,
+                  "col": 5,
+                  "type": "DA",
+                  "lineId": "2100555"
+                },
+                {
+                  "quad": 4,
+                  "row": 1,
+                  "col": 1,
+                  "type": "DA",
+                  "lineId": "2100556"
+                },
+                {
+                  "quad": 4,
+                  "row": 2,
+                  "col": 1,
+                  "type": "DA",
+                  "lineId": "2100544"
+                },
+                {
+                  "quad": 4,
+                  "row": 3,
+                  "col": 1,
+                  "type": "DA",
+                  "lineId": "2100550"
+                },
+                {
+                  "quad": 4,
+                  "row": 4,
+                  "col": 1,
+                  "type": "DA",
+                  "lineId": "2100393"
+                },
+                {
+                  "quad": 4,
+                  "row": 1,
+                  "col": 2,
+                  "type": "DA",
+                  "lineId": "2100522"
+                },
+                {
+                  "quad": 4,
+                  "row": 4,
+                  "col": 2,
+                  "type": "DA",
+                  "lineId": "2100417"
+                },
+                {
+                  "quad": 4,
+                  "row": 1,
+                  "col": 4,
+                  "type": "FUNC",
+                  "funcType": "RECON"
+                },
+                {
+                  "quad": 4,
+                  "row": 2,
+                  "col": 4,
+                  "type": "FUNC",
+                  "funcType": "HL"
+                },
+                {
+                  "quad": 4,
+                  "row": 1,
+                  "col": 5,
+                  "type": "FUNC",
+                  "funcType": "FWD"
+                },
+                {
+                  "quad": 4,
+                  "row": 3,
+                  "col": 5,
+                  "type": "FUNC",
+                  "funcType": "RB"
+                },
+                {
+                  "quad": 4,
+                  "row": 4,
+                  "col": 5,
+                  "type": "FUNC",
+                  "funcType": "REL"
+                },
+                {
+                  "quad": 2,
+                  "row": 1,
+                  "col": 1,
+                  "type": "PARTIAL",
+                  "radioId": "128.325"
+                },
+                {
+                  "quad": 2,
+                  "row": 2,
+                  "col": 1,
+                  "type": "PARTIAL",
+                  "radioId": "134.5"
+                },
+                {
+                  "quad": 2,
+                  "row": 3,
+                  "col": 1,
+                  "type": "PARTIAL",
+                  "radioId": "128.32E"
+                },
+                {
+                  "quad": 2,
+                  "row": 4,
+                  "col": 1,
+                  "type": "PARTIAL",
+                  "radioId": "135.65"
+                },
+                {
+                  "quad": 2,
+                  "row": 1,
+                  "col": 2,
+                  "type": "PARTIAL",
+                  "radioId": "254.3"
+                },
+                {
+                  "quad": 2,
+                  "row": 2,
+                  "col": 2,
+                  "type": "PARTIAL",
+                  "radioId": "338.2"
+                },
+                {
+                  "quad": 2,
+                  "row": 3,
+                  "col": 2,
+                  "type": "PARTIAL",
+                  "radioId": "254.3E"
+                },
+                {
+                  "quad": 2,
+                  "row": 4,
+                  "col": 2,
+                  "type": "PARTIAL",
+                  "radioId": "120.35"
+                },
+                {
+                  "quad": 2,
+                  "row": 1,
+                  "col": 3,
+                  "type": "PARTIAL",
+                  "radioId": "121.5M"
+                },
+                {
+                  "quad": 2,
+                  "row": 2,
+                  "col": 3,
+                  "type": "PARTIAL",
+                  "radioId": "243.0M"
+                },
+                {
+                  "quad": 2,
+                  "row": 3,
+                  "col": 3,
+                  "type": "PARTIAL",
+                  "radioId": "121.5O"
+                },
+                {
+                  "quad": 2,
+                  "row": 4,
+                  "col": 3,
+                  "type": "PARTIAL",
+                  "radioId": "243.0O"
+                }
+              ]
+            },
+            {
+              "pageNumber": 2,
+              "footer": "DRP",
+              "cells": [
+                {
+                  "quad": 1,
+                  "row": 1,
+                  "col": 1,
+                  "type": "RADIO",
+                  "radioId": "338.25"
+                },
+                {
+                  "quad": 1,
+                  "row": 2,
+                  "col": 1,
+                  "type": "RADIO",
+                  "radioId": "251.05"
+                },
+                {
+                  "quad": 1,
+                  "row": 3,
+                  "col": 1,
+                  "type": "RADIO",
+                  "radioId": "123.85"
+                },
+                {
+                  "quad": 1,
+                  "row": 4,
+                  "col": 1,
+                  "type": "RADIO",
+                  "radioId": "278.3"
+                },
+                {
+                  "quad": 2,
+                  "row": 1,
+                  "col": 1,
+                  "type": "RADIO",
+                  "radioId": "125.15"
+                },
+                {
+                  "quad": 2,
+                  "row": 2,
+                  "col": 1,
+                  "type": "RADIO",
+                  "radioId": "127.675"
+                },
+                {
+                  "quad": 3,
+                  "row": 1,
+                  "col": 1,
+                  "type": "RADIO",
+                  "radioId": "124.8"
+                },
+                {
+                  "quad": 3,
+                  "row": 2,
+                  "col": 1,
+                  "type": "RADIO",
+                  "radioId": "263.15"
+                },
+                {
+                  "quad": 3,
+                  "row": 3,
+                  "col": 1,
+                  "type": "RADIO",
+                  "radioId": "125.1"
+                },
+                {
+                  "quad": 3,
+                  "row": 4,
+                  "col": 1,
+                  "type": "RADIO",
+                  "radioId": "363.2"
+                },
+                {
+                  "quad": 4,
+                  "row": 1,
+                  "col": 1,
+                  "type": "RADIO",
+                  "radioId": "128.575"
+                },
+                {
+                  "quad": 4,
+                  "row": 2,
+                  "col": 1,
+                  "type": "RADIO",
+                  "radioId": "254.25"
+                },
+                {
+                  "quad": 4,
+                  "row": 3,
+                  "col": 1,
+                  "type": "RADIO",
+                  "radioId": "132.475"
+                },
+                {
+                  "quad": 4,
+                  "row": 4,
+                  "col": 1,
+                  "type": "RADIO",
+                  "radioId": "133.175"
+                }
+              ]
+            },
+            {
+              "pageNumber": 3,
+              "footer": "DRP",
+              "cells": [
+                {
+                  "quad": 1,
+                  "row": 2,
+                  "col": 1,
+                  "type": "RADIO",
+                  "radioId": "317.6"
+                },
+                {
+                  "quad": 1,
+                  "row": 3,
+                  "col": 1,
+                  "type": "RADIO",
+                  "radioId": "123.7"
+                },
+                {
+                  "quad": 1,
+                  "row": 4,
+                  "col": 1,
+                  "type": "RADIO",
+                  "radioId": "310.8"
+                },
+                {
+                  "quad": 2,
+                  "row": 2,
+                  "col": 1,
+                  "type": "RADIO",
+                  "radioId": "121.5"
+                },
+                {
+                  "quad": 2,
+                  "row": 3,
+                  "col": 1,
+                  "type": "RADIO",
+                  "radioId": "243.0"
+                },
+                {
+                  "quad": 2,
+                  "row": 4,
+                  "col": 1,
+                  "type": "RADIO",
+                  "radioId": "121.5S"
+                },
+                {
+                  "quad": 3,
+                  "row": 1,
+                  "col": 1,
+                  "type": "RADIO",
+                  "radioId": "134.5E"
+                },
+                {
+                  "quad": 3,
+                  "row": 2,
+                  "col": 1,
+                  "type": "RADIO",
+                  "radioId": "338.2E"
+                },
+                {
+                  "quad": 3,
+                  "row": 3,
+                  "col": 1,
+                  "type": "RADIO",
+                  "radioId": "133.95E"
+                },
+                {
+                  "quad": 3,
+                  "row": 4,
+                  "col": 1,
+                  "type": "RADIO",
+                  "radioId": "135.65E"
+                },
+                {
+                  "quad": 4,
+                  "row": 1,
+                  "col": 1,
+                  "type": "RADIO",
+                  "radioId": "243.0S"
+                },
+                {
+                  "quad": 4,
+                  "row": 2,
+                  "col": 1,
+                  "type": "RADIO",
+                  "radioId": "121.5V"
+                },
+                {
+                  "quad": 4,
+                  "row": 3,
+                  "col": 1,
+                  "type": "RADIO",
+                  "radioId": "121.5Y"
+                },
+                {
+                  "quad": 4,
+                  "row": 4,
+                  "col": 1,
+                  "type": "RADIO",
+                  "radioId": "243.0Y"
+                }
+              ]
+            },
+            {
+              "pageNumber": 4,
+              "footer": "DRP",
+              "cells": [
+                {
+                  "quad": 2,
+                  "row": 1,
+                  "col": 2,
+                  "type": "DA",
+                  "lineId": "811080"
+                },
+                {
+                  "quad": 2,
+                  "row": 3,
+                  "col": 2,
+                  "type": "DA",
+                  "lineId": "811067"
+                },
+                {
+                  "quad": 2,
+                  "row": 1,
+                  "col": 3,
+                  "type": "DA",
+                  "lineId": "811066"
+                },
+                {
+                  "quad": 2,
+                  "row": 2,
+                  "col": 3,
+                  "type": "DA",
+                  "lineId": "811082"
+                },
+                {
+                  "quad": 2,
+                  "row": 3,
+                  "col": 3,
+                  "type": "DA",
+                  "lineId": "811096"
+                },
+                {
+                  "quad": 2,
+                  "row": 4,
+                  "col": 3,
+                  "type": "DA",
+                  "lineId": "811079"
+                },
+                {
+                  "quad": 2,
+                  "row": 1,
+                  "col": 4,
+                  "type": "DA",
+                  "lineId": "811085"
+                },
+                {
+                  "quad": 2,
+                  "row": 2,
+                  "col": 4,
+                  "type": "DA",
+                  "lineId": "811065"
+                }
+              ]
+            }
           ]
+        }
         },
         {
           "cs": "SFO_F_APP",
@@ -11025,7 +11647,664 @@
             ["2100418", 0, "H-SUT"],
             ["2100523", 0, "H-TUR"],
             ["8110362", 0, "H-CAS"]
+          ],
+        "tedPattern": {
+          "patternName": "Area B Foster_TED",
+          "display": "LEFT",
+          "dimPercent": 50,
+          "pages": [
+            {
+              "pageNumber": 1,
+              "footer": "DRP",
+              "cells": [
+                {
+                  "quad": 1,
+                  "row": 1,
+                  "col": 1,
+                  "type": "IA"
+                },
+                {
+                  "quad": 1,
+                  "row": 2,
+                  "col": 1,
+                  "type": "IA"
+                },
+                {
+                  "quad": 1,
+                  "row": 3,
+                  "col": 1,
+                  "type": "IA"
+                },
+                {
+                  "quad": 1,
+                  "row": 4,
+                  "col": 1,
+                  "type": "IA"
+                },
+                {
+                  "quad": 1,
+                  "row": 1,
+                  "col": 2,
+                  "type": "DA",
+                  "lineId": "811080"
+                },
+                {
+                  "quad": 1,
+                  "row": 2,
+                  "col": 2,
+                  "type": "DA",
+                  "lineId": "811225"
+                },
+                {
+                  "quad": 1,
+                  "row": 3,
+                  "col": 2,
+                  "type": "DA",
+                  "lineId": "811067"
+                },
+                {
+                  "quad": 1,
+                  "row": 4,
+                  "col": 2,
+                  "type": "DA",
+                  "lineId": "811068"
+                },
+                {
+                  "quad": 1,
+                  "row": 1,
+                  "col": 3,
+                  "type": "DA",
+                  "lineId": "811625"
+                },
+                {
+                  "quad": 1,
+                  "row": 2,
+                  "col": 3,
+                  "type": "DA",
+                  "lineId": "811066"
+                },
+                {
+                  "quad": 1,
+                  "row": 3,
+                  "col": 3,
+                  "type": "DA",
+                  "lineId": "811082"
+                },
+                {
+                  "quad": 1,
+                  "row": 4,
+                  "col": 3,
+                  "type": "DA",
+                  "lineId": "811096"
+                },
+                {
+                  "quad": 1,
+                  "row": 1,
+                  "col": 4,
+                  "type": "DA",
+                  "lineId": "811085"
+                },
+                {
+                  "quad": 1,
+                  "row": 2,
+                  "col": 4,
+                  "type": "DA",
+                  "lineId": "811065"
+                },
+                {
+                  "quad": 1,
+                  "row": 3,
+                  "col": 4,
+                  "type": "DA",
+                  "lineId": "811079"
+                },
+                {
+                  "quad": 1,
+                  "row": 4,
+                  "col": 4,
+                  "type": "DA",
+                  "lineId": "811056"
+                },
+                {
+                  "quad": 1,
+                  "row": 1,
+                  "col": 5,
+                  "type": "DA",
+                  "lineId": "811074"
+                },
+                {
+                  "quad": 1,
+                  "row": 2,
+                  "col": 5,
+                  "type": "DA",
+                  "lineId": "811094"
+                },
+                {
+                  "quad": 1,
+                  "row": 3,
+                  "col": 5,
+                  "type": "DA",
+                  "lineId": "811064"
+                },
+                {
+                  "quad": 1,
+                  "row": 4,
+                  "col": 5,
+                  "type": "DA",
+                  "lineId": "811088"
+                },
+                {
+                  "quad": 3,
+                  "row": 1,
+                  "col": 1,
+                  "type": "DA",
+                  "lineId": "2100441"
+                },
+                {
+                  "quad": 3,
+                  "row": 2,
+                  "col": 1,
+                  "type": "DA",
+                  "lineId": "2100316"
+                },
+                {
+                  "quad": 3,
+                  "row": 3,
+                  "col": 1,
+                  "type": "DA",
+                  "lineId": "8110362"
+                },
+                {
+                  "quad": 3,
+                  "row": 1,
+                  "col": 2,
+                  "type": "DA",
+                  "lineId": "2100463"
+                },
+                {
+                  "quad": 3,
+                  "row": 2,
+                  "col": 2,
+                  "type": "DA",
+                  "lineId": "2100541"
+                },
+                {
+                  "quad": 3,
+                  "row": 3,
+                  "col": 2,
+                  "type": "DA",
+                  "lineId": "2100563"
+                },
+                {
+                  "quad": 3,
+                  "row": 4,
+                  "col": 2,
+                  "type": "DA",
+                  "lineId": "2100575"
+                },
+                {
+                  "quad": 3,
+                  "row": 1,
+                  "col": 3,
+                  "type": "DA",
+                  "lineId": "2100484"
+                },
+                {
+                  "quad": 3,
+                  "row": 3,
+                  "col": 3,
+                  "type": "DA",
+                  "lineId": "2100564"
+                },
+                {
+                  "quad": 3,
+                  "row": 4,
+                  "col": 3,
+                  "type": "DA",
+                  "lineId": "2100574"
+                },
+                {
+                  "quad": 3,
+                  "row": 1,
+                  "col": 4,
+                  "type": "DA",
+                  "lineId": "2100288"
+                },
+                {
+                  "quad": 3,
+                  "row": 2,
+                  "col": 4,
+                  "type": "DA",
+                  "lineId": "2100559"
+                },
+                {
+                  "quad": 3,
+                  "row": 3,
+                  "col": 4,
+                  "type": "DA",
+                  "lineId": "2100565"
+                },
+                {
+                  "quad": 3,
+                  "row": 4,
+                  "col": 4,
+                  "type": "DA",
+                  "lineId": "2100572"
+                },
+                {
+                  "quad": 3,
+                  "row": 1,
+                  "col": 5,
+                  "type": "DA",
+                  "lineId": "2100504"
+                },
+                {
+                  "quad": 3,
+                  "row": 2,
+                  "col": 5,
+                  "type": "DA",
+                  "lineId": "2100560"
+                },
+                {
+                  "quad": 3,
+                  "row": 3,
+                  "col": 5,
+                  "type": "DA",
+                  "lineId": "2100566"
+                },
+                {
+                  "quad": 3,
+                  "row": 4,
+                  "col": 5,
+                  "type": "DA",
+                  "lineId": "2100394"
+                },
+                {
+                  "quad": 4,
+                  "row": 1,
+                  "col": 1,
+                  "type": "DA",
+                  "lineId": "2100573"
+                },
+                {
+                  "quad": 4,
+                  "row": 2,
+                  "col": 1,
+                  "type": "DA",
+                  "lineId": "2100561"
+                },
+                {
+                  "quad": 4,
+                  "row": 3,
+                  "col": 1,
+                  "type": "DA",
+                  "lineId": "2100567"
+                },
+                {
+                  "quad": 4,
+                  "row": 4,
+                  "col": 1,
+                  "type": "DA",
+                  "lineId": "2100418"
+                },
+                {
+                  "quad": 4,
+                  "row": 1,
+                  "col": 2,
+                  "type": "DA",
+                  "lineId": "2100523"
+                },
+                {
+                  "quad": 4,
+                  "row": 1,
+                  "col": 4,
+                  "type": "FUNC",
+                  "funcType": "RECON"
+                },
+                {
+                  "quad": 4,
+                  "row": 2,
+                  "col": 4,
+                  "type": "FUNC",
+                  "funcType": "HL"
+                },
+                {
+                  "quad": 4,
+                  "row": 1,
+                  "col": 5,
+                  "type": "FUNC",
+                  "funcType": "FWD"
+                },
+                {
+                  "quad": 4,
+                  "row": 3,
+                  "col": 5,
+                  "type": "FUNC",
+                  "funcType": "RB"
+                },
+                {
+                  "quad": 4,
+                  "row": 4,
+                  "col": 5,
+                  "type": "FUNC",
+                  "funcType": "REL"
+                },
+                {
+                  "quad": 2,
+                  "row": 1,
+                  "col": 1,
+                  "type": "PARTIAL",
+                  "radioId": "120.35"
+                },
+                {
+                  "quad": 2,
+                  "row": 2,
+                  "col": 1,
+                  "type": "PARTIAL",
+                  "radioId": "135.65"
+                },
+                {
+                  "quad": 2,
+                  "row": 3,
+                  "col": 1,
+                  "type": "PARTIAL",
+                  "radioId": "133.95"
+                },
+                {
+                  "quad": 2,
+                  "row": 4,
+                  "col": 1,
+                  "type": "PARTIAL",
+                  "radioId": "127.675"
+                },
+                {
+                  "quad": 2,
+                  "row": 1,
+                  "col": 2,
+                  "type": "PARTIAL",
+                  "radioId": "251.05"
+                },
+                {
+                  "quad": 2,
+                  "row": 2,
+                  "col": 2,
+                  "type": "PARTIAL",
+                  "radioId": "310.8"
+                },
+                {
+                  "quad": 2,
+                  "row": 3,
+                  "col": 2,
+                  "type": "PARTIAL",
+                  "radioId": "134.5"
+                },
+                {
+                  "quad": 2,
+                  "row": 4,
+                  "col": 2,
+                  "type": "PARTIAL",
+                  "radioId": "125.15"
+                },
+                {
+                  "quad": 2,
+                  "row": 1,
+                  "col": 3,
+                  "type": "PARTIAL",
+                  "radioId": "121.5O"
+                },
+                {
+                  "quad": 2,
+                  "row": 2,
+                  "col": 3,
+                  "type": "PARTIAL",
+                  "radioId": "243.0O"
+                },
+                {
+                  "quad": 2,
+                  "row": 3,
+                  "col": 3,
+                  "type": "PARTIAL",
+                  "radioId": "135.65E"
+                },
+                {
+                  "quad": 2,
+                  "row": 4,
+                  "col": 3,
+                  "type": "PARTIAL",
+                  "radioId": "132.475"
+                }
+              ]
+            },
+            {
+              "pageNumber": 2,
+              "footer": "DRP",
+              "cells": [
+                {
+                  "quad": 1,
+                  "row": 1,
+                  "col": 1,
+                  "type": "RADIO",
+                  "radioId": "123.7"
+                },
+                {
+                  "quad": 1,
+                  "row": 2,
+                  "col": 1,
+                  "type": "RADIO",
+                  "radioId": "338.25"
+                },
+                {
+                  "quad": 1,
+                  "row": 3,
+                  "col": 1,
+                  "type": "RADIO",
+                  "radioId": "123.85"
+                },
+                {
+                  "quad": 1,
+                  "row": 4,
+                  "col": 1,
+                  "type": "RADIO",
+                  "radioId": "278.3"
+                },
+                {
+                  "quad": 2,
+                  "row": 1,
+                  "col": 1,
+                  "type": "RADIO",
+                  "radioId": "251.05E"
+                },
+                {
+                  "quad": 2,
+                  "row": 2,
+                  "col": 1,
+                  "type": "RADIO",
+                  "radioId": "128.325"
+                },
+                {
+                  "quad": 3,
+                  "row": 1,
+                  "col": 1,
+                  "type": "RADIO",
+                  "radioId": "124.8"
+                },
+                {
+                  "quad": 3,
+                  "row": 2,
+                  "col": 1,
+                  "type": "RADIO",
+                  "radioId": "263.15"
+                },
+                {
+                  "quad": 3,
+                  "row": 3,
+                  "col": 1,
+                  "type": "RADIO",
+                  "radioId": "125.1"
+                },
+                {
+                  "quad": 3,
+                  "row": 4,
+                  "col": 1,
+                  "type": "RADIO",
+                  "radioId": "363.2"
+                },
+                {
+                  "quad": 4,
+                  "row": 1,
+                  "col": 1,
+                  "type": "RADIO",
+                  "radioId": "254.3"
+                },
+                {
+                  "quad": 4,
+                  "row": 2,
+                  "col": 1,
+                  "type": "RADIO",
+                  "radioId": "128.575"
+                },
+                {
+                  "quad": 4,
+                  "row": 3,
+                  "col": 1,
+                  "type": "RADIO",
+                  "radioId": "254.25"
+                },
+                {
+                  "quad": 4,
+                  "row": 4,
+                  "col": 1,
+                  "type": "RADIO",
+                  "radioId": "133.175"
+                }
+              ]
+            },
+            {
+              "pageNumber": 3,
+              "footer": "DRP",
+              "cells": [
+                {
+                  "quad": 1,
+                  "row": 2,
+                  "col": 1,
+                  "type": "RADIO",
+                  "radioId": "317.6"
+                },
+                {
+                  "quad": 1,
+                  "row": 3,
+                  "col": 1,
+                  "type": "RADIO",
+                  "radioId": "338.2"
+                },
+                {
+                  "quad": 1,
+                  "row": 4,
+                  "col": 1,
+                  "type": "RADIO",
+                  "radioId": "128.32E"
+                },
+                {
+                  "quad": 2,
+                  "row": 2,
+                  "col": 1,
+                  "type": "RADIO",
+                  "radioId": "121.5"
+                },
+                {
+                  "quad": 2,
+                  "row": 3,
+                  "col": 1,
+                  "type": "RADIO",
+                  "radioId": "243.0"
+                },
+                {
+                  "quad": 2,
+                  "row": 4,
+                  "col": 1,
+                  "type": "RADIO",
+                  "radioId": "121.5M"
+                },
+                {
+                  "quad": 3,
+                  "row": 1,
+                  "col": 1,
+                  "type": "RADIO",
+                  "radioId": "254.3E"
+                },
+                {
+                  "quad": 3,
+                  "row": 2,
+                  "col": 1,
+                  "type": "RADIO",
+                  "radioId": "134.5E"
+                },
+                {
+                  "quad": 3,
+                  "row": 3,
+                  "col": 1,
+                  "type": "RADIO",
+                  "radioId": "338.2E"
+                },
+                {
+                  "quad": 3,
+                  "row": 4,
+                  "col": 1,
+                  "type": "RADIO",
+                  "radioId": "133.95E"
+                },
+                {
+                  "quad": 4,
+                  "row": 1,
+                  "col": 1,
+                  "type": "RADIO",
+                  "radioId": "243.0M"
+                },
+                {
+                  "quad": 4,
+                  "row": 2,
+                  "col": 1,
+                  "type": "RADIO",
+                  "radioId": "121.5S"
+                },
+                {
+                  "quad": 4,
+                  "row": 3,
+                  "col": 1,
+                  "type": "RADIO",
+                  "radioId": "243.0S"
+                },
+                {
+                  "quad": 4,
+                  "row": 4,
+                  "col": 1,
+                  "type": "RADIO",
+                  "radioId": "121.5V"
+                }
+              ]
+            },
+            {
+              "pageNumber": 4,
+              "footer": "DRP",
+              "cells": [
+                {
+                  "quad": 1,
+                  "row": 1,
+                  "col": 1,
+                  "type": "RADIO",
+                  "radioId": "121.5Y"
+                },
+                {
+                  "quad": 1,
+                  "row": 2,
+                  "col": 1,
+                  "type": "RADIO",
+                  "radioId": "243.0Y"
+                }
+              ]
+            }
           ]
+        }
         },
         {
           "cs": "SFO_G_APP",
@@ -11074,7 +12353,664 @@
             ["8110367", 0, "H-TRA"],
             ["8110368", 0, "H-VAL"],
             ["916226", 3, "S-BAY"]
+          ],
+        "tedPattern": {
+          "patternName": "Area B Laguna_TED",
+          "display": "LEFT",
+          "dimPercent": 50,
+          "pages": [
+            {
+              "pageNumber": 1,
+              "footer": "DRP",
+              "cells": [
+                {
+                  "quad": 1,
+                  "row": 1,
+                  "col": 1,
+                  "type": "IA"
+                },
+                {
+                  "quad": 1,
+                  "row": 2,
+                  "col": 1,
+                  "type": "IA"
+                },
+                {
+                  "quad": 1,
+                  "row": 3,
+                  "col": 1,
+                  "type": "IA"
+                },
+                {
+                  "quad": 1,
+                  "row": 4,
+                  "col": 1,
+                  "type": "IA"
+                },
+                {
+                  "quad": 1,
+                  "row": 4,
+                  "col": 4,
+                  "type": "DA",
+                  "lineId": "811056"
+                },
+                {
+                  "quad": 1,
+                  "row": 1,
+                  "col": 5,
+                  "type": "DA",
+                  "lineId": "811074"
+                },
+                {
+                  "quad": 1,
+                  "row": 2,
+                  "col": 5,
+                  "type": "DA",
+                  "lineId": "811094"
+                },
+                {
+                  "quad": 1,
+                  "row": 3,
+                  "col": 5,
+                  "type": "DA",
+                  "lineId": "811064"
+                },
+                {
+                  "quad": 1,
+                  "row": 4,
+                  "col": 5,
+                  "type": "DA",
+                  "lineId": "811088"
+                },
+                {
+                  "quad": 3,
+                  "row": 1,
+                  "col": 1,
+                  "type": "DA",
+                  "lineId": "2100442"
+                },
+                {
+                  "quad": 3,
+                  "row": 2,
+                  "col": 1,
+                  "type": "DA",
+                  "lineId": "2100317"
+                },
+                {
+                  "quad": 3,
+                  "row": 3,
+                  "col": 1,
+                  "type": "DA",
+                  "lineId": "8110363"
+                },
+                {
+                  "quad": 3,
+                  "row": 1,
+                  "col": 2,
+                  "type": "DA",
+                  "lineId": "2100464"
+                },
+                {
+                  "quad": 3,
+                  "row": 2,
+                  "col": 2,
+                  "type": "DA",
+                  "lineId": "2100542"
+                },
+                {
+                  "quad": 3,
+                  "row": 3,
+                  "col": 2,
+                  "type": "DA",
+                  "lineId": "8110364"
+                },
+                {
+                  "quad": 3,
+                  "row": 4,
+                  "col": 2,
+                  "type": "DA",
+                  "lineId": "2100591"
+                },
+                {
+                  "quad": 3,
+                  "row": 1,
+                  "col": 3,
+                  "type": "DA",
+                  "lineId": "2100485"
+                },
+                {
+                  "quad": 3,
+                  "row": 2,
+                  "col": 3,
+                  "type": "DA",
+                  "lineId": "2100559"
+                },
+                {
+                  "quad": 3,
+                  "row": 3,
+                  "col": 3,
+                  "type": "DA",
+                  "lineId": "8110365"
+                },
+                {
+                  "quad": 3,
+                  "row": 4,
+                  "col": 3,
+                  "type": "DA",
+                  "lineId": "2100590"
+                },
+                {
+                  "quad": 3,
+                  "row": 1,
+                  "col": 4,
+                  "type": "DA",
+                  "lineId": "2100289"
+                },
+                {
+                  "quad": 3,
+                  "row": 3,
+                  "col": 4,
+                  "type": "DA",
+                  "lineId": "8110366"
+                },
+                {
+                  "quad": 3,
+                  "row": 4,
+                  "col": 4,
+                  "type": "DA",
+                  "lineId": "2100588"
+                },
+                {
+                  "quad": 3,
+                  "row": 1,
+                  "col": 5,
+                  "type": "DA",
+                  "lineId": "2100505"
+                },
+                {
+                  "quad": 3,
+                  "row": 2,
+                  "col": 5,
+                  "type": "DA",
+                  "lineId": "2100576"
+                },
+                {
+                  "quad": 3,
+                  "row": 3,
+                  "col": 5,
+                  "type": "DA",
+                  "lineId": "8110367"
+                },
+                {
+                  "quad": 3,
+                  "row": 4,
+                  "col": 5,
+                  "type": "DA",
+                  "lineId": "2100395"
+                },
+                {
+                  "quad": 4,
+                  "row": 1,
+                  "col": 1,
+                  "type": "DA",
+                  "lineId": "2100589"
+                },
+                {
+                  "quad": 4,
+                  "row": 2,
+                  "col": 1,
+                  "type": "DA",
+                  "lineId": "2100577"
+                },
+                {
+                  "quad": 4,
+                  "row": 3,
+                  "col": 1,
+                  "type": "DA",
+                  "lineId": "8110368"
+                },
+                {
+                  "quad": 4,
+                  "row": 4,
+                  "col": 1,
+                  "type": "DA",
+                  "lineId": "2100419"
+                },
+                {
+                  "quad": 4,
+                  "row": 1,
+                  "col": 2,
+                  "type": "DA",
+                  "lineId": "2100524"
+                },
+                {
+                  "quad": 4,
+                  "row": 1,
+                  "col": 4,
+                  "type": "FUNC",
+                  "funcType": "RECON"
+                },
+                {
+                  "quad": 4,
+                  "row": 2,
+                  "col": 4,
+                  "type": "FUNC",
+                  "funcType": "HL"
+                },
+                {
+                  "quad": 4,
+                  "row": 1,
+                  "col": 5,
+                  "type": "FUNC",
+                  "funcType": "FWD"
+                },
+                {
+                  "quad": 4,
+                  "row": 3,
+                  "col": 5,
+                  "type": "FUNC",
+                  "funcType": "RB"
+                },
+                {
+                  "quad": 4,
+                  "row": 4,
+                  "col": 5,
+                  "type": "FUNC",
+                  "funcType": "REL"
+                },
+                {
+                  "quad": 2,
+                  "row": 1,
+                  "col": 1,
+                  "type": "PARTIAL",
+                  "radioId": "128.575"
+                },
+                {
+                  "quad": 2,
+                  "row": 2,
+                  "col": 1,
+                  "type": "PARTIAL",
+                  "radioId": "133.95"
+                },
+                {
+                  "quad": 2,
+                  "row": 3,
+                  "col": 1,
+                  "type": "PARTIAL",
+                  "radioId": "134.5"
+                },
+                {
+                  "quad": 2,
+                  "row": 4,
+                  "col": 1,
+                  "type": "PARTIAL",
+                  "radioId": "135.65"
+                },
+                {
+                  "quad": 2,
+                  "row": 1,
+                  "col": 2,
+                  "type": "PARTIAL",
+                  "radioId": "254.25"
+                },
+                {
+                  "quad": 2,
+                  "row": 2,
+                  "col": 2,
+                  "type": "PARTIAL",
+                  "radioId": "317.6"
+                },
+                {
+                  "quad": 2,
+                  "row": 3,
+                  "col": 2,
+                  "type": "PARTIAL",
+                  "radioId": "338.2"
+                },
+                {
+                  "quad": 2,
+                  "row": 4,
+                  "col": 2,
+                  "type": "PARTIAL",
+                  "radioId": "120.35"
+                },
+                {
+                  "quad": 2,
+                  "row": 1,
+                  "col": 3,
+                  "type": "PARTIAL",
+                  "radioId": "121.5Y"
+                },
+                {
+                  "quad": 2,
+                  "row": 2,
+                  "col": 3,
+                  "type": "PARTIAL",
+                  "radioId": "243.0Y"
+                },
+                {
+                  "quad": 2,
+                  "row": 3,
+                  "col": 3,
+                  "type": "PARTIAL",
+                  "radioId": "121.5O"
+                },
+                {
+                  "quad": 2,
+                  "row": 4,
+                  "col": 3,
+                  "type": "PARTIAL",
+                  "radioId": "243.0O"
+                }
+              ]
+            },
+            {
+              "pageNumber": 2,
+              "footer": "DRP",
+              "cells": [
+                {
+                  "quad": 1,
+                  "row": 1,
+                  "col": 1,
+                  "type": "RADIO",
+                  "radioId": "254.3"
+                },
+                {
+                  "quad": 1,
+                  "row": 2,
+                  "col": 1,
+                  "type": "RADIO",
+                  "radioId": "251.05"
+                },
+                {
+                  "quad": 1,
+                  "row": 3,
+                  "col": 1,
+                  "type": "RADIO",
+                  "radioId": "123.7"
+                },
+                {
+                  "quad": 1,
+                  "row": 4,
+                  "col": 1,
+                  "type": "RADIO",
+                  "radioId": "338.25"
+                },
+                {
+                  "quad": 2,
+                  "row": 1,
+                  "col": 1,
+                  "type": "RADIO",
+                  "radioId": "125.1"
+                },
+                {
+                  "quad": 2,
+                  "row": 2,
+                  "col": 1,
+                  "type": "RADIO",
+                  "radioId": "363.2"
+                },
+                {
+                  "quad": 2,
+                  "row": 3,
+                  "col": 1,
+                  "type": "RADIO",
+                  "radioId": "125.15"
+                },
+                {
+                  "quad": 2,
+                  "row": 4,
+                  "col": 1,
+                  "type": "RADIO",
+                  "radioId": "127.675"
+                },
+                {
+                  "quad": 3,
+                  "row": 1,
+                  "col": 1,
+                  "type": "RADIO",
+                  "radioId": "123.85"
+                },
+                {
+                  "quad": 3,
+                  "row": 2,
+                  "col": 1,
+                  "type": "RADIO",
+                  "radioId": "278.3"
+                },
+                {
+                  "quad": 3,
+                  "row": 3,
+                  "col": 1,
+                  "type": "RADIO",
+                  "radioId": "124.8"
+                },
+                {
+                  "quad": 3,
+                  "row": 4,
+                  "col": 1,
+                  "type": "RADIO",
+                  "radioId": "263.15"
+                },
+                {
+                  "quad": 4,
+                  "row": 3,
+                  "col": 1,
+                  "type": "RADIO",
+                  "radioId": "132.475"
+                },
+                {
+                  "quad": 4,
+                  "row": 4,
+                  "col": 1,
+                  "type": "RADIO",
+                  "radioId": "133.175"
+                }
+              ]
+            },
+            {
+              "pageNumber": 3,
+              "footer": "DRP",
+              "cells": [
+                {
+                  "quad": 1,
+                  "row": 1,
+                  "col": 1,
+                  "type": "RADIO",
+                  "radioId": "128.325"
+                },
+                {
+                  "quad": 1,
+                  "row": 2,
+                  "col": 1,
+                  "type": "RADIO",
+                  "radioId": "310.8"
+                },
+                {
+                  "quad": 1,
+                  "row": 3,
+                  "col": 1,
+                  "type": "RADIO",
+                  "radioId": "128.32E"
+                },
+                {
+                  "quad": 1,
+                  "row": 4,
+                  "col": 1,
+                  "type": "RADIO",
+                  "radioId": "254.3E"
+                },
+                {
+                  "quad": 2,
+                  "row": 1,
+                  "col": 1,
+                  "type": "RADIO",
+                  "radioId": "251.05E"
+                },
+                {
+                  "quad": 2,
+                  "row": 2,
+                  "col": 1,
+                  "type": "RADIO",
+                  "radioId": "121.5"
+                },
+                {
+                  "quad": 2,
+                  "row": 3,
+                  "col": 1,
+                  "type": "RADIO",
+                  "radioId": "243.0"
+                },
+                {
+                  "quad": 2,
+                  "row": 4,
+                  "col": 1,
+                  "type": "RADIO",
+                  "radioId": "121.5M"
+                },
+                {
+                  "quad": 3,
+                  "row": 1,
+                  "col": 1,
+                  "type": "RADIO",
+                  "radioId": "134.5E"
+                },
+                {
+                  "quad": 3,
+                  "row": 2,
+                  "col": 1,
+                  "type": "RADIO",
+                  "radioId": "338.2E"
+                },
+                {
+                  "quad": 3,
+                  "row": 3,
+                  "col": 1,
+                  "type": "RADIO",
+                  "radioId": "133.95E"
+                },
+                {
+                  "quad": 3,
+                  "row": 4,
+                  "col": 1,
+                  "type": "RADIO",
+                  "radioId": "135.65E"
+                },
+                {
+                  "quad": 4,
+                  "row": 1,
+                  "col": 1,
+                  "type": "RADIO",
+                  "radioId": "243.0M"
+                },
+                {
+                  "quad": 4,
+                  "row": 2,
+                  "col": 1,
+                  "type": "RADIO",
+                  "radioId": "121.5S"
+                },
+                {
+                  "quad": 4,
+                  "row": 3,
+                  "col": 1,
+                  "type": "RADIO",
+                  "radioId": "243.0S"
+                },
+                {
+                  "quad": 4,
+                  "row": 4,
+                  "col": 1,
+                  "type": "RADIO",
+                  "radioId": "121.5V"
+                }
+              ]
+            },
+            {
+              "pageNumber": 4,
+              "footer": "DRP",
+              "cells": [
+                {
+                  "quad": 2,
+                  "row": 2,
+                  "col": 1,
+                  "type": "DA",
+                  "lineId": "811225"
+                },
+                {
+                  "quad": 2,
+                  "row": 1,
+                  "col": 2,
+                  "type": "DA",
+                  "lineId": "811080"
+                },
+                {
+                  "quad": 2,
+                  "row": 2,
+                  "col": 2,
+                  "type": "DA",
+                  "lineId": "811220"
+                },
+                {
+                  "quad": 2,
+                  "row": 3,
+                  "col": 2,
+                  "type": "DA",
+                  "lineId": "811067"
+                },
+                {
+                  "quad": 2,
+                  "row": 4,
+                  "col": 2,
+                  "type": "DA",
+                  "lineId": "811068"
+                },
+                {
+                  "quad": 2,
+                  "row": 1,
+                  "col": 3,
+                  "type": "DA",
+                  "lineId": "811066"
+                },
+                {
+                  "quad": 2,
+                  "row": 2,
+                  "col": 3,
+                  "type": "DA",
+                  "lineId": "811082"
+                },
+                {
+                  "quad": 2,
+                  "row": 3,
+                  "col": 3,
+                  "type": "DA",
+                  "lineId": "811096"
+                },
+                {
+                  "quad": 2,
+                  "row": 4,
+                  "col": 3,
+                  "type": "DA",
+                  "lineId": "811079"
+                },
+                {
+                  "quad": 2,
+                  "row": 1,
+                  "col": 4,
+                  "type": "DA",
+                  "lineId": "811085"
+                },
+                {
+                  "quad": 2,
+                  "row": 2,
+                  "col": 4,
+                  "type": "DA",
+                  "lineId": "811065"
+                }
+              ]
+            }
           ]
+        }
         },
         {
           "cs": "SFO_N_APP",
@@ -11123,7 +13059,664 @@
             ["811225", 0, "SFO-O4"],
             ["8110369", 0, "H-CAS"],
             ["916246", 3, "S-BAY"]
+          ],
+        "tedPattern": {
+          "patternName": "Area B Niles_TED",
+          "display": "LEFT",
+          "dimPercent": 50,
+          "pages": [
+            {
+              "pageNumber": 1,
+              "footer": "DRP",
+              "cells": [
+                {
+                  "quad": 1,
+                  "row": 1,
+                  "col": 1,
+                  "type": "IA"
+                },
+                {
+                  "quad": 1,
+                  "row": 2,
+                  "col": 1,
+                  "type": "IA"
+                },
+                {
+                  "quad": 1,
+                  "row": 3,
+                  "col": 1,
+                  "type": "IA"
+                },
+                {
+                  "quad": 1,
+                  "row": 4,
+                  "col": 1,
+                  "type": "IA"
+                },
+                {
+                  "quad": 1,
+                  "row": 1,
+                  "col": 2,
+                  "type": "DA",
+                  "lineId": "811080"
+                },
+                {
+                  "quad": 1,
+                  "row": 2,
+                  "col": 2,
+                  "type": "DA",
+                  "lineId": "811220"
+                },
+                {
+                  "quad": 1,
+                  "row": 3,
+                  "col": 2,
+                  "type": "DA",
+                  "lineId": "811067"
+                },
+                {
+                  "quad": 1,
+                  "row": 4,
+                  "col": 2,
+                  "type": "DA",
+                  "lineId": "811068"
+                },
+                {
+                  "quad": 1,
+                  "row": 1,
+                  "col": 3,
+                  "type": "DA",
+                  "lineId": "811066"
+                },
+                {
+                  "quad": 1,
+                  "row": 2,
+                  "col": 3,
+                  "type": "DA",
+                  "lineId": "811082"
+                },
+                {
+                  "quad": 1,
+                  "row": 3,
+                  "col": 3,
+                  "type": "DA",
+                  "lineId": "811096"
+                },
+                {
+                  "quad": 1,
+                  "row": 4,
+                  "col": 3,
+                  "type": "DA",
+                  "lineId": "811079"
+                },
+                {
+                  "quad": 1,
+                  "row": 1,
+                  "col": 4,
+                  "type": "DA",
+                  "lineId": "811085"
+                },
+                {
+                  "quad": 1,
+                  "row": 2,
+                  "col": 4,
+                  "type": "DA",
+                  "lineId": "811065"
+                },
+                {
+                  "quad": 1,
+                  "row": 4,
+                  "col": 4,
+                  "type": "DA",
+                  "lineId": "811056"
+                },
+                {
+                  "quad": 1,
+                  "row": 1,
+                  "col": 5,
+                  "type": "DA",
+                  "lineId": "811074"
+                },
+                {
+                  "quad": 1,
+                  "row": 2,
+                  "col": 5,
+                  "type": "DA",
+                  "lineId": "811094"
+                },
+                {
+                  "quad": 1,
+                  "row": 3,
+                  "col": 5,
+                  "type": "DA",
+                  "lineId": "811064"
+                },
+                {
+                  "quad": 1,
+                  "row": 4,
+                  "col": 5,
+                  "type": "DA",
+                  "lineId": "811088"
+                },
+                {
+                  "quad": 3,
+                  "row": 1,
+                  "col": 1,
+                  "type": "DA",
+                  "lineId": "2100443"
+                },
+                {
+                  "quad": 3,
+                  "row": 2,
+                  "col": 1,
+                  "type": "DA",
+                  "lineId": "2100318"
+                },
+                {
+                  "quad": 3,
+                  "row": 3,
+                  "col": 1,
+                  "type": "DA",
+                  "lineId": "8110369"
+                },
+                {
+                  "quad": 3,
+                  "row": 1,
+                  "col": 2,
+                  "type": "DA",
+                  "lineId": "2100465"
+                },
+                {
+                  "quad": 3,
+                  "row": 2,
+                  "col": 2,
+                  "type": "DA",
+                  "lineId": "2100543"
+                },
+                {
+                  "quad": 3,
+                  "row": 3,
+                  "col": 2,
+                  "type": "DA",
+                  "lineId": "2100594"
+                },
+                {
+                  "quad": 3,
+                  "row": 4,
+                  "col": 2,
+                  "type": "DA",
+                  "lineId": "2100606"
+                },
+                {
+                  "quad": 3,
+                  "row": 1,
+                  "col": 3,
+                  "type": "DA",
+                  "lineId": "2100486"
+                },
+                {
+                  "quad": 3,
+                  "row": 2,
+                  "col": 3,
+                  "type": "DA",
+                  "lineId": "2100560"
+                },
+                {
+                  "quad": 3,
+                  "row": 3,
+                  "col": 3,
+                  "type": "DA",
+                  "lineId": "2100595"
+                },
+                {
+                  "quad": 3,
+                  "row": 4,
+                  "col": 3,
+                  "type": "DA",
+                  "lineId": "2100605"
+                },
+                {
+                  "quad": 3,
+                  "row": 1,
+                  "col": 4,
+                  "type": "DA",
+                  "lineId": "2100290"
+                },
+                {
+                  "quad": 3,
+                  "row": 2,
+                  "col": 4,
+                  "type": "DA",
+                  "lineId": "2100576"
+                },
+                {
+                  "quad": 3,
+                  "row": 3,
+                  "col": 4,
+                  "type": "DA",
+                  "lineId": "2100596"
+                },
+                {
+                  "quad": 3,
+                  "row": 1,
+                  "col": 5,
+                  "type": "DA",
+                  "lineId": "2100506"
+                },
+                {
+                  "quad": 3,
+                  "row": 3,
+                  "col": 5,
+                  "type": "DA",
+                  "lineId": "2100597"
+                },
+                {
+                  "quad": 3,
+                  "row": 4,
+                  "col": 5,
+                  "type": "DA",
+                  "lineId": "2100603"
+                },
+                {
+                  "quad": 4,
+                  "row": 1,
+                  "col": 1,
+                  "type": "DA",
+                  "lineId": "2100604"
+                },
+                {
+                  "quad": 4,
+                  "row": 2,
+                  "col": 1,
+                  "type": "DA",
+                  "lineId": "2100592"
+                },
+                {
+                  "quad": 4,
+                  "row": 3,
+                  "col": 1,
+                  "type": "DA",
+                  "lineId": "2100598"
+                },
+                {
+                  "quad": 4,
+                  "row": 4,
+                  "col": 1,
+                  "type": "DA",
+                  "lineId": "2100396"
+                },
+                {
+                  "quad": 4,
+                  "row": 1,
+                  "col": 2,
+                  "type": "DA",
+                  "lineId": "2100525"
+                },
+                {
+                  "quad": 4,
+                  "row": 4,
+                  "col": 2,
+                  "type": "DA",
+                  "lineId": "2100420"
+                },
+                {
+                  "quad": 4,
+                  "row": 1,
+                  "col": 4,
+                  "type": "FUNC",
+                  "funcType": "RECON"
+                },
+                {
+                  "quad": 4,
+                  "row": 2,
+                  "col": 4,
+                  "type": "FUNC",
+                  "funcType": "HL"
+                },
+                {
+                  "quad": 4,
+                  "row": 1,
+                  "col": 5,
+                  "type": "FUNC",
+                  "funcType": "FWD"
+                },
+                {
+                  "quad": 4,
+                  "row": 3,
+                  "col": 5,
+                  "type": "FUNC",
+                  "funcType": "RB"
+                },
+                {
+                  "quad": 4,
+                  "row": 4,
+                  "col": 5,
+                  "type": "FUNC",
+                  "funcType": "REL"
+                },
+                {
+                  "quad": 2,
+                  "row": 1,
+                  "col": 1,
+                  "type": "PARTIAL",
+                  "radioId": "134.5"
+                },
+                {
+                  "quad": 2,
+                  "row": 2,
+                  "col": 1,
+                  "type": "PARTIAL",
+                  "radioId": "128.325"
+                },
+                {
+                  "quad": 2,
+                  "row": 3,
+                  "col": 1,
+                  "type": "PARTIAL",
+                  "radioId": "133.95"
+                },
+                {
+                  "quad": 2,
+                  "row": 4,
+                  "col": 1,
+                  "type": "PARTIAL",
+                  "radioId": "135.65"
+                },
+                {
+                  "quad": 2,
+                  "row": 1,
+                  "col": 2,
+                  "type": "PARTIAL",
+                  "radioId": "338.2"
+                },
+                {
+                  "quad": 2,
+                  "row": 3,
+                  "col": 2,
+                  "type": "PARTIAL",
+                  "radioId": "317.6"
+                },
+                {
+                  "quad": 2,
+                  "row": 4,
+                  "col": 2,
+                  "type": "PARTIAL",
+                  "radioId": "120.35"
+                },
+                {
+                  "quad": 2,
+                  "row": 1,
+                  "col": 3,
+                  "type": "PARTIAL",
+                  "radioId": "121.5O"
+                },
+                {
+                  "quad": 2,
+                  "row": 2,
+                  "col": 3,
+                  "type": "PARTIAL",
+                  "radioId": "243.0O"
+                },
+                {
+                  "quad": 2,
+                  "row": 3,
+                  "col": 3,
+                  "type": "PARTIAL",
+                  "radioId": "121.5S"
+                },
+                {
+                  "quad": 2,
+                  "row": 4,
+                  "col": 3,
+                  "type": "PARTIAL",
+                  "radioId": "243.0S"
+                }
+              ]
+            },
+            {
+              "pageNumber": 2,
+              "footer": "DRP",
+              "cells": [
+                {
+                  "quad": 1,
+                  "row": 1,
+                  "col": 1,
+                  "type": "RADIO",
+                  "radioId": "123.7"
+                },
+                {
+                  "quad": 1,
+                  "row": 2,
+                  "col": 1,
+                  "type": "RADIO",
+                  "radioId": "338.25"
+                },
+                {
+                  "quad": 1,
+                  "row": 3,
+                  "col": 1,
+                  "type": "RADIO",
+                  "radioId": "123.85"
+                },
+                {
+                  "quad": 1,
+                  "row": 4,
+                  "col": 1,
+                  "type": "RADIO",
+                  "radioId": "278.3"
+                },
+                {
+                  "quad": 2,
+                  "row": 1,
+                  "col": 1,
+                  "type": "RADIO",
+                  "radioId": "125.15"
+                },
+                {
+                  "quad": 2,
+                  "row": 2,
+                  "col": 1,
+                  "type": "RADIO",
+                  "radioId": "127.675"
+                },
+                {
+                  "quad": 2,
+                  "row": 3,
+                  "col": 1,
+                  "type": "RADIO",
+                  "radioId": "251.05"
+                },
+                {
+                  "quad": 2,
+                  "row": 4,
+                  "col": 1,
+                  "type": "RADIO",
+                  "radioId": "310.8"
+                },
+                {
+                  "quad": 3,
+                  "row": 1,
+                  "col": 1,
+                  "type": "RADIO",
+                  "radioId": "124.8"
+                },
+                {
+                  "quad": 3,
+                  "row": 2,
+                  "col": 1,
+                  "type": "RADIO",
+                  "radioId": "263.15"
+                },
+                {
+                  "quad": 3,
+                  "row": 3,
+                  "col": 1,
+                  "type": "RADIO",
+                  "radioId": "125.1"
+                },
+                {
+                  "quad": 3,
+                  "row": 4,
+                  "col": 1,
+                  "type": "RADIO",
+                  "radioId": "363.2"
+                },
+                {
+                  "quad": 4,
+                  "row": 2,
+                  "col": 1,
+                  "type": "RADIO",
+                  "radioId": "254.3"
+                },
+                {
+                  "quad": 4,
+                  "row": 3,
+                  "col": 1,
+                  "type": "RADIO",
+                  "radioId": "128.575"
+                },
+                {
+                  "quad": 4,
+                  "row": 4,
+                  "col": 1,
+                  "type": "RADIO",
+                  "radioId": "254.25"
+                }
+              ]
+            },
+            {
+              "pageNumber": 3,
+              "footer": "DRP",
+              "cells": [
+                {
+                  "quad": 1,
+                  "row": 1,
+                  "col": 1,
+                  "type": "RADIO",
+                  "radioId": "132.475"
+                },
+                {
+                  "quad": 1,
+                  "row": 2,
+                  "col": 1,
+                  "type": "RADIO",
+                  "radioId": "133.175"
+                },
+                {
+                  "quad": 1,
+                  "row": 3,
+                  "col": 1,
+                  "type": "RADIO",
+                  "radioId": "128.32E"
+                },
+                {
+                  "quad": 1,
+                  "row": 4,
+                  "col": 1,
+                  "type": "RADIO",
+                  "radioId": "254.3E"
+                },
+                {
+                  "quad": 2,
+                  "row": 2,
+                  "col": 1,
+                  "type": "RADIO",
+                  "radioId": "134.5E"
+                },
+                {
+                  "quad": 2,
+                  "row": 3,
+                  "col": 1,
+                  "type": "RADIO",
+                  "radioId": "121.5M"
+                },
+                {
+                  "quad": 2,
+                  "row": 4,
+                  "col": 1,
+                  "type": "RADIO",
+                  "radioId": "243.0M"
+                },
+                {
+                  "quad": 3,
+                  "row": 1,
+                  "col": 1,
+                  "type": "RADIO",
+                  "radioId": "133.95E"
+                },
+                {
+                  "quad": 3,
+                  "row": 2,
+                  "col": 1,
+                  "type": "RADIO",
+                  "radioId": "135.65E"
+                },
+                {
+                  "quad": 3,
+                  "row": 3,
+                  "col": 1,
+                  "type": "RADIO",
+                  "radioId": "251.05E"
+                },
+                {
+                  "quad": 3,
+                  "row": 4,
+                  "col": 1,
+                  "type": "RADIO",
+                  "radioId": "338.2E"
+                },
+                {
+                  "quad": 4,
+                  "row": 2,
+                  "col": 1,
+                  "type": "RADIO",
+                  "radioId": "121.5V"
+                },
+                {
+                  "quad": 4,
+                  "row": 3,
+                  "col": 1,
+                  "type": "RADIO",
+                  "radioId": "121.5Y"
+                },
+                {
+                  "quad": 4,
+                  "row": 4,
+                  "col": 1,
+                  "type": "RADIO",
+                  "radioId": "243.0Y"
+                }
+              ]
+            },
+            {
+              "pageNumber": 4,
+              "footer": "DRP",
+              "cells": [
+                {
+                  "quad": 1,
+                  "row": 1,
+                  "col": 1,
+                  "type": "RADIO",
+                  "radioId": "121.5"
+                },
+                {
+                  "quad": 1,
+                  "row": 2,
+                  "col": 1,
+                  "type": "RADIO",
+                  "radioId": "243.0"
+                },
+                {
+                  "quad": 2,
+                  "row": 2,
+                  "col": 1,
+                  "type": "DA",
+                  "lineId": "811225"
+                }
+              ]
+            }
           ]
+        }
         },
         {
           "cs": "SFO_W_APP",
@@ -12302,7 +14895,287 @@
             ["916120", 3, "E/W/V"],
             ["916268", 3, "S-BAY"],
             ["916420", 3, "NTWRS"]
+          ],
+        "tedPattern": {
+          "patternName": "Area C Castle_TED",
+          "display": "LEFT",
+          "dimPercent": 50,
+          "pages": [
+            {
+              "pageNumber": 1,
+              "footer": "DRP",
+              "cells": [
+                {
+                  "quad": 1,
+                  "row": 4,
+                  "col": 2,
+                  "type": "IA"
+                },
+                {
+                  "quad": 1,
+                  "row": 1,
+                  "col": 1,
+                  "type": "DA",
+                  "lineId": "811075"
+                },
+                {
+                  "quad": 1,
+                  "row": 3,
+                  "col": 1,
+                  "type": "DA",
+                  "lineId": "811045"
+                },
+                {
+                  "quad": 1,
+                  "row": 1,
+                  "col": 2,
+                  "type": "DA",
+                  "lineId": "811078"
+                },
+                {
+                  "quad": 1,
+                  "row": 3,
+                  "col": 2,
+                  "type": "DA",
+                  "lineId": "811070"
+                },
+                {
+                  "quad": 1,
+                  "row": 1,
+                  "col": 3,
+                  "type": "DA",
+                  "lineId": "811089"
+                },
+                {
+                  "quad": 1,
+                  "row": 3,
+                  "col": 3,
+                  "type": "DA",
+                  "lineId": "811043"
+                },
+                {
+                  "quad": 1,
+                  "row": 4,
+                  "col": 3,
+                  "type": "DA",
+                  "lineId": "916420"
+                },
+                {
+                  "quad": 1,
+                  "row": 3,
+                  "col": 4,
+                  "type": "DA",
+                  "lineId": "81148113"
+                },
+                {
+                  "quad": 1,
+                  "row": 4,
+                  "col": 4,
+                  "type": "DA",
+                  "lineId": "916120"
+                },
+                {
+                  "quad": 1,
+                  "row": 3,
+                  "col": 5,
+                  "type": "DA",
+                  "lineId": "811057"
+                },
+                {
+                  "quad": 1,
+                  "row": 4,
+                  "col": 5,
+                  "type": "DA",
+                  "lineId": "811602"
+                },
+                {
+                  "quad": 3,
+                  "row": 1,
+                  "col": 1,
+                  "type": "DA",
+                  "lineId": "8110328"
+                },
+                {
+                  "quad": 3,
+                  "row": 2,
+                  "col": 1,
+                  "type": "DA",
+                  "lineId": "2100545"
+                },
+                {
+                  "quad": 3,
+                  "row": 3,
+                  "col": 1,
+                  "type": "DA",
+                  "lineId": "2100621"
+                },
+                {
+                  "quad": 3,
+                  "row": 4,
+                  "col": 1,
+                  "type": "DA",
+                  "lineId": "2100633"
+                },
+                {
+                  "quad": 3,
+                  "row": 1,
+                  "col": 2,
+                  "type": "DA",
+                  "lineId": "2100488"
+                },
+                {
+                  "quad": 3,
+                  "row": 3,
+                  "col": 2,
+                  "type": "DA",
+                  "lineId": "2100622"
+                },
+                {
+                  "quad": 3,
+                  "row": 1,
+                  "col": 3,
+                  "type": "DA",
+                  "lineId": "2100292"
+                },
+                {
+                  "quad": 3,
+                  "row": 3,
+                  "col": 3,
+                  "type": "DA",
+                  "lineId": "2100623"
+                },
+                {
+                  "quad": 3,
+                  "row": 1,
+                  "col": 4,
+                  "type": "DA",
+                  "lineId": "2100631"
+                },
+                {
+                  "quad": 3,
+                  "row": 3,
+                  "col": 4,
+                  "type": "DA",
+                  "lineId": "2100624"
+                },
+                {
+                  "quad": 3,
+                  "row": 4,
+                  "col": 4,
+                  "type": "DA",
+                  "lineId": "2100398"
+                },
+                {
+                  "quad": 3,
+                  "row": 1,
+                  "col": 5,
+                  "type": "DA",
+                  "lineId": "2100527"
+                },
+                {
+                  "quad": 3,
+                  "row": 3,
+                  "col": 5,
+                  "type": "DA",
+                  "lineId": "2100625"
+                },
+                {
+                  "quad": 4,
+                  "row": 2,
+                  "col": 3,
+                  "type": "FUNC",
+                  "funcType": "RECON"
+                },
+                {
+                  "quad": 4,
+                  "row": 4,
+                  "col": 3,
+                  "type": "FUNC",
+                  "funcType": "HL"
+                },
+                {
+                  "quad": 4,
+                  "row": 2,
+                  "col": 4,
+                  "type": "FUNC",
+                  "funcType": "FWD"
+                },
+                {
+                  "quad": 4,
+                  "row": 2,
+                  "col": 5,
+                  "type": "FUNC",
+                  "funcType": "RB"
+                },
+                {
+                  "quad": 4,
+                  "row": 4,
+                  "col": 5,
+                  "type": "FUNC",
+                  "funcType": "REL"
+                }
+              ]
+            },
+            {
+              "pageNumber": 2,
+              "footer": "DRP",
+              "cells": []
+            },
+            {
+              "pageNumber": 3,
+              "footer": "DRP",
+              "cells": []
+            },
+            {
+              "pageNumber": 4,
+              "footer": "DRP",
+              "cells": [
+                {
+                  "quad": 2,
+                  "row": 1,
+                  "col": 2,
+                  "type": "DA",
+                  "lineId": "2100320"
+                },
+                {
+                  "quad": 2,
+                  "row": 3,
+                  "col": 2,
+                  "type": "DA",
+                  "lineId": "8110351"
+                },
+                {
+                  "quad": 2,
+                  "row": 1,
+                  "col": 3,
+                  "type": "DA",
+                  "lineId": "8110362"
+                },
+                {
+                  "quad": 2,
+                  "row": 3,
+                  "col": 3,
+                  "type": "DA",
+                  "lineId": "8110361"
+                },
+                {
+                  "quad": 2,
+                  "row": 1,
+                  "col": 4,
+                  "type": "DA",
+                  "lineId": "8110370"
+                },
+                {
+                  "quad": 2,
+                  "row": 1,
+                  "col": 5,
+                  "type": "DA",
+                  "lineId": "8110369"
+                }
+              ]
+            }
           ]
+        }
         },
         {
           "cs": "OAK_G_APP",
@@ -13854,7 +16727,681 @@
             ["8110359", 0, "H-PAR"],
             ["8110365", 0, "H-LAG"],
             ["916267", 3, "S-BAY"]
+          ],
+        "tedPattern": {
+          "patternName": "Area C Mulford_TED",
+          "display": "LEFT",
+          "dimPercent": 50,
+          "pages": [
+            {
+              "pageNumber": 1,
+              "footer": "DRP",
+              "cells": [
+                {
+                  "quad": 1,
+                  "row": 4,
+                  "col": 2,
+                  "type": "IA"
+                },
+                {
+                  "quad": 1,
+                  "row": 1,
+                  "col": 1,
+                  "type": "DA",
+                  "lineId": "811075"
+                },
+                {
+                  "quad": 1,
+                  "row": 2,
+                  "col": 1,
+                  "type": "DA",
+                  "lineId": "811622"
+                },
+                {
+                  "quad": 1,
+                  "row": 3,
+                  "col": 1,
+                  "type": "DA",
+                  "lineId": "811614"
+                },
+                {
+                  "quad": 1,
+                  "row": 4,
+                  "col": 1,
+                  "type": "DA",
+                  "lineId": "811219"
+                },
+                {
+                  "quad": 1,
+                  "row": 1,
+                  "col": 2,
+                  "type": "DA",
+                  "lineId": "811078"
+                },
+                {
+                  "quad": 1,
+                  "row": 2,
+                  "col": 2,
+                  "type": "DA",
+                  "lineId": "811067"
+                },
+                {
+                  "quad": 1,
+                  "row": 3,
+                  "col": 2,
+                  "type": "DA",
+                  "lineId": "811068"
+                },
+                {
+                  "quad": 1,
+                  "row": 1,
+                  "col": 3,
+                  "type": "DA",
+                  "lineId": "811089"
+                },
+                {
+                  "quad": 1,
+                  "row": 2,
+                  "col": 3,
+                  "type": "DA",
+                  "lineId": "811070"
+                },
+                {
+                  "quad": 1,
+                  "row": 3,
+                  "col": 3,
+                  "type": "DA",
+                  "lineId": "811082"
+                },
+                {
+                  "quad": 1,
+                  "row": 1,
+                  "col": 4,
+                  "type": "DA",
+                  "lineId": "811062"
+                },
+                {
+                  "quad": 1,
+                  "row": 2,
+                  "col": 4,
+                  "type": "DA",
+                  "lineId": "811065"
+                },
+                {
+                  "quad": 1,
+                  "row": 3,
+                  "col": 4,
+                  "type": "DA",
+                  "lineId": "811079"
+                },
+                {
+                  "quad": 1,
+                  "row": 2,
+                  "col": 5,
+                  "type": "DA",
+                  "lineId": "811059"
+                },
+                {
+                  "quad": 1,
+                  "row": 3,
+                  "col": 5,
+                  "type": "DA",
+                  "lineId": "811066"
+                },
+                {
+                  "quad": 1,
+                  "row": 4,
+                  "col": 5,
+                  "type": "DA",
+                  "lineId": "916267"
+                },
+                {
+                  "quad": 3,
+                  "row": 1,
+                  "col": 1,
+                  "type": "DA",
+                  "lineId": "2100469"
+                },
+                {
+                  "quad": 3,
+                  "row": 2,
+                  "col": 1,
+                  "type": "DA",
+                  "lineId": "2100547"
+                },
+                {
+                  "quad": 3,
+                  "row": 3,
+                  "col": 1,
+                  "type": "DA",
+                  "lineId": "2100622"
+                },
+                {
+                  "quad": 3,
+                  "row": 1,
+                  "col": 2,
+                  "type": "DA",
+                  "lineId": "2100490"
+                },
+                {
+                  "quad": 3,
+                  "row": 2,
+                  "col": 2,
+                  "type": "DA",
+                  "lineId": "2100322"
+                },
+                {
+                  "quad": 3,
+                  "row": 3,
+                  "col": 2,
+                  "type": "DA",
+                  "lineId": "2100634"
+                },
+                {
+                  "quad": 3,
+                  "row": 4,
+                  "col": 2,
+                  "type": "DA",
+                  "lineId": "2100655"
+                },
+                {
+                  "quad": 3,
+                  "row": 1,
+                  "col": 3,
+                  "type": "DA",
+                  "lineId": "2100654"
+                },
+                {
+                  "quad": 3,
+                  "row": 2,
+                  "col": 3,
+                  "type": "DA",
+                  "lineId": "2100564"
+                },
+                {
+                  "quad": 3,
+                  "row": 3,
+                  "col": 3,
+                  "type": "DA",
+                  "lineId": "2100646"
+                },
+                {
+                  "quad": 3,
+                  "row": 4,
+                  "col": 3,
+                  "type": "DA",
+                  "lineId": "2100656"
+                },
+                {
+                  "quad": 3,
+                  "row": 2,
+                  "col": 4,
+                  "type": "DA",
+                  "lineId": "2100595"
+                },
+                {
+                  "quad": 3,
+                  "row": 3,
+                  "col": 4,
+                  "type": "DA",
+                  "lineId": "2100647"
+                },
+                {
+                  "quad": 3,
+                  "row": 4,
+                  "col": 4,
+                  "type": "DA",
+                  "lineId": "2100653"
+                },
+                {
+                  "quad": 3,
+                  "row": 2,
+                  "col": 5,
+                  "type": "DA",
+                  "lineId": "2100609"
+                },
+                {
+                  "quad": 3,
+                  "row": 3,
+                  "col": 5,
+                  "type": "DA",
+                  "lineId": "2100648"
+                },
+                {
+                  "quad": 4,
+                  "row": 2,
+                  "col": 3,
+                  "type": "FUNC",
+                  "funcType": "RECON"
+                },
+                {
+                  "quad": 4,
+                  "row": 4,
+                  "col": 3,
+                  "type": "FUNC",
+                  "funcType": "HL"
+                },
+                {
+                  "quad": 4,
+                  "row": 2,
+                  "col": 4,
+                  "type": "FUNC",
+                  "funcType": "FWD"
+                },
+                {
+                  "quad": 4,
+                  "row": 2,
+                  "col": 5,
+                  "type": "FUNC",
+                  "funcType": "RB"
+                },
+                {
+                  "quad": 4,
+                  "row": 4,
+                  "col": 5,
+                  "type": "FUNC",
+                  "funcType": "REL"
+                },
+                {
+                  "quad": 2,
+                  "row": 1,
+                  "col": 1,
+                  "type": "PARTIAL",
+                  "radioId": "124.4"
+                },
+                {
+                  "quad": 2,
+                  "row": 2,
+                  "col": 1,
+                  "type": "PARTIAL",
+                  "radioId": "351.8"
+                },
+                {
+                  "quad": 2,
+                  "row": 3,
+                  "col": 1,
+                  "type": "PARTIAL",
+                  "radioId": "125.35"
+                },
+                {
+                  "quad": 2,
+                  "row": 4,
+                  "col": 1,
+                  "type": "PARTIAL",
+                  "radioId": "354.1"
+                },
+                {
+                  "quad": 2,
+                  "row": 1,
+                  "col": 2,
+                  "type": "PARTIAL",
+                  "radioId": "124.4E"
+                },
+                {
+                  "quad": 2,
+                  "row": 3,
+                  "col": 2,
+                  "type": "PARTIAL",
+                  "radioId": "125.35E"
+                },
+                {
+                  "quad": 2,
+                  "row": 4,
+                  "col": 2,
+                  "type": "PARTIAL",
+                  "radioId": "354.1E"
+                },
+                {
+                  "quad": 2,
+                  "row": 1,
+                  "col": 3,
+                  "type": "PARTIAL",
+                  "radioId": "121.5O"
+                },
+                {
+                  "quad": 2,
+                  "row": 2,
+                  "col": 3,
+                  "type": "PARTIAL",
+                  "radioId": "243.0O"
+                },
+                {
+                  "quad": 2,
+                  "row": 3,
+                  "col": 3,
+                  "type": "PARTIAL",
+                  "radioId": "135.4"
+                },
+                {
+                  "quad": 2,
+                  "row": 4,
+                  "col": 3,
+                  "type": "PARTIAL",
+                  "radioId": "128.05"
+                }
+              ]
+            },
+            {
+              "pageNumber": 2,
+              "footer": "DRP",
+              "cells": [
+                {
+                  "quad": 1,
+                  "row": 1,
+                  "col": 1,
+                  "type": "RADIO",
+                  "radioId": "120.95"
+                },
+                {
+                  "quad": 1,
+                  "row": 2,
+                  "col": 1,
+                  "type": "RADIO",
+                  "radioId": "269.45"
+                },
+                {
+                  "quad": 1,
+                  "row": 3,
+                  "col": 1,
+                  "type": "RADIO",
+                  "radioId": "123.7"
+                },
+                {
+                  "quad": 1,
+                  "row": 4,
+                  "col": 1,
+                  "type": "RADIO",
+                  "radioId": "338.25"
+                },
+                {
+                  "quad": 2,
+                  "row": 1,
+                  "col": 1,
+                  "type": "RADIO",
+                  "radioId": "125.1"
+                },
+                {
+                  "quad": 2,
+                  "row": 2,
+                  "col": 1,
+                  "type": "RADIO",
+                  "radioId": "363.2"
+                },
+                {
+                  "quad": 2,
+                  "row": 3,
+                  "col": 1,
+                  "type": "RADIO",
+                  "radioId": "126.475"
+                },
+                {
+                  "quad": 2,
+                  "row": 4,
+                  "col": 1,
+                  "type": "RADIO",
+                  "radioId": "317.775"
+                },
+                {
+                  "quad": 3,
+                  "row": 1,
+                  "col": 1,
+                  "type": "RADIO",
+                  "radioId": "123.85"
+                },
+                {
+                  "quad": 3,
+                  "row": 2,
+                  "col": 1,
+                  "type": "RADIO",
+                  "radioId": "278.3"
+                },
+                {
+                  "quad": 3,
+                  "row": 3,
+                  "col": 1,
+                  "type": "RADIO",
+                  "radioId": "124.8"
+                },
+                {
+                  "quad": 3,
+                  "row": 4,
+                  "col": 1,
+                  "type": "RADIO",
+                  "radioId": "263.15"
+                },
+                {
+                  "quad": 4,
+                  "row": 1,
+                  "col": 1,
+                  "type": "RADIO",
+                  "radioId": "127.0"
+                },
+                {
+                  "quad": 4,
+                  "row": 2,
+                  "col": 1,
+                  "type": "RADIO",
+                  "radioId": "128.325"
+                },
+                {
+                  "quad": 4,
+                  "row": 3,
+                  "col": 1,
+                  "type": "RADIO",
+                  "radioId": "254.3"
+                }
+              ]
+            },
+            {
+              "pageNumber": 3,
+              "footer": "DRP",
+              "cells": [
+                {
+                  "quad": 1,
+                  "row": 1,
+                  "col": 1,
+                  "type": "RADIO",
+                  "radioId": "128.575"
+                },
+                {
+                  "quad": 1,
+                  "row": 2,
+                  "col": 1,
+                  "type": "RADIO",
+                  "radioId": "254.25"
+                },
+                {
+                  "quad": 1,
+                  "row": 3,
+                  "col": 1,
+                  "type": "RADIO",
+                  "radioId": "132.475"
+                },
+                {
+                  "quad": 2,
+                  "row": 1,
+                  "col": 1,
+                  "type": "RADIO",
+                  "radioId": "128.32E"
+                },
+                {
+                  "quad": 2,
+                  "row": 2,
+                  "col": 1,
+                  "type": "RADIO",
+                  "radioId": "254.3E"
+                },
+                {
+                  "quad": 2,
+                  "row": 3,
+                  "col": 1,
+                  "type": "RADIO",
+                  "radioId": "121.5"
+                },
+                {
+                  "quad": 2,
+                  "row": 4,
+                  "col": 1,
+                  "type": "RADIO",
+                  "radioId": "243.0"
+                },
+                {
+                  "quad": 3,
+                  "row": 1,
+                  "col": 1,
+                  "type": "RADIO",
+                  "radioId": "123.7E"
+                },
+                {
+                  "quad": 3,
+                  "row": 2,
+                  "col": 1,
+                  "type": "RADIO",
+                  "radioId": "123.85E"
+                },
+                {
+                  "quad": 3,
+                  "row": 3,
+                  "col": 1,
+                  "type": "RADIO",
+                  "radioId": "124.8E"
+                },
+                {
+                  "quad": 3,
+                  "row": 4,
+                  "col": 1,
+                  "type": "RADIO",
+                  "radioId": "263.15E"
+                },
+                {
+                  "quad": 4,
+                  "row": 1,
+                  "col": 1,
+                  "type": "RADIO",
+                  "radioId": "121.5M"
+                },
+                {
+                  "quad": 4,
+                  "row": 2,
+                  "col": 1,
+                  "type": "RADIO",
+                  "radioId": "243.0M"
+                },
+                {
+                  "quad": 4,
+                  "row": 3,
+                  "col": 1,
+                  "type": "RADIO",
+                  "radioId": "121.5S"
+                },
+                {
+                  "quad": 4,
+                  "row": 4,
+                  "col": 1,
+                  "type": "RADIO",
+                  "radioId": "243.0S"
+                }
+              ]
+            },
+            {
+              "pageNumber": 4,
+              "footer": "DRP",
+              "cells": [
+                {
+                  "quad": 1,
+                  "row": 1,
+                  "col": 1,
+                  "type": "RADIO",
+                  "radioId": "121.5V"
+                },
+                {
+                  "quad": 1,
+                  "row": 2,
+                  "col": 1,
+                  "type": "RADIO",
+                  "radioId": "121.5Y"
+                },
+                {
+                  "quad": 1,
+                  "row": 3,
+                  "col": 1,
+                  "type": "RADIO",
+                  "radioId": "243.0Y"
+                },
+                {
+                  "quad": 2,
+                  "row": 1,
+                  "col": 1,
+                  "type": "DA",
+                  "lineId": "2100529"
+                },
+                {
+                  "quad": 2,
+                  "row": 2,
+                  "col": 1,
+                  "type": "DA",
+                  "lineId": "2100424"
+                },
+                {
+                  "quad": 2,
+                  "row": 3,
+                  "col": 1,
+                  "type": "DA",
+                  "lineId": "811045"
+                },
+                {
+                  "quad": 2,
+                  "row": 1,
+                  "col": 2,
+                  "type": "DA",
+                  "lineId": "2100294"
+                },
+                {
+                  "quad": 2,
+                  "row": 2,
+                  "col": 2,
+                  "type": "DA",
+                  "lineId": "2100400"
+                },
+                {
+                  "quad": 2,
+                  "row": 3,
+                  "col": 2,
+                  "type": "DA",
+                  "lineId": "811602"
+                },
+                {
+                  "quad": 2,
+                  "row": 1,
+                  "col": 3,
+                  "type": "DA",
+                  "lineId": "2100447"
+                },
+                {
+                  "quad": 2,
+                  "row": 3,
+                  "col": 3,
+                  "type": "DA",
+                  "lineId": "811043"
+                },
+                {
+                  "quad": 2,
+                  "row": 3,
+                  "col": 4,
+                  "type": "DA",
+                  "lineId": "81148113"
+                },
+                {
+                  "quad": 2,
+                  "row": 3,
+                  "col": 5,
+                  "type": "DA",
+                  "lineId": "811057"
+                }
+              ]
+            }
           ]
+        }
         },
         {
           "cs": "OAK_S_APP",
@@ -13909,7 +17456,667 @@
             ["8110366", 0, "H-LAG"],
             ["916124", 3, "E/W/V"],
             ["916424", 3, "NTWRS"]
+          ],
+        "tedPattern": {
+          "patternName": "Area C Sunol_TED",
+          "display": "LEFT",
+          "dimPercent": 50,
+          "pages": [
+            {
+              "pageNumber": 1,
+              "footer": "DRP",
+              "cells": [
+                {
+                  "quad": 1,
+                  "row": 4,
+                  "col": 2,
+                  "type": "IA"
+                },
+                {
+                  "quad": 1,
+                  "row": 1,
+                  "col": 1,
+                  "type": "DA",
+                  "lineId": "811075"
+                },
+                {
+                  "quad": 1,
+                  "row": 1,
+                  "col": 2,
+                  "type": "DA",
+                  "lineId": "811078"
+                },
+                {
+                  "quad": 1,
+                  "row": 1,
+                  "col": 3,
+                  "type": "DA",
+                  "lineId": "811089"
+                },
+                {
+                  "quad": 1,
+                  "row": 3,
+                  "col": 3,
+                  "type": "DA",
+                  "lineId": "811043"
+                },
+                {
+                  "quad": 1,
+                  "row": 4,
+                  "col": 3,
+                  "type": "DA",
+                  "lineId": "916424"
+                },
+                {
+                  "quad": 1,
+                  "row": 1,
+                  "col": 4,
+                  "type": "DA",
+                  "lineId": "811062"
+                },
+                {
+                  "quad": 1,
+                  "row": 4,
+                  "col": 4,
+                  "type": "DA",
+                  "lineId": "916124"
+                },
+                {
+                  "quad": 1,
+                  "row": 2,
+                  "col": 5,
+                  "type": "DA",
+                  "lineId": "811059"
+                },
+                {
+                  "quad": 3,
+                  "row": 1,
+                  "col": 1,
+                  "type": "DA",
+                  "lineId": "2100448"
+                },
+                {
+                  "quad": 3,
+                  "row": 2,
+                  "col": 1,
+                  "type": "DA",
+                  "lineId": "2100323"
+                },
+                {
+                  "quad": 3,
+                  "row": 3,
+                  "col": 1,
+                  "type": "DA",
+                  "lineId": "2100623"
+                },
+                {
+                  "quad": 3,
+                  "row": 1,
+                  "col": 2,
+                  "type": "DA",
+                  "lineId": "2100491"
+                },
+                {
+                  "quad": 3,
+                  "row": 2,
+                  "col": 2,
+                  "type": "DA",
+                  "lineId": "2100548"
+                },
+                {
+                  "quad": 3,
+                  "row": 3,
+                  "col": 2,
+                  "type": "DA",
+                  "lineId": "2100646"
+                },
+                {
+                  "quad": 3,
+                  "row": 4,
+                  "col": 2,
+                  "type": "DA",
+                  "lineId": "2100665"
+                },
+                {
+                  "quad": 3,
+                  "row": 1,
+                  "col": 3,
+                  "type": "DA",
+                  "lineId": "2100295"
+                },
+                {
+                  "quad": 3,
+                  "row": 2,
+                  "col": 3,
+                  "type": "DA",
+                  "lineId": "2100596"
+                },
+                {
+                  "quad": 3,
+                  "row": 3,
+                  "col": 3,
+                  "type": "DA",
+                  "lineId": "2100635"
+                },
+                {
+                  "quad": 3,
+                  "row": 4,
+                  "col": 3,
+                  "type": "DA",
+                  "lineId": "2100666"
+                },
+                {
+                  "quad": 3,
+                  "row": 1,
+                  "col": 4,
+                  "type": "DA",
+                  "lineId": "2100664"
+                },
+                {
+                  "quad": 3,
+                  "row": 3,
+                  "col": 4,
+                  "type": "DA",
+                  "lineId": "2100657"
+                },
+                {
+                  "quad": 3,
+                  "row": 1,
+                  "col": 5,
+                  "type": "DA",
+                  "lineId": "2100530"
+                },
+                {
+                  "quad": 3,
+                  "row": 3,
+                  "col": 5,
+                  "type": "DA",
+                  "lineId": "2100658"
+                },
+                {
+                  "quad": 4,
+                  "row": 2,
+                  "col": 3,
+                  "type": "FUNC",
+                  "funcType": "RECON"
+                },
+                {
+                  "quad": 4,
+                  "row": 4,
+                  "col": 3,
+                  "type": "FUNC",
+                  "funcType": "HL"
+                },
+                {
+                  "quad": 4,
+                  "row": 2,
+                  "col": 4,
+                  "type": "FUNC",
+                  "funcType": "FWD"
+                },
+                {
+                  "quad": 4,
+                  "row": 2,
+                  "col": 5,
+                  "type": "FUNC",
+                  "funcType": "RB"
+                },
+                {
+                  "quad": 4,
+                  "row": 4,
+                  "col": 5,
+                  "type": "FUNC",
+                  "funcType": "REL"
+                },
+                {
+                  "quad": 2,
+                  "row": 1,
+                  "col": 1,
+                  "type": "PARTIAL",
+                  "radioId": "124.8"
+                },
+                {
+                  "quad": 2,
+                  "row": 2,
+                  "col": 1,
+                  "type": "PARTIAL",
+                  "radioId": "263.15"
+                },
+                {
+                  "quad": 2,
+                  "row": 3,
+                  "col": 1,
+                  "type": "PARTIAL",
+                  "radioId": "123.85"
+                },
+                {
+                  "quad": 2,
+                  "row": 4,
+                  "col": 1,
+                  "type": "PARTIAL",
+                  "radioId": "278.3"
+                },
+                {
+                  "quad": 2,
+                  "row": 1,
+                  "col": 2,
+                  "type": "PARTIAL",
+                  "radioId": "124.8E"
+                },
+                {
+                  "quad": 2,
+                  "row": 2,
+                  "col": 2,
+                  "type": "PARTIAL",
+                  "radioId": "263.15E"
+                },
+                {
+                  "quad": 2,
+                  "row": 3,
+                  "col": 2,
+                  "type": "PARTIAL",
+                  "radioId": "125.1"
+                },
+                {
+                  "quad": 2,
+                  "row": 4,
+                  "col": 2,
+                  "type": "PARTIAL",
+                  "radioId": "363.2"
+                },
+                {
+                  "quad": 2,
+                  "row": 1,
+                  "col": 3,
+                  "type": "PARTIAL",
+                  "radioId": "121.5S"
+                },
+                {
+                  "quad": 2,
+                  "row": 2,
+                  "col": 3,
+                  "type": "PARTIAL",
+                  "radioId": "243.0S"
+                },
+                {
+                  "quad": 2,
+                  "row": 3,
+                  "col": 3,
+                  "type": "PARTIAL",
+                  "radioId": "132.475"
+                }
+              ]
+            },
+            {
+              "pageNumber": 2,
+              "footer": "DRP",
+              "cells": [
+                {
+                  "quad": 1,
+                  "row": 1,
+                  "col": 1,
+                  "type": "RADIO",
+                  "radioId": "120.95"
+                },
+                {
+                  "quad": 1,
+                  "row": 2,
+                  "col": 1,
+                  "type": "RADIO",
+                  "radioId": "269.45"
+                },
+                {
+                  "quad": 1,
+                  "row": 3,
+                  "col": 1,
+                  "type": "RADIO",
+                  "radioId": "123.7"
+                },
+                {
+                  "quad": 1,
+                  "row": 4,
+                  "col": 1,
+                  "type": "RADIO",
+                  "radioId": "338.25"
+                },
+                {
+                  "quad": 2,
+                  "row": 1,
+                  "col": 1,
+                  "type": "RADIO",
+                  "radioId": "126.475"
+                },
+                {
+                  "quad": 2,
+                  "row": 2,
+                  "col": 1,
+                  "type": "RADIO",
+                  "radioId": "317.775"
+                },
+                {
+                  "quad": 2,
+                  "row": 3,
+                  "col": 1,
+                  "type": "RADIO",
+                  "radioId": "127.0"
+                },
+                {
+                  "quad": 2,
+                  "row": 4,
+                  "col": 1,
+                  "type": "RADIO",
+                  "radioId": "128.325"
+                },
+                {
+                  "quad": 3,
+                  "row": 1,
+                  "col": 1,
+                  "type": "RADIO",
+                  "radioId": "124.4"
+                },
+                {
+                  "quad": 3,
+                  "row": 2,
+                  "col": 1,
+                  "type": "RADIO",
+                  "radioId": "351.8"
+                },
+                {
+                  "quad": 3,
+                  "row": 3,
+                  "col": 1,
+                  "type": "RADIO",
+                  "radioId": "125.35"
+                },
+                {
+                  "quad": 3,
+                  "row": 4,
+                  "col": 1,
+                  "type": "RADIO",
+                  "radioId": "354.1"
+                },
+                {
+                  "quad": 4,
+                  "row": 1,
+                  "col": 1,
+                  "type": "RADIO",
+                  "radioId": "254.3"
+                },
+                {
+                  "quad": 4,
+                  "row": 2,
+                  "col": 1,
+                  "type": "RADIO",
+                  "radioId": "128.575"
+                },
+                {
+                  "quad": 4,
+                  "row": 3,
+                  "col": 1,
+                  "type": "RADIO",
+                  "radioId": "254.25"
+                },
+                {
+                  "quad": 4,
+                  "row": 4,
+                  "col": 1,
+                  "type": "RADIO",
+                  "radioId": "135.4"
+                }
+              ]
+            },
+            {
+              "pageNumber": 3,
+              "footer": "DRP",
+              "cells": [
+                {
+                  "quad": 1,
+                  "row": 1,
+                  "col": 1,
+                  "type": "RADIO",
+                  "radioId": "123.7E"
+                },
+                {
+                  "quad": 1,
+                  "row": 2,
+                  "col": 1,
+                  "type": "RADIO",
+                  "radioId": "123.85E"
+                },
+                {
+                  "quad": 1,
+                  "row": 3,
+                  "col": 1,
+                  "type": "RADIO",
+                  "radioId": "124.4E"
+                },
+                {
+                  "quad": 1,
+                  "row": 4,
+                  "col": 1,
+                  "type": "RADIO",
+                  "radioId": "125.35E"
+                },
+                {
+                  "quad": 2,
+                  "row": 1,
+                  "col": 1,
+                  "type": "RADIO",
+                  "radioId": "121.5"
+                },
+                {
+                  "quad": 2,
+                  "row": 2,
+                  "col": 1,
+                  "type": "RADIO",
+                  "radioId": "243.0"
+                },
+                {
+                  "quad": 2,
+                  "row": 3,
+                  "col": 1,
+                  "type": "RADIO",
+                  "radioId": "121.5M"
+                },
+                {
+                  "quad": 2,
+                  "row": 4,
+                  "col": 1,
+                  "type": "RADIO",
+                  "radioId": "243.0M"
+                },
+                {
+                  "quad": 3,
+                  "row": 1,
+                  "col": 1,
+                  "type": "RADIO",
+                  "radioId": "354.1E"
+                },
+                {
+                  "quad": 3,
+                  "row": 2,
+                  "col": 1,
+                  "type": "RADIO",
+                  "radioId": "128.32E"
+                },
+                {
+                  "quad": 3,
+                  "row": 3,
+                  "col": 1,
+                  "type": "RADIO",
+                  "radioId": "254.3E"
+                },
+                {
+                  "quad": 4,
+                  "row": 1,
+                  "col": 1,
+                  "type": "RADIO",
+                  "radioId": "121.5O"
+                },
+                {
+                  "quad": 4,
+                  "row": 2,
+                  "col": 1,
+                  "type": "RADIO",
+                  "radioId": "243.0O"
+                },
+                {
+                  "quad": 4,
+                  "row": 3,
+                  "col": 1,
+                  "type": "RADIO",
+                  "radioId": "121.5V"
+                }
+              ]
+            },
+            {
+              "pageNumber": 4,
+              "footer": "DRP",
+              "cells": [
+                {
+                  "quad": 1,
+                  "row": 1,
+                  "col": 1,
+                  "type": "RADIO",
+                  "radioId": "121.5Y"
+                },
+                {
+                  "quad": 1,
+                  "row": 2,
+                  "col": 1,
+                  "type": "RADIO",
+                  "radioId": "243.0Y"
+                },
+                {
+                  "quad": 2,
+                  "row": 1,
+                  "col": 1,
+                  "type": "DA",
+                  "lineId": "2100470"
+                },
+                {
+                  "quad": 2,
+                  "row": 2,
+                  "col": 1,
+                  "type": "DA",
+                  "lineId": "811623"
+                },
+                {
+                  "quad": 2,
+                  "row": 3,
+                  "col": 1,
+                  "type": "DA",
+                  "lineId": "811079"
+                },
+                {
+                  "quad": 2,
+                  "row": 4,
+                  "col": 1,
+                  "type": "DA",
+                  "lineId": "811219"
+                },
+                {
+                  "quad": 2,
+                  "row": 1,
+                  "col": 2,
+                  "type": "DA",
+                  "lineId": "2100565"
+                },
+                {
+                  "quad": 2,
+                  "row": 2,
+                  "col": 2,
+                  "type": "DA",
+                  "lineId": "811067"
+                },
+                {
+                  "quad": 2,
+                  "row": 3,
+                  "col": 2,
+                  "type": "DA",
+                  "lineId": "811082"
+                },
+                {
+                  "quad": 2,
+                  "row": 1,
+                  "col": 3,
+                  "type": "DA",
+                  "lineId": "2100610"
+                },
+                {
+                  "quad": 2,
+                  "row": 2,
+                  "col": 3,
+                  "type": "DA",
+                  "lineId": "811068"
+                },
+                {
+                  "quad": 2,
+                  "row": 3,
+                  "col": 3,
+                  "type": "DA",
+                  "lineId": "811602"
+                },
+                {
+                  "quad": 2,
+                  "row": 4,
+                  "col": 3,
+                  "type": "DA",
+                  "lineId": "811066"
+                },
+                {
+                  "quad": 2,
+                  "row": 1,
+                  "col": 4,
+                  "type": "DA",
+                  "lineId": "2100425"
+                },
+                {
+                  "quad": 2,
+                  "row": 2,
+                  "col": 4,
+                  "type": "DA",
+                  "lineId": "811065"
+                },
+                {
+                  "quad": 2,
+                  "row": 3,
+                  "col": 4,
+                  "type": "DA",
+                  "lineId": "81148113"
+                },
+                {
+                  "quad": 2,
+                  "row": 4,
+                  "col": 4,
+                  "type": "DA",
+                  "lineId": "811045"
+                },
+                {
+                  "quad": 2,
+                  "row": 1,
+                  "col": 5,
+                  "type": "DA",
+                  "lineId": "811097"
+                },
+                {
+                  "quad": 2,
+                  "row": 2,
+                  "col": 5,
+                  "type": "DA",
+                  "lineId": "811057"
+                },
+                {
+                  "quad": 2,
+                  "row": 4,
+                  "col": 5,
+                  "type": "DA",
+                  "lineId": "811070"
+                }
+              ]
+            }
           ]
+        }
         },
         {
           "cs": "MOD_J_APP",
@@ -13964,7 +18171,695 @@
             ["8110367", 0, "H-LAG"],
             ["916276", 3, "S-BAY"],
             ["916476", 3, "NTWRS"]
+          ],
+        "tedPattern": {
+          "patternName": "Area C Tracy_TED",
+          "display": "LEFT",
+          "dimPercent": 50,
+          "pages": [
+            {
+              "pageNumber": 1,
+              "footer": "DRP",
+              "cells": [
+                {
+                  "quad": 1,
+                  "row": 4,
+                  "col": 2,
+                  "type": "IA"
+                },
+                {
+                  "quad": 1,
+                  "row": 1,
+                  "col": 1,
+                  "type": "DA",
+                  "lineId": "811075"
+                },
+                {
+                  "quad": 1,
+                  "row": 3,
+                  "col": 1,
+                  "type": "DA",
+                  "lineId": "811045"
+                },
+                {
+                  "quad": 1,
+                  "row": 1,
+                  "col": 2,
+                  "type": "DA",
+                  "lineId": "811078"
+                },
+                {
+                  "quad": 1,
+                  "row": 3,
+                  "col": 2,
+                  "type": "DA",
+                  "lineId": "811070"
+                },
+                {
+                  "quad": 1,
+                  "row": 1,
+                  "col": 3,
+                  "type": "DA",
+                  "lineId": "811089"
+                },
+                {
+                  "quad": 1,
+                  "row": 3,
+                  "col": 3,
+                  "type": "DA",
+                  "lineId": "811043"
+                },
+                {
+                  "quad": 1,
+                  "row": 4,
+                  "col": 3,
+                  "type": "DA",
+                  "lineId": "916476"
+                },
+                {
+                  "quad": 1,
+                  "row": 1,
+                  "col": 4,
+                  "type": "DA",
+                  "lineId": "811062"
+                },
+                {
+                  "quad": 1,
+                  "row": 2,
+                  "col": 5,
+                  "type": "DA",
+                  "lineId": "811059"
+                },
+                {
+                  "quad": 1,
+                  "row": 3,
+                  "col": 5,
+                  "type": "DA",
+                  "lineId": "811057"
+                },
+                {
+                  "quad": 3,
+                  "row": 2,
+                  "col": 1,
+                  "type": "DA",
+                  "lineId": "2100324"
+                },
+                {
+                  "quad": 3,
+                  "row": 3,
+                  "col": 1,
+                  "type": "DA",
+                  "lineId": "2100624"
+                },
+                {
+                  "quad": 3,
+                  "row": 1,
+                  "col": 2,
+                  "type": "DA",
+                  "lineId": "2100296"
+                },
+                {
+                  "quad": 3,
+                  "row": 2,
+                  "col": 2,
+                  "type": "DA",
+                  "lineId": "2100549"
+                },
+                {
+                  "quad": 3,
+                  "row": 3,
+                  "col": 2,
+                  "type": "DA",
+                  "lineId": "2100647"
+                },
+                {
+                  "quad": 3,
+                  "row": 4,
+                  "col": 2,
+                  "type": "DA",
+                  "lineId": "2100674"
+                },
+                {
+                  "quad": 3,
+                  "row": 1,
+                  "col": 3,
+                  "type": "DA",
+                  "lineId": "2100673"
+                },
+                {
+                  "quad": 3,
+                  "row": 2,
+                  "col": 3,
+                  "type": "DA",
+                  "lineId": "2100597"
+                },
+                {
+                  "quad": 3,
+                  "row": 3,
+                  "col": 3,
+                  "type": "DA",
+                  "lineId": "2100636"
+                },
+                {
+                  "quad": 3,
+                  "row": 4,
+                  "col": 3,
+                  "type": "DA",
+                  "lineId": "2100675"
+                },
+                {
+                  "quad": 3,
+                  "row": 1,
+                  "col": 4,
+                  "type": "DA",
+                  "lineId": "2100531"
+                },
+                {
+                  "quad": 3,
+                  "row": 3,
+                  "col": 4,
+                  "type": "DA",
+                  "lineId": "2100657"
+                },
+                {
+                  "quad": 3,
+                  "row": 3,
+                  "col": 5,
+                  "type": "DA",
+                  "lineId": "2100667"
+                },
+                {
+                  "quad": 3,
+                  "row": 4,
+                  "col": 5,
+                  "type": "DA",
+                  "lineId": "2100672"
+                },
+                {
+                  "quad": 4,
+                  "row": 4,
+                  "col": 1,
+                  "type": "DA",
+                  "lineId": "2100402"
+                },
+                {
+                  "quad": 4,
+                  "row": 1,
+                  "col": 3,
+                  "type": "DA",
+                  "lineId": "2100669"
+                },
+                {
+                  "quad": 4,
+                  "row": 1,
+                  "col": 4,
+                  "type": "DA",
+                  "lineId": "2100671"
+                },
+                {
+                  "quad": 4,
+                  "row": 1,
+                  "col": 5,
+                  "type": "DA",
+                  "lineId": "2100351"
+                },
+                {
+                  "quad": 4,
+                  "row": 2,
+                  "col": 3,
+                  "type": "FUNC",
+                  "funcType": "RECON"
+                },
+                {
+                  "quad": 4,
+                  "row": 4,
+                  "col": 3,
+                  "type": "FUNC",
+                  "funcType": "HL"
+                },
+                {
+                  "quad": 4,
+                  "row": 2,
+                  "col": 4,
+                  "type": "FUNC",
+                  "funcType": "FWD"
+                },
+                {
+                  "quad": 4,
+                  "row": 2,
+                  "col": 5,
+                  "type": "FUNC",
+                  "funcType": "RB"
+                },
+                {
+                  "quad": 4,
+                  "row": 4,
+                  "col": 5,
+                  "type": "FUNC",
+                  "funcType": "REL"
+                },
+                {
+                  "quad": 2,
+                  "row": 1,
+                  "col": 1,
+                  "type": "PARTIAL",
+                  "radioId": "123.85"
+                },
+                {
+                  "quad": 2,
+                  "row": 2,
+                  "col": 1,
+                  "type": "PARTIAL",
+                  "radioId": "278.3"
+                },
+                {
+                  "quad": 2,
+                  "row": 3,
+                  "col": 1,
+                  "type": "PARTIAL",
+                  "radioId": "125.1"
+                },
+                {
+                  "quad": 2,
+                  "row": 4,
+                  "col": 1,
+                  "type": "PARTIAL",
+                  "radioId": "363.2"
+                },
+                {
+                  "quad": 2,
+                  "row": 1,
+                  "col": 2,
+                  "type": "PARTIAL",
+                  "radioId": "123.85E"
+                },
+                {
+                  "quad": 2,
+                  "row": 3,
+                  "col": 2,
+                  "type": "PARTIAL",
+                  "radioId": "124.8"
+                },
+                {
+                  "quad": 2,
+                  "row": 4,
+                  "col": 2,
+                  "type": "PARTIAL",
+                  "radioId": "263.15"
+                },
+                {
+                  "quad": 2,
+                  "row": 1,
+                  "col": 3,
+                  "type": "PARTIAL",
+                  "radioId": "121.5S"
+                },
+                {
+                  "quad": 2,
+                  "row": 2,
+                  "col": 3,
+                  "type": "PARTIAL",
+                  "radioId": "243.0S"
+                },
+                {
+                  "quad": 2,
+                  "row": 3,
+                  "col": 3,
+                  "type": "PARTIAL",
+                  "radioId": "124.8E"
+                },
+                {
+                  "quad": 2,
+                  "row": 4,
+                  "col": 3,
+                  "type": "PARTIAL",
+                  "radioId": "263.15E"
+                }
+              ]
+            },
+            {
+              "pageNumber": 2,
+              "footer": "DRP",
+              "cells": [
+                {
+                  "quad": 1,
+                  "row": 1,
+                  "col": 1,
+                  "type": "RADIO",
+                  "radioId": "120.95"
+                },
+                {
+                  "quad": 1,
+                  "row": 2,
+                  "col": 1,
+                  "type": "RADIO",
+                  "radioId": "269.45"
+                },
+                {
+                  "quad": 1,
+                  "row": 3,
+                  "col": 1,
+                  "type": "RADIO",
+                  "radioId": "123.7"
+                },
+                {
+                  "quad": 1,
+                  "row": 4,
+                  "col": 1,
+                  "type": "RADIO",
+                  "radioId": "338.25"
+                },
+                {
+                  "quad": 2,
+                  "row": 1,
+                  "col": 1,
+                  "type": "RADIO",
+                  "radioId": "126.475"
+                },
+                {
+                  "quad": 2,
+                  "row": 2,
+                  "col": 1,
+                  "type": "RADIO",
+                  "radioId": "317.775"
+                },
+                {
+                  "quad": 2,
+                  "row": 3,
+                  "col": 1,
+                  "type": "RADIO",
+                  "radioId": "127.0"
+                },
+                {
+                  "quad": 2,
+                  "row": 4,
+                  "col": 1,
+                  "type": "RADIO",
+                  "radioId": "128.325"
+                },
+                {
+                  "quad": 3,
+                  "row": 1,
+                  "col": 1,
+                  "type": "RADIO",
+                  "radioId": "124.4"
+                },
+                {
+                  "quad": 3,
+                  "row": 2,
+                  "col": 1,
+                  "type": "RADIO",
+                  "radioId": "351.8"
+                },
+                {
+                  "quad": 3,
+                  "row": 3,
+                  "col": 1,
+                  "type": "RADIO",
+                  "radioId": "125.35"
+                },
+                {
+                  "quad": 3,
+                  "row": 4,
+                  "col": 1,
+                  "type": "RADIO",
+                  "radioId": "354.1"
+                },
+                {
+                  "quad": 4,
+                  "row": 1,
+                  "col": 1,
+                  "type": "RADIO",
+                  "radioId": "254.3"
+                },
+                {
+                  "quad": 4,
+                  "row": 2,
+                  "col": 1,
+                  "type": "RADIO",
+                  "radioId": "128.575"
+                },
+                {
+                  "quad": 4,
+                  "row": 3,
+                  "col": 1,
+                  "type": "RADIO",
+                  "radioId": "254.25"
+                },
+                {
+                  "quad": 4,
+                  "row": 4,
+                  "col": 1,
+                  "type": "RADIO",
+                  "radioId": "132.475"
+                }
+              ]
+            },
+            {
+              "pageNumber": 3,
+              "footer": "DRP",
+              "cells": [
+                {
+                  "quad": 1,
+                  "row": 1,
+                  "col": 1,
+                  "type": "RADIO",
+                  "radioId": "135.4"
+                },
+                {
+                  "quad": 1,
+                  "row": 3,
+                  "col": 1,
+                  "type": "RADIO",
+                  "radioId": "123.7E"
+                },
+                {
+                  "quad": 1,
+                  "row": 4,
+                  "col": 1,
+                  "type": "RADIO",
+                  "radioId": "124.4E"
+                },
+                {
+                  "quad": 2,
+                  "row": 1,
+                  "col": 1,
+                  "type": "RADIO",
+                  "radioId": "121.5"
+                },
+                {
+                  "quad": 2,
+                  "row": 2,
+                  "col": 1,
+                  "type": "RADIO",
+                  "radioId": "243.0"
+                },
+                {
+                  "quad": 2,
+                  "row": 3,
+                  "col": 1,
+                  "type": "RADIO",
+                  "radioId": "121.5M"
+                },
+                {
+                  "quad": 2,
+                  "row": 4,
+                  "col": 1,
+                  "type": "RADIO",
+                  "radioId": "243.0M"
+                },
+                {
+                  "quad": 3,
+                  "row": 1,
+                  "col": 1,
+                  "type": "RADIO",
+                  "radioId": "125.35E"
+                },
+                {
+                  "quad": 3,
+                  "row": 2,
+                  "col": 1,
+                  "type": "RADIO",
+                  "radioId": "354.1E"
+                },
+                {
+                  "quad": 3,
+                  "row": 3,
+                  "col": 1,
+                  "type": "RADIO",
+                  "radioId": "128.32E"
+                },
+                {
+                  "quad": 3,
+                  "row": 4,
+                  "col": 1,
+                  "type": "RADIO",
+                  "radioId": "254.3E"
+                },
+                {
+                  "quad": 4,
+                  "row": 1,
+                  "col": 1,
+                  "type": "RADIO",
+                  "radioId": "121.5O"
+                },
+                {
+                  "quad": 4,
+                  "row": 2,
+                  "col": 1,
+                  "type": "RADIO",
+                  "radioId": "243.0O"
+                },
+                {
+                  "quad": 4,
+                  "row": 3,
+                  "col": 1,
+                  "type": "RADIO",
+                  "radioId": "121.5V"
+                }
+              ]
+            },
+            {
+              "pageNumber": 4,
+              "footer": "DRP",
+              "cells": [
+                {
+                  "quad": 1,
+                  "row": 1,
+                  "col": 1,
+                  "type": "RADIO",
+                  "radioId": "121.5Y"
+                },
+                {
+                  "quad": 1,
+                  "row": 2,
+                  "col": 1,
+                  "type": "RADIO",
+                  "radioId": "243.0Y"
+                },
+                {
+                  "quad": 2,
+                  "row": 1,
+                  "col": 1,
+                  "type": "DA",
+                  "lineId": "2100471"
+                },
+                {
+                  "quad": 2,
+                  "row": 2,
+                  "col": 1,
+                  "type": "DA",
+                  "lineId": "811623"
+                },
+                {
+                  "quad": 2,
+                  "row": 3,
+                  "col": 1,
+                  "type": "DA",
+                  "lineId": "811079"
+                },
+                {
+                  "quad": 2,
+                  "row": 4,
+                  "col": 1,
+                  "type": "DA",
+                  "lineId": "811219"
+                },
+                {
+                  "quad": 2,
+                  "row": 1,
+                  "col": 2,
+                  "type": "DA",
+                  "lineId": "2100566"
+                },
+                {
+                  "quad": 2,
+                  "row": 2,
+                  "col": 2,
+                  "type": "DA",
+                  "lineId": "811067"
+                },
+                {
+                  "quad": 2,
+                  "row": 3,
+                  "col": 2,
+                  "type": "DA",
+                  "lineId": "811602"
+                },
+                {
+                  "quad": 2,
+                  "row": 1,
+                  "col": 3,
+                  "type": "DA",
+                  "lineId": "2100611"
+                },
+                {
+                  "quad": 2,
+                  "row": 2,
+                  "col": 3,
+                  "type": "DA",
+                  "lineId": "811068"
+                },
+                {
+                  "quad": 2,
+                  "row": 3,
+                  "col": 3,
+                  "type": "DA",
+                  "lineId": "811082"
+                },
+                {
+                  "quad": 2,
+                  "row": 1,
+                  "col": 4,
+                  "type": "DA",
+                  "lineId": "2100426"
+                },
+                {
+                  "quad": 2,
+                  "row": 2,
+                  "col": 4,
+                  "type": "DA",
+                  "lineId": "811065"
+                },
+                {
+                  "quad": 2,
+                  "row": 3,
+                  "col": 4,
+                  "type": "DA",
+                  "lineId": "81148113"
+                },
+                {
+                  "quad": 2,
+                  "row": 4,
+                  "col": 4,
+                  "type": "DA",
+                  "lineId": "2100449"
+                },
+                {
+                  "quad": 2,
+                  "row": 1,
+                  "col": 5,
+                  "type": "DA",
+                  "lineId": "811097"
+                },
+                {
+                  "quad": 2,
+                  "row": 3,
+                  "col": 5,
+                  "type": "DA",
+                  "lineId": "811066"
+                },
+                {
+                  "quad": 2,
+                  "row": 4,
+                  "col": 5,
+                  "type": "DA",
+                  "lineId": "916276"
+                }
+              ]
+            }
           ]
+        }
         },
         {
           "cs": "MOD_APP",
@@ -16909,7 +21804,551 @@
             ["8110351", 0, "H-CAS"],
             ["916143", 3, "E/W/V"],
             ["916443", 3, "NTWRS"]
+          ],
+        "tedPattern": {
+          "patternName": "Area D Diablo_TED",
+          "display": "LEFT",
+          "dimPercent": 50,
+          "pages": [
+            {
+              "pageNumber": 1,
+              "footer": "DRP",
+              "cells": [
+                {
+                  "quad": 1,
+                  "row": 1,
+                  "col": 1,
+                  "type": "IA"
+                },
+                {
+                  "quad": 1,
+                  "row": 2,
+                  "col": 1,
+                  "type": "IA"
+                },
+                {
+                  "quad": 1,
+                  "row": 3,
+                  "col": 1,
+                  "type": "IA"
+                },
+                {
+                  "quad": 1,
+                  "row": 4,
+                  "col": 1,
+                  "type": "IA"
+                },
+                {
+                  "quad": 1,
+                  "row": 1,
+                  "col": 2,
+                  "type": "DA",
+                  "lineId": "811080"
+                },
+                {
+                  "quad": 1,
+                  "row": 4,
+                  "col": 2,
+                  "type": "DA",
+                  "lineId": "811067"
+                },
+                {
+                  "quad": 1,
+                  "row": 1,
+                  "col": 3,
+                  "type": "DA",
+                  "lineId": "811626"
+                },
+                {
+                  "quad": 1,
+                  "row": 2,
+                  "col": 3,
+                  "type": "DA",
+                  "lineId": "811624"
+                },
+                {
+                  "quad": 1,
+                  "row": 1,
+                  "col": 4,
+                  "type": "DA",
+                  "lineId": "811085"
+                },
+                {
+                  "quad": 1,
+                  "row": 2,
+                  "col": 4,
+                  "type": "DA",
+                  "lineId": "916443"
+                },
+                {
+                  "quad": 1,
+                  "row": 4,
+                  "col": 4,
+                  "type": "DA",
+                  "lineId": "811056"
+                },
+                {
+                  "quad": 1,
+                  "row": 2,
+                  "col": 5,
+                  "type": "DA",
+                  "lineId": "811094"
+                },
+                {
+                  "quad": 1,
+                  "row": 4,
+                  "col": 5,
+                  "type": "DA",
+                  "lineId": "811312"
+                },
+                {
+                  "quad": 3,
+                  "row": 3,
+                  "col": 1,
+                  "type": "DA",
+                  "lineId": "8110351"
+                },
+                {
+                  "quad": 3,
+                  "row": 1,
+                  "col": 2,
+                  "type": "DA",
+                  "lineId": "2100479"
+                },
+                {
+                  "quad": 3,
+                  "row": 2,
+                  "col": 2,
+                  "type": "DA",
+                  "lineId": "2100557"
+                },
+                {
+                  "quad": 3,
+                  "row": 3,
+                  "col": 2,
+                  "type": "DA",
+                  "lineId": "2100644"
+                },
+                {
+                  "quad": 3,
+                  "row": 4,
+                  "col": 2,
+                  "type": "DA",
+                  "lineId": "2100711"
+                },
+                {
+                  "quad": 3,
+                  "row": 1,
+                  "col": 3,
+                  "type": "DA",
+                  "lineId": "2100500"
+                },
+                {
+                  "quad": 3,
+                  "row": 2,
+                  "col": 3,
+                  "type": "DA",
+                  "lineId": "2100574"
+                },
+                {
+                  "quad": 3,
+                  "row": 3,
+                  "col": 3,
+                  "type": "DA",
+                  "lineId": "2100655"
+                },
+                {
+                  "quad": 3,
+                  "row": 1,
+                  "col": 4,
+                  "type": "DA",
+                  "lineId": "2100304"
+                },
+                {
+                  "quad": 3,
+                  "row": 2,
+                  "col": 4,
+                  "type": "DA",
+                  "lineId": "2100590"
+                },
+                {
+                  "quad": 3,
+                  "row": 3,
+                  "col": 4,
+                  "type": "DA",
+                  "lineId": "2100665"
+                },
+                {
+                  "quad": 3,
+                  "row": 1,
+                  "col": 5,
+                  "type": "DA",
+                  "lineId": "8110338"
+                },
+                {
+                  "quad": 3,
+                  "row": 2,
+                  "col": 5,
+                  "type": "DA",
+                  "lineId": "2100605"
+                },
+                {
+                  "quad": 3,
+                  "row": 3,
+                  "col": 5,
+                  "type": "DA",
+                  "lineId": "2100674"
+                },
+                {
+                  "quad": 3,
+                  "row": 4,
+                  "col": 5,
+                  "type": "DA",
+                  "lineId": "2100707"
+                },
+                {
+                  "quad": 4,
+                  "row": 1,
+                  "col": 1,
+                  "type": "DA",
+                  "lineId": "2100709"
+                },
+                {
+                  "quad": 4,
+                  "row": 2,
+                  "col": 1,
+                  "type": "DA",
+                  "lineId": "2100619"
+                },
+                {
+                  "quad": 4,
+                  "row": 3,
+                  "col": 1,
+                  "type": "DA",
+                  "lineId": "2100682"
+                },
+                {
+                  "quad": 4,
+                  "row": 4,
+                  "col": 1,
+                  "type": "DA",
+                  "lineId": "2100410"
+                },
+                {
+                  "quad": 4,
+                  "row": 1,
+                  "col": 2,
+                  "type": "DA",
+                  "lineId": "2100539"
+                },
+                {
+                  "quad": 4,
+                  "row": 2,
+                  "col": 2,
+                  "type": "DA",
+                  "lineId": "2100332"
+                },
+                {
+                  "quad": 4,
+                  "row": 4,
+                  "col": 2,
+                  "type": "DA",
+                  "lineId": "2100434"
+                },
+                {
+                  "quad": 4,
+                  "row": 1,
+                  "col": 4,
+                  "type": "FUNC",
+                  "funcType": "RECON"
+                },
+                {
+                  "quad": 4,
+                  "row": 2,
+                  "col": 4,
+                  "type": "FUNC",
+                  "funcType": "HL"
+                },
+                {
+                  "quad": 4,
+                  "row": 1,
+                  "col": 5,
+                  "type": "FUNC",
+                  "funcType": "FWD"
+                },
+                {
+                  "quad": 4,
+                  "row": 3,
+                  "col": 5,
+                  "type": "FUNC",
+                  "funcType": "RB"
+                },
+                {
+                  "quad": 4,
+                  "row": 4,
+                  "col": 5,
+                  "type": "FUNC",
+                  "funcType": "REL"
+                },
+                {
+                  "quad": 2,
+                  "row": 1,
+                  "col": 1,
+                  "type": "PARTIAL",
+                  "radioId": "133.95"
+                },
+                {
+                  "quad": 2,
+                  "row": 2,
+                  "col": 1,
+                  "type": "PARTIAL",
+                  "radioId": "128.575"
+                },
+                {
+                  "quad": 2,
+                  "row": 3,
+                  "col": 1,
+                  "type": "PARTIAL",
+                  "radioId": "134.5"
+                },
+                {
+                  "quad": 2,
+                  "row": 4,
+                  "col": 1,
+                  "type": "PARTIAL",
+                  "radioId": "135.65"
+                },
+                {
+                  "quad": 2,
+                  "row": 1,
+                  "col": 2,
+                  "type": "PARTIAL",
+                  "radioId": "317.6"
+                },
+                {
+                  "quad": 2,
+                  "row": 2,
+                  "col": 2,
+                  "type": "PARTIAL",
+                  "radioId": "254.25"
+                },
+                {
+                  "quad": 2,
+                  "row": 3,
+                  "col": 2,
+                  "type": "PARTIAL",
+                  "radioId": "338.2"
+                },
+                {
+                  "quad": 2,
+                  "row": 4,
+                  "col": 2,
+                  "type": "PARTIAL",
+                  "radioId": "120.35"
+                },
+                {
+                  "quad": 2,
+                  "row": 1,
+                  "col": 3,
+                  "type": "PARTIAL",
+                  "radioId": "121.5V"
+                },
+                {
+                  "quad": 2,
+                  "row": 2,
+                  "col": 3,
+                  "type": "PARTIAL",
+                  "radioId": "121.5O"
+                },
+                {
+                  "quad": 2,
+                  "row": 3,
+                  "col": 3,
+                  "type": "PARTIAL",
+                  "radioId": "243.0O"
+                },
+                {
+                  "quad": 2,
+                  "row": 4,
+                  "col": 3,
+                  "type": "PARTIAL",
+                  "radioId": "133.95E"
+                }
+              ]
+            },
+            {
+              "pageNumber": 2,
+              "footer": "DRP",
+              "cells": [
+                {
+                  "quad": 1,
+                  "row": 1,
+                  "col": 1,
+                  "type": "RADIO",
+                  "radioId": "124.4"
+                },
+                {
+                  "quad": 1,
+                  "row": 2,
+                  "col": 1,
+                  "type": "RADIO",
+                  "radioId": "351.8"
+                },
+                {
+                  "quad": 1,
+                  "row": 3,
+                  "col": 1,
+                  "type": "RADIO",
+                  "radioId": "124.4E"
+                },
+                {
+                  "quad": 2,
+                  "row": 1,
+                  "col": 1,
+                  "type": "RADIO",
+                  "radioId": "125.35"
+                },
+                {
+                  "quad": 2,
+                  "row": 2,
+                  "col": 1,
+                  "type": "RADIO",
+                  "radioId": "354.1"
+                },
+                {
+                  "quad": 2,
+                  "row": 3,
+                  "col": 1,
+                  "type": "RADIO",
+                  "radioId": "128.325"
+                },
+                {
+                  "quad": 3,
+                  "row": 2,
+                  "col": 1,
+                  "type": "RADIO",
+                  "radioId": "128.05"
+                },
+                {
+                  "quad": 4,
+                  "row": 2,
+                  "col": 1,
+                  "type": "RADIO",
+                  "radioId": "254.3"
+                }
+              ]
+            },
+            {
+              "pageNumber": 3,
+              "footer": "DRP",
+              "cells": [
+                {
+                  "quad": 1,
+                  "row": 1,
+                  "col": 1,
+                  "type": "RADIO",
+                  "radioId": "251.05"
+                },
+                {
+                  "quad": 1,
+                  "row": 2,
+                  "col": 1,
+                  "type": "RADIO",
+                  "radioId": "310.8"
+                },
+                {
+                  "quad": 1,
+                  "row": 3,
+                  "col": 1,
+                  "type": "RADIO",
+                  "radioId": "128.32E"
+                },
+                {
+                  "quad": 1,
+                  "row": 4,
+                  "col": 1,
+                  "type": "RADIO",
+                  "radioId": "254.3E"
+                },
+                {
+                  "quad": 2,
+                  "row": 3,
+                  "col": 1,
+                  "type": "RADIO",
+                  "radioId": "125.35E"
+                },
+                {
+                  "quad": 2,
+                  "row": 4,
+                  "col": 1,
+                  "type": "RADIO",
+                  "radioId": "354.1E"
+                },
+                {
+                  "quad": 3,
+                  "row": 1,
+                  "col": 1,
+                  "type": "RADIO",
+                  "radioId": "134.5E"
+                },
+                {
+                  "quad": 3,
+                  "row": 2,
+                  "col": 1,
+                  "type": "RADIO",
+                  "radioId": "338.2E"
+                },
+                {
+                  "quad": 3,
+                  "row": 3,
+                  "col": 1,
+                  "type": "RADIO",
+                  "radioId": "135.65E"
+                },
+                {
+                  "quad": 3,
+                  "row": 4,
+                  "col": 1,
+                  "type": "RADIO",
+                  "radioId": "251.05E"
+                },
+                {
+                  "quad": 4,
+                  "row": 1,
+                  "col": 1,
+                  "type": "RADIO",
+                  "radioId": "121.5S"
+                },
+                {
+                  "quad": 4,
+                  "row": 2,
+                  "col": 1,
+                  "type": "RADIO",
+                  "radioId": "243.0S"
+                },
+                {
+                  "quad": 4,
+                  "row": 3,
+                  "col": 1,
+                  "type": "RADIO",
+                  "radioId": "121.5Y"
+                },
+                {
+                  "quad": 4,
+                  "row": 4,
+                  "col": 1,
+                  "type": "RADIO",
+                  "radioId": "243.0Y"
+                }
+              ]
+            },
+            {
+              "pageNumber": 4,
+              "footer": "DRP",
+              "cells": []
+            }
           ]
+        }
         },
         {
           "cs": "OAK_F_DEP",
@@ -18580,7 +24019,571 @@
             ["8110378", 0, "H-RIC"],
             ["8110379", 0, "H-SUT"],
             ["916453", 3, "NTWRS"]
+          ],
+        "tedPattern": {
+          "patternName": "Area E Buttes_TED",
+          "display": "LEFT",
+          "dimPercent": 50,
+          "pages": [
+            {
+              "pageNumber": 1,
+              "footer": "DRP",
+              "cells": [
+                {
+                  "quad": 1,
+                  "row": 3,
+                  "col": 4,
+                  "type": "IA"
+                },
+                {
+                  "quad": 1,
+                  "row": 4,
+                  "col": 4,
+                  "type": "IA"
+                },
+                {
+                  "quad": 1,
+                  "row": 1,
+                  "col": 5,
+                  "type": "IA"
+                },
+                {
+                  "quad": 1,
+                  "row": 2,
+                  "col": 5,
+                  "type": "IA"
+                },
+                {
+                  "quad": 1,
+                  "row": 4,
+                  "col": 5,
+                  "type": "IA"
+                },
+                {
+                  "quad": 3,
+                  "row": 1,
+                  "col": 1,
+                  "type": "IA"
+                },
+                {
+                  "quad": 1,
+                  "row": 2,
+                  "col": 1,
+                  "type": "DA",
+                  "lineId": "811083"
+                },
+                {
+                  "quad": 1,
+                  "row": 3,
+                  "col": 1,
+                  "type": "DA",
+                  "lineId": "811044"
+                },
+                {
+                  "quad": 1,
+                  "row": 4,
+                  "col": 1,
+                  "type": "DA",
+                  "lineId": "811041"
+                },
+                {
+                  "quad": 1,
+                  "row": 1,
+                  "col": 2,
+                  "type": "DA",
+                  "lineId": "811040"
+                },
+                {
+                  "quad": 1,
+                  "row": 2,
+                  "col": 2,
+                  "type": "DA",
+                  "lineId": "811095"
+                },
+                {
+                  "quad": 1,
+                  "row": 4,
+                  "col": 2,
+                  "type": "DA",
+                  "lineId": "811058"
+                },
+                {
+                  "quad": 1,
+                  "row": 1,
+                  "col": 3,
+                  "type": "DA",
+                  "lineId": "811311"
+                },
+                {
+                  "quad": 1,
+                  "row": 2,
+                  "col": 3,
+                  "type": "DA",
+                  "lineId": "811310"
+                },
+                {
+                  "quad": 1,
+                  "row": 3,
+                  "col": 3,
+                  "type": "DA",
+                  "lineId": "811090"
+                },
+                {
+                  "quad": 1,
+                  "row": 4,
+                  "col": 3,
+                  "type": "DA",
+                  "lineId": "811312"
+                },
+                {
+                  "quad": 1,
+                  "row": 3,
+                  "col": 5,
+                  "type": "DA",
+                  "lineId": "916453"
+                },
+                {
+                  "quad": 3,
+                  "row": 2,
+                  "col": 1,
+                  "type": "DA",
+                  "lineId": "2100379"
+                },
+                {
+                  "quad": 3,
+                  "row": 3,
+                  "col": 1,
+                  "type": "DA",
+                  "lineId": "2100659"
+                },
+                {
+                  "quad": 3,
+                  "row": 4,
+                  "col": 1,
+                  "type": "DA",
+                  "lineId": "2100689"
+                },
+                {
+                  "quad": 3,
+                  "row": 1,
+                  "col": 2,
+                  "type": "DA",
+                  "lineId": "2100684"
+                },
+                {
+                  "quad": 3,
+                  "row": 2,
+                  "col": 2,
+                  "type": "DA",
+                  "lineId": "2100687"
+                },
+                {
+                  "quad": 3,
+                  "row": 3,
+                  "col": 2,
+                  "type": "DA",
+                  "lineId": "2100668"
+                },
+                {
+                  "quad": 3,
+                  "row": 1,
+                  "col": 3,
+                  "type": "DA",
+                  "lineId": "2100685"
+                },
+                {
+                  "quad": 3,
+                  "row": 3,
+                  "col": 3,
+                  "type": "DA",
+                  "lineId": "2100676"
+                },
+                {
+                  "quad": 3,
+                  "row": 4,
+                  "col": 3,
+                  "type": "DA",
+                  "lineId": "2100690"
+                },
+                {
+                  "quad": 3,
+                  "row": 1,
+                  "col": 4,
+                  "type": "DA",
+                  "lineId": "2100686"
+                },
+                {
+                  "quad": 3,
+                  "row": 3,
+                  "col": 4,
+                  "type": "DA",
+                  "lineId": "2100626"
+                },
+                {
+                  "quad": 3,
+                  "row": 1,
+                  "col": 5,
+                  "type": "DA",
+                  "lineId": "2100353"
+                },
+                {
+                  "quad": 3,
+                  "row": 4,
+                  "col": 5,
+                  "type": "DA",
+                  "lineId": "8110378"
+                },
+                {
+                  "quad": 4,
+                  "row": 1,
+                  "col": 4,
+                  "type": "FUNC",
+                  "funcType": "FWD"
+                },
+                {
+                  "quad": 4,
+                  "row": 2,
+                  "col": 4,
+                  "type": "FUNC",
+                  "funcType": "HL"
+                },
+                {
+                  "quad": 4,
+                  "row": 1,
+                  "col": 5,
+                  "type": "FUNC",
+                  "funcType": "RB"
+                },
+                {
+                  "quad": 4,
+                  "row": 2,
+                  "col": 5,
+                  "type": "FUNC",
+                  "funcType": "RECON"
+                },
+                {
+                  "quad": 4,
+                  "row": 3,
+                  "col": 5,
+                  "type": "FUNC",
+                  "funcType": "REL"
+                },
+                {
+                  "quad": 2,
+                  "row": 1,
+                  "col": 1,
+                  "type": "PARTIAL",
+                  "radioId": "120.45"
+                },
+                {
+                  "quad": 2,
+                  "row": 2,
+                  "col": 1,
+                  "type": "PARTIAL",
+                  "radioId": "353.7"
+                },
+                {
+                  "quad": 2,
+                  "row": 3,
+                  "col": 1,
+                  "type": "PARTIAL",
+                  "radioId": "125.4"
+                },
+                {
+                  "quad": 2,
+                  "row": 4,
+                  "col": 1,
+                  "type": "PARTIAL",
+                  "radioId": "259.1"
+                },
+                {
+                  "quad": 2,
+                  "row": 1,
+                  "col": 2,
+                  "type": "PARTIAL",
+                  "radioId": "120.45E"
+                },
+                {
+                  "quad": 2,
+                  "row": 3,
+                  "col": 2,
+                  "type": "PARTIAL",
+                  "radioId": "125.4E"
+                },
+                {
+                  "quad": 2,
+                  "row": 4,
+                  "col": 2,
+                  "type": "PARTIAL",
+                  "radioId": "259.1E"
+                },
+                {
+                  "quad": 2,
+                  "row": 1,
+                  "col": 3,
+                  "type": "PARTIAL",
+                  "radioId": "269.6"
+                },
+                {
+                  "quad": 2,
+                  "row": 3,
+                  "col": 3,
+                  "type": "PARTIAL",
+                  "radioId": "121.5"
+                },
+                {
+                  "quad": 2,
+                  "row": 4,
+                  "col": 3,
+                  "type": "PARTIAL",
+                  "radioId": "243.0"
+                }
+              ]
+            },
+            {
+              "pageNumber": 2,
+              "footer": "DRP",
+              "cells": [
+                {
+                  "quad": 1,
+                  "row": 1,
+                  "col": 1,
+                  "type": "RADIO",
+                  "radioId": "125.25"
+                },
+                {
+                  "quad": 1,
+                  "row": 2,
+                  "col": 1,
+                  "type": "RADIO",
+                  "radioId": "257.9"
+                },
+                {
+                  "quad": 1,
+                  "row": 3,
+                  "col": 1,
+                  "type": "RADIO",
+                  "radioId": "127.4"
+                },
+                {
+                  "quad": 1,
+                  "row": 4,
+                  "col": 1,
+                  "type": "RADIO",
+                  "radioId": "317.5"
+                },
+                {
+                  "quad": 2,
+                  "row": 1,
+                  "col": 1,
+                  "type": "RADIO",
+                  "radioId": "125.25E"
+                },
+                {
+                  "quad": 2,
+                  "row": 3,
+                  "col": 1,
+                  "type": "RADIO",
+                  "radioId": "127.4E"
+                },
+                {
+                  "quad": 3,
+                  "row": 1,
+                  "col": 1,
+                  "type": "RADIO",
+                  "radioId": "123.7"
+                },
+                {
+                  "quad": 3,
+                  "row": 2,
+                  "col": 1,
+                  "type": "RADIO",
+                  "radioId": "338.25"
+                },
+                {
+                  "quad": 3,
+                  "row": 3,
+                  "col": 1,
+                  "type": "RADIO",
+                  "radioId": "118.8"
+                },
+                {
+                  "quad": 4,
+                  "row": 1,
+                  "col": 1,
+                  "type": "RADIO",
+                  "radioId": "119.825"
+                },
+                {
+                  "quad": 4,
+                  "row": 2,
+                  "col": 1,
+                  "type": "RADIO",
+                  "radioId": "284.0"
+                },
+                {
+                  "quad": 4,
+                  "row": 3,
+                  "col": 1,
+                  "type": "RADIO",
+                  "radioId": "282.35"
+                }
+              ]
+            },
+            {
+              "pageNumber": 3,
+              "footer": "DRP",
+              "cells": [
+                {
+                  "quad": 1,
+                  "row": 1,
+                  "col": 1,
+                  "type": "RADIO",
+                  "radioId": "121.5R"
+                },
+                {
+                  "quad": 1,
+                  "row": 2,
+                  "col": 1,
+                  "type": "RADIO",
+                  "radioId": "243.0R"
+                },
+                {
+                  "quad": 1,
+                  "row": 3,
+                  "col": 1,
+                  "type": "RADIO",
+                  "radioId": "121.5S"
+                },
+                {
+                  "quad": 1,
+                  "row": 4,
+                  "col": 1,
+                  "type": "RADIO",
+                  "radioId": "243.0S"
+                },
+                {
+                  "quad": 2,
+                  "row": 1,
+                  "col": 1,
+                  "type": "RADIO",
+                  "radioId": "121.5M"
+                },
+                {
+                  "quad": 2,
+                  "row": 2,
+                  "col": 1,
+                  "type": "RADIO",
+                  "radioId": "243.0M"
+                },
+                {
+                  "quad": 2,
+                  "row": 3,
+                  "col": 1,
+                  "type": "RADIO",
+                  "radioId": "121.5O"
+                },
+                {
+                  "quad": 2,
+                  "row": 4,
+                  "col": 1,
+                  "type": "RADIO",
+                  "radioId": "243.0O"
+                },
+                {
+                  "quad": 3,
+                  "row": 1,
+                  "col": 1,
+                  "type": "RADIO",
+                  "radioId": "121.5Y"
+                },
+                {
+                  "quad": 3,
+                  "row": 2,
+                  "col": 1,
+                  "type": "RADIO",
+                  "radioId": "243.0Y"
+                },
+                {
+                  "quad": 3,
+                  "row": 3,
+                  "col": 1,
+                  "type": "RADIO",
+                  "radioId": "121.5V"
+                }
+              ]
+            },
+            {
+              "pageNumber": 4,
+              "footer": "DRP",
+              "cells": [
+                {
+                  "quad": 1,
+                  "row": 1,
+                  "col": 1,
+                  "type": "RADIO",
+                  "radioId": "134.8"
+                },
+                {
+                  "quad": 1,
+                  "row": 2,
+                  "col": 1,
+                  "type": "RADIO",
+                  "radioId": "270.25"
+                },
+                {
+                  "quad": 1,
+                  "row": 3,
+                  "col": 1,
+                  "type": "RADIO",
+                  "radioId": "360.8"
+                },
+                {
+                  "quad": 2,
+                  "row": 1,
+                  "col": 1,
+                  "type": "DA",
+                  "lineId": "2100298"
+                },
+                {
+                  "quad": 2,
+                  "row": 2,
+                  "col": 1,
+                  "type": "DA",
+                  "lineId": "2100326"
+                },
+                {
+                  "quad": 2,
+                  "row": 1,
+                  "col": 2,
+                  "type": "DA",
+                  "lineId": "2100533"
+                },
+                {
+                  "quad": 2,
+                  "row": 2,
+                  "col": 2,
+                  "type": "DA",
+                  "lineId": "2100599"
+                },
+                {
+                  "quad": 2,
+                  "row": 3,
+                  "col": 2,
+                  "type": "DA",
+                  "lineId": "8110379"
+                },
+                {
+                  "quad": 2,
+                  "row": 2,
+                  "col": 3,
+                  "type": "DA",
+                  "lineId": "2100551"
+                }
+              ]
+            }
           ]
+        }
         },
         {
           "cs": "SMF_D_APP",
