@@ -29867,7 +29867,16 @@
               "freq": 121100000,
               "rn": "Oakland Clearance",
               "ui": "ivsr",
-              "lines": []
+              "lines": [
+                ["811394", 0, "LC"],
+                ["811067", 2, "NCT 1"],
+                ["811068", 2, "NCT-2"],
+                ["811626", 0, "DBLO"],
+                ["811623", 0, "GROVE"],
+                ["811622", 0, "MULFD"],
+                ["811625", 0, "FOSTR"],
+                ["916190", 3, "E/W/V"]                
+              ]
             },
             {
               "cs": "OAK_GND",
@@ -29875,7 +29884,16 @@
               "freq": 121750000,
               "rn": "Oakland Ground",
               "ui": "ivsr",
-              "lines": [["811394", 0, "LC"]]
+              "lines": [
+                ["811394", 0, "LC"],
+                ["811067", 2, "NCT 1"],
+                ["811068", 2, "NCT-2"],
+                ["811626", 0, "DBLO"],
+                ["811623", 0, "GROVE"],
+                ["811622", 0, "MULFD"],
+                ["811625", 0, "FOSTR"],
+                ["916190", 3, "E/W/V"]                
+              ]
             },
             {
               "cs": "OAK_N_GND",
@@ -29883,7 +29901,16 @@
               "freq": 121900000,
               "rn": "Oakland Ground",
               "ui": "ivsr",
-              "lines": [["811394", 0, "LC"]]
+              "lines": [
+                ["811394", 0, "LC"],
+                ["811067", 2, "NCT 1"],
+                ["811068", 2, "NCT-2"],
+                ["811626", 0, "DBLO"],
+                ["811623", 0, "GROVE"],
+                ["811622", 0, "MULFD"],
+                ["811625", 0, "FOSTR"],
+                ["916190", 3, "E/W/V"]                
+              ]
             },
             {
               "cs": "OAK_TWR",
@@ -29892,15 +29919,15 @@
               "rn": "Oakland Tower",
               "ui": "ivsr",
               "lines": [
-                ["811221", 0, "H-GRO"],
                 ["811394", 0, "GC"],
                 ["811067", 2, "NCT 1"],
                 ["811068", 2, "NCT-2"],
-                ["811626", 0, "DIABLO"],
+                ["811626", 0, "DBLO"],
                 ["811623", 0, "GROVE"],
-                ["811622", 0, "MULFRD"],
+                ["811622", 0, "MULFD"],
                 ["811625", 0, "FOSTR"],
-                ["916190", 3, "E/W/V"]                
+                ["916190", 3, "E/W/V"],
+                ["510101", 2, "HWD"]
               ]
             },
             {
@@ -29910,13 +29937,13 @@
               "rn": "Oakland Tower",
               "ui": "ivsr",
               "lines": [
-                ["811221", 0, "H-GRO"],
                 ["811394", 0, "GC"],
                 ["811067", 2, "NCT 1"],
                 ["811068", 2, "NCT-2"],
-                ["811626", 0, "DIABLO"],
+                ["811626", 0, "DBLO"],
                 ["811614", 0, "GROVE"],
-                ["916192", 3, "E/W/V"]
+                ["916192", 3, "E/W/V"],
+                ["510102", 2, "HWD"]
               ]
             }
           ],
@@ -30187,8 +30214,11 @@
               "rn": "Hayward Ground",
               "ui": "etvs",
               "lines": [
-                ["811065", 2, "NCT"],
-                ["916163", 3, "E/W/V"]
+                ["510001", 0, "LC"],
+                ["510101", 2, "OAK 1"],
+                ["510102", 2, "OAK 2"],                
+                ["811065", 2, "NCT"],                
+                ["916163", 3, "ZOA"]
               ]
             },
             {
@@ -30198,8 +30228,11 @@
               "rn": "Hayward Tower",
               "ui": "etvs",
               "lines": [
-                ["811065", 2, "NCT"],
-                ["916163", 3, "E/W/V"]
+                ["510001", 0, "LC"],
+                ["510101", 2, "OAK 1"],
+                ["510102", 2, "OAK 2"],                
+                ["811065", 2, "NCT"],                
+                ["916163", 3, "ZOA"]
               ]
             }
           ],
@@ -31424,297 +31457,6 @@
           "rn": "Kwajalein Tower",
           "ui": "ivsr",
           "lines": []
-        }
-      ],
-      "childFacilities": []
-    },
-    {
-      "id": "O90",
-      "name": "Oakland Bay TRACON (DO NOT USE)",
-      "positions": [
-        {
-          "cs": "BAY_B_APP",
-          "pos": "Boulder",
-          "freq": 133950000,
-          "rn": "Bay Approach",
-          "ui": "stvs",
-          "lines": []
-        },
-        {
-          "cs": "BAY_D_DEP",
-          "pos": "Diablo",
-          "freq": 127000000,
-          "rn": "Bay Approach",
-          "ui": "stvs",
-          "lines": []
-        },
-        {
-          "cs": "BAY_F_APP",
-          "pos": "Foster",
-          "freq": 120350000,
-          "rn": "Bay Approach",
-          "ui": "stvs",
-          "lines": []
-        },
-        {
-          "cs": "BAY_G_APP",
-          "pos": "Grove",
-          "freq": 125350000,
-          "rn": "Bay Approach",
-          "ui": "stvs",
-          "lines": []
-        },
-        {
-          "cs": "BAY_K_APP",
-          "pos": "Hooks",
-          "freq": 135200000,
-          "rn": "Bay Approach",
-          "ui": "stvs",
-          "lines": []
-        },
-        {
-          "cs": "HWD_GND",
-          "pos": "HWD GC",
-          "freq": 121400000,
-          "rn": "Hayward Ground",
-          "ui": "stvs",
-          "lines": []
-        },
-        {
-          "cs": "HWD_TWR",
-          "pos": "HWD LC",
-          "freq": 120200000,
-          "rn": "Hayward Tower",
-          "ui": "stvs",
-          "lines": []
-        },
-        {
-          "cs": "BAY_L_APP",
-          "pos": "Licke",
-          "freq": 120100000,
-          "rn": "Bay Approach",
-          "ui": "stvs",
-          "lines": []
-        },
-        {
-          "cs": "BAY_M_APP",
-          "pos": "Mulford",
-          "freq": 124400000,
-          "rn": "Bay Approach",
-          "ui": "stvs",
-          "lines": []
-        },
-        {
-          "cs": "BAY_N_APP",
-          "pos": "Niles",
-          "freq": 134500000,
-          "rn": "Bay Approach",
-          "ui": "stvs",
-          "lines": []
-        },
-        {
-          "cs": "NUQ_GND",
-          "pos": "NUQ GC",
-          "freq": 121850000,
-          "rn": "Moffet Ground",
-          "ui": "stvs",
-          "lines": []
-        },
-        {
-          "cs": "NUQ_TWR",
-          "pos": "NUQ LC",
-          "freq": 119550000,
-          "rn": "Moffet Local",
-          "ui": "stvs",
-          "lines": []
-        },
-        {
-          "cs": "OAK_DEL",
-          "pos": "OAK CD",
-          "freq": 121100000,
-          "rn": "Oakland Clearance",
-          "ui": "stvs",
-          "lines": []
-        },
-        {
-          "cs": "OAK_GND",
-          "pos": "OAK GC1",
-          "freq": 121750000,
-          "rn": "Oakland Ground",
-          "ui": "stvs",
-          "lines": [["811394", 0, "LC"]]
-        },
-        {
-          "cs": "OAK_2_GND",
-          "pos": "OAK GC2",
-          "freq": 121900000,
-          "rn": "Oakland GRound",
-          "ui": "stvs",
-          "lines": []
-        },
-        {
-          "cs": "OAK_TWR",
-          "pos": "OAK LC1",
-          "freq": 127200000,
-          "rn": "Oakland Tower",
-          "ui": "stvs",
-          "lines": [
-            ["811221", 0, "H-GRO"],
-            ["811394", 0, "GC"],
-            ["811067", 2, "NCT B/D"]
-          ]
-        },
-        {
-          "cs": "OAK_2_TWR",
-          "pos": "OAK LC2",
-          "freq": 118300000,
-          "rn": "Oakland Tower",
-          "ui": "stvs",
-          "lines": [
-            ["811221", 0, "H-GRO"],
-            ["811394", 0, "GC"],
-            ["811067", 2, "NCT B/D"]
-          ]
-        },
-        {
-          "cs": "PAO_GND",
-          "pos": "PAO GC",
-          "freq": 125000000,
-          "rn": "Palo Alto Ground",
-          "ui": "stvs",
-          "lines": []
-        },
-        {
-          "cs": "PAO_TWR",
-          "pos": "PAO LC",
-          "freq": 118600000,
-          "rn": "Palo Alto Tower",
-          "ui": "stvs",
-          "lines": []
-        },
-        {
-          "cs": "RHV_GND",
-          "pos": "RHV GC",
-          "freq": 121650000,
-          "rn": "Reid Hillview Ground",
-          "ui": "stvs",
-          "lines": []
-        },
-        {
-          "cs": "RHV_TWR",
-          "pos": "RHV LC",
-          "freq": 119800000,
-          "rn": "Reid Hillview Tower",
-          "ui": "stvs",
-          "lines": []
-        },
-        {
-          "cs": "BAY_R_DEP",
-          "pos": "Richmond",
-          "freq": 120900000,
-          "rn": "Bay Departure",
-          "ui": "stvs",
-          "lines": []
-        },
-        {
-          "cs": "SFO_DEL",
-          "pos": "SFO CD",
-          "freq": 118200000,
-          "rn": "San Francisco Clearance",
-          "ui": "stvs",
-          "lines": []
-        },
-        {
-          "cs": "SFO_GND",
-          "pos": "SFO GC1",
-          "freq": 121800000,
-          "rn": "San Francisco Ground",
-          "ui": "stvs",
-          "lines": [["8110221", 0, "LC"]]
-        },
-        {
-          "cs": "SFO_2_GND",
-          "pos": "SFO GC2",
-          "freq": 124250000,
-          "rn": "San Francisco Ground",
-          "ui": "stvs",
-          "lines": [["8110221", 0, "LC"]]
-        },
-        {
-          "cs": "SFO_TWR",
-          "pos": "SFO LC",
-          "freq": 120500000,
-          "rn": "San Francisco Tower",
-          "ui": "stvs",
-          "lines": [
-            ["811219", 0, "H-RIC"],
-            ["811227", 0, "H-SUT"],
-            ["811220", 0, "H-WOO"],
-            ["811225", 0, "FOSTR"],
-            ["811080", 2, "NCT B/D"],
-            ["8110221", 0, "GC"]
-          ]
-        },
-        {
-          "cs": "SFO_A_TWR",
-          "pos": "SFO LCA",
-          "freq": 120500000,
-          "rn": "San Francisco Tower",
-          "ui": "stvs",
-          "lines": [
-            ["811219", 0, "H-RIC"],
-            ["811227", 0, "H-SUT"],
-            ["811220", 0, "H-WOO"],
-            ["811225", 0, "FOSTR"],
-            ["811080", 2, "NCT B/D"],
-            ["8110221", 0, "GC"]
-          ]
-        },
-        {
-          "cs": "SJC_DEL",
-          "pos": "SJC CD",
-          "freq": 118000000,
-          "rn": "San Jose Clearance",
-          "ui": "stvs",
-          "lines": []
-        },
-        {
-          "cs": "SJC_GND",
-          "pos": "SJC GC",
-          "freq": 121700000,
-          "rn": "San Jose Ground",
-          "ui": "stvs",
-          "lines": []
-        },
-        {
-          "cs": "SJC_TWR",
-          "pos": "SJC LC",
-          "freq": 124000000,
-          "rn": "San Jose Tower",
-          "ui": "stvs",
-          "lines": [
-            ["811222", 0, "H-LIC"],
-            ["811217", 0, "H-TOG"],
-            ["811216", 0, "HOOKS"],
-            ["811096", 2, "NCT"],
-            ["811421", 2, "RHV"]
-          ]
-        },
-        {
-          "cs": "SQL_GND",
-          "pos": "SQL GC",
-          "freq": 121600000,
-          "rn": "San Carlos Ground",
-          "ui": "stvs",
-          "lines": []
-        },
-        {
-          "cs": "SQL_TWR",
-          "pos": "SQL LC",
-          "freq": 119000000,
-          "rn": "San Carlos Tower",
-          "ui": "stvs",
-          "lines": [["811066", 2, "NCT"]]
         }
       ],
       "childFacilities": []
