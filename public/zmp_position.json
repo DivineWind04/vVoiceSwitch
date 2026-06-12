@@ -3385,7 +3385,7 @@
           "pos": "17/35 West Final/Arrival",
           "freq": 118725000,
           "rn": "Minneapolis Approach",
-          "ui": "rdvs",
+          "ui": "ivsr",
           "lines": [
             ["6510955", 0, "Midnight"],
             ["6510964", 0, "North Fi"],
@@ -3413,7 +3413,7 @@
           "pos": "Arrival Overhead",
           "freq": 119975000,
           "rn": "Minneapolis Approach",
-          "ui": "rdvs",
+          "ui": "ivsr",
           "lines": [
             ["6510956", 0, "Midnight"],
             ["6510965", 0, "North Fi"],
@@ -3441,7 +3441,7 @@
           "pos": "Crystal Satellite",
           "freq": 126500000,
           "rn": "Minneapolis Approach",
-          "ui": "rdvs",
+          "ui": "ivsr",
           "lines": [
             ["6510957", 0, "Midnight"],
             ["6510966", 0, "North Fi"],
@@ -3469,7 +3469,7 @@
           "pos": "East Departure",
           "freq": 132975000,
           "rn": "Minneapolis Departure",
-          "ui": "rdvs",
+          "ui": "ivsr",
           "lines": [
             ["6121008", 0, "South De"],
             ["6121010", 0, "North De"]
@@ -3480,7 +3480,7 @@
           "pos": "Flying Cloud Satellite",
           "freq": 134700000,
           "rn": "Minneapolis Approach",
-          "ui": "rdvs",
+          "ui": "ivsr",
           "lines": [
             ["6510958", 0, "Midnight"],
             ["6510967", 0, "North Fi"],
@@ -3508,7 +3508,7 @@
           "pos": "Midnight",
           "freq": 124700000,
           "rn": "Minneapolis Approach",
-          "ui": "rdvs",
+          "ui": "ivsr",
           "lines": [
             ["6510953", 0, "North Fi"],
             ["6510954", 0, "South Fe"],
@@ -3536,7 +3536,7 @@
           "pos": "North Departure",
           "freq": 125750000,
           "rn": "Minneapolis Departure",
-          "ui": "rdvs",
+          "ui": "ivsr",
           "lines": [
             ["6121009", 0, "South De"],
             ["6121010", 0, "East Dep"]
@@ -3547,7 +3547,7 @@
           "pos": "North Feeder",
           "freq": 126350000,
           "rn": "Minneapolis Approach",
-          "ui": "rdvs",
+          "ui": "ivsr",
           "lines": [
             ["6510959", 0, "Midnight"],
             ["6510968", 0, "North Fi"],
@@ -3575,7 +3575,7 @@
           "pos": "North Final/Arrival",
           "freq": 119300000,
           "rn": "Minneapolis Approach",
-          "ui": "rdvs",
+          "ui": "ivsr",
           "lines": [
             ["6510953", 0, "Midnight"],
             ["6510963", 0, "South Fe"],
@@ -3603,7 +3603,7 @@
           "pos": "South Departure",
           "freq": 124700000,
           "rn": "Minneapolis Departure",
-          "ui": "rdvs",
+          "ui": "ivsr",
           "lines": [
             ["6121008", 0, "East Dep"],
             ["6121009", 0, "North De"]
@@ -3614,7 +3614,7 @@
           "pos": "South Feeder",
           "freq": 135475000,
           "rn": "Minneapolis Approach",
-          "ui": "rdvs",
+          "ui": "ivsr",
           "lines": [
             ["6510954", 0, "Midnight"],
             ["6510963", 0, "North Fi"],
@@ -3642,7 +3642,7 @@
           "pos": "South Final/Arrival",
           "freq": 126950000,
           "rn": "Minneapolis Approach",
-          "ui": "rdvs",
+          "ui": "ivsr",
           "lines": [
             ["6510960", 0, "Midnight"],
             ["6510969", 0, "North Fi"],
@@ -3670,7 +3670,7 @@
           "pos": "St. Paul Satellite",
           "freq": 121200000,
           "rn": "Minneapolis Approach",
-          "ui": "rdvs",
+          "ui": "ivsr",
           "lines": [
             ["6510961", 0, "Midnight"],
             ["6510970", 0, "North Fi"],
@@ -3698,7 +3698,7 @@
           "pos": "TMU",
           "freq": 123450000,
           "rn": "Minneapolis Approach",
-          "ui": "rdvs",
+          "ui": "ivsr",
           "lines": [
             ["6510962", 0, "Midnight"],
             ["6510971", 0, "North Fi"],
@@ -3985,7 +3985,7 @@
           "pos": "LF",
           "freq": 128150000,
           "rn": "Omaha Approach",
-          "ui": "rdvs",
+          "ui": "ivsr",
           "lines": [
             ["8001017", 0, "RW"],
             ["8001022", 0, "LW"],
@@ -4006,7 +4006,7 @@
           "pos": "LW",
           "freq": 124000000,
           "rn": "Omaha Approach",
-          "ui": "rdvs",
+          "ui": "ivsr",
           "lines": [
             ["8001018", 0, "RW"],
             ["8001022", 0, "LF"],
@@ -4027,7 +4027,7 @@
           "pos": "RE",
           "freq": 124500000,
           "rn": "Omaha Approach",
-          "ui": "rdvs",
+          "ui": "ivsr",
           "lines": [
             ["8001019", 0, "RW"],
             ["8001023", 0, "LF"],
@@ -4048,7 +4048,7 @@
           "pos": "RF",
           "freq": 133325000,
           "rn": "Omaha Approach",
-          "ui": "rdvs",
+          "ui": "ivsr",
           "lines": [
             ["8001020", 0, "RW"],
             ["8001024", 0, "LF"],
@@ -4069,7 +4069,7 @@
           "pos": "RO",
           "freq": 124950000,
           "rn": "Omaha Approach",
-          "ui": "rdvs",
+          "ui": "ivsr",
           "lines": [
             ["8001021", 0, "RW"],
             ["8001025", 0, "LF"],
@@ -4090,7 +4090,7 @@
           "pos": "RW",
           "freq": 135875000,
           "rn": "Omaha Approach",
-          "ui": "rdvs",
+          "ui": "ivsr",
           "lines": [
             ["8001017", 0, "LF"],
             ["8001018", 0, "LW"],
