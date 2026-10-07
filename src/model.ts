@@ -572,12 +572,18 @@ export const useCoreStore = create<CoreState>((set: any, get: any) => {
     landlineStore.bindStore(set, get);
     // Bind vNAS store bridge to this zustand instance
     vnasStore.bindStore(set, get);
-    // Default override sound for RDVS/IVSR/ETVS (VSCS overrides this in its component)
-    landlineStore.setOverrideSoundPath('/Override_Term.wav');
-    // Default ring chime for incoming lineType 1 landline calls
-    // IVSR uses its chime selector; others default to RDVS chime (VSCS overrides in its component)
+    // Override sound varies by active UI (resolved live via currentUI, not a one-shot
+    // string — avoids staleness if the UI switches after a component sets it once).
+    landlineStore.setOverrideSoundPath(() => {
+        const ctx = get().currentUI || getCurrentUIContext();
+        if (ctx === 'vscs') return '/vscs/Override.wav';
+        return '/Override_Term.wav'; // RDVS/IVSR/ETVS/STVS/LSTAR/CVCS
+    });
+    // Ring chime for incoming lineType 1 landline calls; also resolved live per UI.
+    // IVSR uses its chime selector; others default to RDVS chime.
     landlineStore.setRingChimeSoundPath(() => {
-        const ctx = getCurrentUIContext();
+        const ctx = get().currentUI || getCurrentUIContext();
+        if (ctx === 'vscs') return '/vscs/GGChime.wav';
         if (ctx === 'ivsr') {
             const sel = get().selectedChime || 1;
             return `/ivsr/IVSRChime-${sel.toString().padStart(2, '0')}.wav`;

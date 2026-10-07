@@ -1778,11 +1778,8 @@ function VscsPanel(props: VscsProps & { panelId?: string; defaultScreenMode?: st
     showVdmMessage(msg, autoDismissMs);
   };
 
-  // Set VSCS-specific override and ring chime sounds
-  useEffect(() => {
-    landlineStore.setOverrideSoundPath('/vscs/Override.wav');
-    landlineStore.setRingChimeSoundPath('/vscs/GGChime.wav');
-  }, []);
+  // Override/ring-chime sound paths are resolved centrally in model.ts based on
+  // currentUI, so they switch correctly if the user changes UI without a reload.
 
   // Subscribe to landline call errors and show appropriate VDM messages
   useEffect(() => {

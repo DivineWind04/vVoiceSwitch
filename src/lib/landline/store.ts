@@ -81,8 +81,8 @@ class LandlineStore {
   private llDialCodeTable: LandlineDialCodeTable | null = null;
   /** Maps a shout group key → active call IDs for that group */
   private shoutGroupCalls = new Map<string, CallId[]>();
-  /** Path to override sound file (set by UI layer) */
-  private overrideSoundPath: string | null = null;
+  /** Path (or resolver function) to override sound file, set by UI layer */
+  private overrideSoundPath: string | (() => string) | null = null;
   /** Path (or resolver function) for ring chime sound on incoming lineType 1 calls */
   private ringChimeSoundPath: string | (() => string) | null = null;
   /** Currently playing ring chime audio element */
@@ -94,9 +94,9 @@ class LandlineStore {
   /** Call ID that the active ringback is associated with */
   private activeRingbackCallId: string | null = null;
 
-  /** Set the override sound file to play when an override call connects */
-  setOverrideSoundPath(path: string): void {
-    this.overrideSoundPath = path;
+  /** Set the override sound file (or a resolver function) to play when an override call connects */
+  setOverrideSoundPath(pathOrGetter: string | (() => string)): void {
+    this.overrideSoundPath = pathOrGetter;
   }
 
   /** Set the ring chime sound path (or a function returning the path) for incoming lineType 1 calls */
@@ -655,11 +655,16 @@ class LandlineStore {
         if (event.state === 'connected' && this.overrideSoundPath) {
           const call = this.client?.getCallInfo(event.callId);
           if (call && call.lineType === 0) {
-            try {
-              const tone = new Audio(this.overrideSoundPath);
-              tone.volume = 0.7;
-              tone.play().catch(() => {});
-            } catch (_) { /* ignore audio errors */ }
+            const path = typeof this.overrideSoundPath === 'function'
+              ? this.overrideSoundPath()
+              : this.overrideSoundPath;
+            if (path) {
+              try {
+                const tone = new Audio(path);
+                tone.volume = 0.7;
+                tone.play().catch(() => {});
+              } catch (_) { /* ignore audio errors */ }
+            }
           }
         }
         // Start ring chime for incoming lineType 1 (ring) calls only — NOT shout (type 2)
