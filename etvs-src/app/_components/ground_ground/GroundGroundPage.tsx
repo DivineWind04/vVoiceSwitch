@@ -89,6 +89,15 @@ const GroundGroundPage: React.FC<GroundGroundPageProps> = ({ onGG3Toggle }) => {
       let indicator = false;
       let indicatorClassName = '';
 
+      if (data.ngButton) {
+        const parts = (data.call_name || '').split(',');
+        buttons.push(<DAButton key={index} topLine={parts[0] || ''} middleLine={parts[1]} bottomLine={parts[2]} latching={false}
+          onClick={data.disabled ? undefined : () => sendMsg({ type: 'call', cmd1: call_id })}
+          controlledIndicator={data.ngButton.tx || data.ngButton.rx}
+          indicatorClassName={data.status === 'chime' || data.status === 'ringing' ? 'flutter receive flashing' : data.status === 'hold' ? 'flutter hold' : data.status === 'ok' ? 'steady green' : ''} />);
+        return;
+      }
+
       // v-VSCS WebRTC calls
       if (data.isVvscs && data.vvscsLineId) {
         if (data.status === 'ok' || data.status === 'active') {

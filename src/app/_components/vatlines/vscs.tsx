@@ -844,6 +844,8 @@ function VikKeypad() {
   const ringTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   
   const sendMsg = useCoreStore((s: any) => s.sendMessageNow);
+  const ngState = useCoreStore((s: any) => s.ngState);
+  const ngRequest = useCoreStore((s: any) => s.ngRequest);
   const sendDialCall = useCoreStore((s: any) => s.sendDialCall);
   const activeDialLine = useCoreStore((s: any) => s.activeDialLine);
   const setActiveDialLine = useCoreStore((s: any) => s.setActiveDialLine);
@@ -860,6 +862,22 @@ function VikKeypad() {
   // Sync VIK callState with real gg_status from the backend
   useEffect(() => {
     if (!activeLineId) return;
+
+    if (ngState) {
+      const calls = [...ngState.buttons.flatMap((button: any) => button.calls), ...ngState.ia];
+      const call = calls.find((item: any) => item.callId === activeLineId || item.dialNumber === activeLineId);
+      if (call && ['connected', 'conference', 'override_out', 'broadcast_out'].includes(call.state)) {
+        setDisplayLine1(VIK_MESSAGES.CALL_ACTIVE);
+        setCallState('active');
+      } else if (call && ['setup_out', 'ringing_out'].includes(call.state)) {
+        setDisplayLine1(VIK_MESSAGES.CALL_RINGING);
+        setCallState('ringing');
+      } else if (!call && callState === 'active') {
+        setDisplayLine1(VIK_MESSAGES.CALL_RELEASED);
+        setCallState('released');
+      }
+      return;
+    }
 
     // Find matching entry in gg_status for our active line
     // Check both AFV entries (by call field) and landline entries (by target position)
@@ -902,7 +920,7 @@ function VikKeypad() {
         }, 3000);
       }
     }
-  }, [gg_status, activeLineId, callState]);
+  }, [gg_status, activeLineId, callState, ngState]);
 
   // Cleanup ring timeout on unmount
   useEffect(() => {
@@ -938,6 +956,7 @@ function VikKeypad() {
   // Check if the dial buffer is complete and should auto-initiate the call
   // Returns true if call should be auto-initiated based on dial code format (Table 6-2)
   const shouldAutoInitiate = (buffer: string): boolean => {
+    if (ngState) return /^\d{4}$/.test(buffer);
     if (buffer.length < 2) return false;
 
     // VSCS type-3 dial line mode: once trunk is selected, two digits completes dialing.
@@ -985,6 +1004,27 @@ function VikKeypad() {
   const initiateCall = (buffer?: string) => {
     const buf = buffer ?? dialBuffer;
     if (buf.length < 2) return;
+
+    if (ngState) {
+      if (!/^\d{4}$/.test(buf)) {
+        setDisplayLine1(VIK_MESSAGES.INVALID_CODE);
+        return;
+      }
+      setActiveLineId(buf);
+      setDisplayLine1(VIK_MESSAGES.CALL_RINGING);
+      setDisplayLine2(buf);
+      setCallState('ringing');
+      setKeysIlluminated(false);
+      void ngRequest({ type: 'call', dialNumber: buf }).then((result: any) => {
+        if (result.ok && result.callId) setActiveLineId(result.callId);
+        else if (!result.ok) {
+          setDisplayLine1(VIK_MESSAGES.INVALID_CODE);
+          setDisplayLine2(result.error?.message || buf);
+          setCallState('denied');
+        }
+      });
+      return;
+    }
     
     console.log('VIK: Initiating call to:', buf);
     
@@ -1316,6 +1356,14 @@ function VikKeypad() {
 
   const handleRelease = () => {
     if (callState === 'active' || callState === 'ringing') {
+      if (ngState && activeLineId) {
+        const calls = [...ngState.buttons.flatMap((button: any) => button.calls), ...ngState.ia];
+        const call = calls.find((item: any) => item.callId === activeLineId || item.dialNumber === activeLineId);
+        if (call?.canRelease) void ngRequest({ type: 'release', callId: call.callId });
+        setDisplayLine1(VIK_MESSAGES.CALL_RELEASED);
+        setCallState('released');
+        return;
+      }
       // Clear any pending ring timeout
       if (ringTimeoutRef.current) { clearTimeout(ringTimeoutRef.current); ringTimeoutRef.current = null; }
       
@@ -2020,6 +2068,10 @@ function VscsPanel(props: VscsProps & { panelId?: string; defaultScreenMode?: st
     
     // Only proceed if we have valid button data
     if (buttonData) {
+      if (buttonData.ngButton) {
+        if (!buttonData.disabled) sendMsg({ type: 'call', cmd1: buttonData.call.substring(3) });
+        return;
+      }
       // Landline WebRTC calls — route through Landline handler
       if (buttonData.isLandline && buttonData.landlineCallId) {
         console.log('Landline call button pressed:', buttonData.landlineCallId, 'status:', buttonData.status);

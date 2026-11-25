@@ -9,6 +9,8 @@ import { landlineStore, INITIAL_LANDLINE_STATE } from './lib/landline/store';
 import type { LandlineStoreState, LandlineConfiguredLine, LandlineTarget } from './lib/landline/store';
 import { vnasStore, INITIAL_VNAS_STATE } from './lib/vnas/store';
 import type { VnasStoreState } from './lib/vnas/store';
+import { ngButtonId, ngButtonsToLegacy, ngChannelsToLegacy, ngIaDialNumber } from './lib/afv-ng';
+import type { NgChannel, NgPositions, NgResult, NgState } from './lib/afv-ng';
 
 interface Position {
     cs: string;
@@ -190,6 +192,10 @@ export function resolveDialCode(dialCodeTable: DialCodeTable | null, trunkName: 
 
 interface CoreState extends VacsStoreState, VvscsStoreState, LandlineStoreState, VnasStoreState {
     connected: boolean;
+    ngState: NgState | null;
+    ngPositions: NgPositions | null;
+    ngError: string | null;
+    ngRequest: (message: Record<string, unknown>) => Promise<NgResult>;
     afv_version: string;
     ptt: boolean;
     cid: number;
@@ -404,6 +410,7 @@ export function getCurrentUIContext(): string {
     try {
         // Access the Zustand store to get selected position data
         const state = (window as any).__ZUSTAND_STORE_STATE__ || useCoreStore.getState();
+        if (state?.ngState && state.currentUI) return state.currentUI.toLowerCase();
         if (state?.selectedPositions?.length > 0) {
             const position = state.selectedPositions[0];
             // Check if position has a UI field (from JSON)
@@ -592,8 +599,39 @@ export const useCoreStore = create<CoreState>((set: any, get: any) => {
     });
 
     let socket: WebSocket | null;
+    let ngReady = false;
+    let ngUnsupported = false;
+    let helloTimeout: ReturnType<typeof setTimeout> | null = null;
+    let nextNgRequestId = 1;
+    const pendingNgRequests = new Map<string, (result: NgResult) => void>();
+
+    function ngRequest(message: Record<string, unknown>): Promise<NgResult> {
+        const reqId = `vivsr-${nextNgRequestId++}`;
+        return new Promise(resolve => {
+            if (!ngReady || socket?.readyState !== WebSocket.OPEN) {
+                resolve({ type: 'result', reqId, ok: false, error: { code: 'WS_CLOSED', message: 'Not connected to the AFV client' } });
+                return;
+            }
+            const timeout = setTimeout(() => {
+                pendingNgRequests.delete(reqId);
+                resolve({ type: 'result', reqId, ok: false, error: { code: 'TIMEOUT', message: 'The AFV client did not answer in time' } });
+            }, message.type === 'register' || message.type === 'get_positions' ? 12000 : 7000);
+            pendingNgRequests.set(reqId, result => { clearTimeout(timeout); resolve(result); });
+            socket.send(JSON.stringify({ ...message, reqId }));
+        });
+    }
+
+    function ngAct(message: Record<string, unknown>) {
+        void ngRequest(message).then(result => {
+            if (!result.ok) set({ ngError: result.error?.message || result.error?.code || 'Request failed' });
+        });
+    }
     const ds: CoreState = {
         connected: false,
+        ngState: null,
+        ngPositions: null,
+        ngError: null,
+        ngRequest,
         afv_version: '',
         cid: 0,
         ptt: false,
@@ -617,6 +655,12 @@ export const useCoreStore = create<CoreState>((set: any, get: any) => {
     heldLandlines: [],
     buttonPress: () => {},
     holdBtn: () => {
+        if (ngReady) {
+            const calls = [...(get().ngState?.buttons.flatMap((button: any) => button.calls) || []), ...(get().ngState?.ia || [])];
+            const active = calls.filter((call: any) => ['connected', 'conference', 'broadcast_out', 'override_out'].includes(call.state));
+            for (const call of active) ngAct({ type: 'hold', callId: call.callId, held: true });
+            return;
+        }
         // Hold all active G/G calls (AFV only — VACS/v-VSCS do not support hold)
         const { gg_status, sendMessageNow } = get();
         const activeCalls = (gg_status || []).filter((call: any) =>
@@ -637,6 +681,14 @@ export const useCoreStore = create<CoreState>((set: any, get: any) => {
         });
     },
     releaseBtn: () => {
+        if (ngReady) {
+            const calls = [...(get().ngState?.buttons.flatMap((button: any) => button.calls) || []), ...(get().ngState?.ia || [])];
+            for (const call of calls) {
+                if (call.state === 'ringing_in') ngAct({ type: 'reject', callId: call.callId });
+                else if (call.canRelease) ngAct({ type: 'release', callId: call.callId });
+            }
+            return;
+        }
         // Release all active G/G calls
         const { gg_status, sendMessageNow } = get();
         const activeCalls = (gg_status || []).filter((call: any) =>
@@ -789,6 +841,7 @@ export const useCoreStore = create<CoreState>((set: any, get: any) => {
             set({
                 currentUI: ui
             })
+            if (ngReady) ngAct({ type: 'set_device', device: ui === 'vscs' ? 'VSCS' : 'OTHER' });
         },
         setCurrentConfig: (config: any) => {
             set({ currentConfig: config });
@@ -971,6 +1024,31 @@ export const useCoreStore = create<CoreState>((set: any, get: any) => {
                 return;
             }
         }
+        if (ngReady && message && typeof message === 'object') {
+            const button = get().ngState?.buttons.find((item: any) => ngButtonId(item) === String(message.cmd1));
+            if (button && ['call', 'stop', 'pick_up', 'hold'].includes(message.type)) {
+                if (message.type === 'hold' && button.callId) ngAct({ type: 'hold', callId: button.callId, held: true });
+                else if (!button.disabled) {
+                    const starts = ['idle', 'denied', 'broadcast_in', 'conference_other'].includes(button.state);
+                    const calls = [...(get().ngState?.buttons.flatMap((item: any) => item.calls) || []), ...(get().ngState?.ia || [])];
+                    const old = starts ? calls.filter((call: any) => call.canRelease && ['connected', 'conference', 'broadcast_out', 'override_out', 'setup_out', 'ringing_out'].includes(call.state)) : [];
+                    void Promise.all(old.map((call: any) => ngRequest({ type: 'release', callId: call.callId }))).then(results => {
+                        if (results.some(result => !result.ok)) set({ ngError: results.find(result => !result.ok)?.error?.message || 'Unable to release previous call' });
+                        else ngAct({ type: 'press', x: button.x, y: button.y });
+                    });
+                }
+            } else if (['tx', 'rx', 'set_hs'].includes(message.type)) {
+                const field = message.type === 'tx' ? 'tx' : message.type === 'rx' ? 'rx' : 'headset';
+                ngAct({ type: 'ag_set', freq: Number(message.cmd1), [field]: !!message.dbl1 });
+            } else if (message.type === 'ia_call') {
+                const dialNumber = ngIaDialNumber(message.cmd1, message.dbl1);
+                if (dialNumber) ngAct({ type: 'call', dialNumber });
+                else set({ ngError: 'Enter a four-digit IA number.' });
+            } else if (message.type === 'sync') {
+                ngAct({ type: 'sync' });
+            }
+            return;
+        }
         if (message && socket?.readyState === WebSocket.OPEN) {
             if (typeof message === "object") {
                 socket.send(JSON.stringify(message));
@@ -985,6 +1063,7 @@ export const useCoreStore = create<CoreState>((set: any, get: any) => {
 
     let syncTimeout: ReturnType<typeof setTimeout> | null = null;
     function resetWindow() {
+        if (ngReady) return;
         const { callsign = '', cid = 0 } = get();
         const { selectedPositions: selected_positions } = get();
         const inSweatbox = vnasStore.getState().isSweatbox;
@@ -1332,8 +1411,9 @@ export const useCoreStore = create<CoreState>((set: any, get: any) => {
 
     const debounce_set = debounce(set, 50)
     function connect() {
-        if (typeof window === 'undefined') return;
-        const wsUrl = 'ws://localhost:9002';
+        if (typeof window === 'undefined' || ngUnsupported) return;
+        const rawWs = new URLSearchParams(window.location.search).get('ws')?.trim();
+        const wsUrl = !rawWs ? 'ws://127.0.0.1:9002' : /^wss?:\/\//i.test(rawWs) ? rawWs : /^\d+$/.test(rawWs) ? `ws://127.0.0.1:${rawWs}` : `ws://${rawWs}`;
         try {
             socket = new WebSocket(wsUrl);
         } catch (err) {
@@ -1342,18 +1422,22 @@ export const useCoreStore = create<CoreState>((set: any, get: any) => {
             return;
         }
         socket.onopen = () => {
-            ds.setConnected(true)
-            // Request sync immediately to get call_sign/cid for auto-detection
-            console.log('[WebSocket] Connected, sending sync request');
-            sendMessageNow({ type: 'sync' })
+            ds.setConnected(false)
+            const currentSocket = socket;
+            helloTimeout = setTimeout(() => { if (!ngReady && socket === currentSocket) currentSocket?.close(); }, 5000);
         };
         socket.onerror = (error) => {
             console.error('WebSocket error:', error, 'URL:', wsUrl);
-            socket = null
         };
 
         socket.onclose = () => {
+            if (helloTimeout) clearTimeout(helloTimeout);
             ds.setConnected(false)
+            ngReady = false;
+            for (const [reqId, resolve] of pendingNgRequests) resolve({ type: 'result', reqId, ok: false, error: { code: 'WS_CLOSED', message: 'Connection to AFV closed' } });
+            pendingNgRequests.clear();
+            stopAudio();
+            set({ ngState: null, ngPositions: null, selectedPositions: [], ag_status: [], gg_status: [], ptt: false });
             socket = null
         };
 
@@ -1373,6 +1457,48 @@ export const useCoreStore = create<CoreState>((set: any, get: any) => {
             }
             try {
                 const data = JSON.parse(event.data)
+                if (data.type === 'hello') {
+                    if (helloTimeout) clearTimeout(helloTimeout);
+                    if (data.protocol !== 'afv-ui' || data.version !== 1) {
+                        ngUnsupported = true;
+                        set({ ngError: `Unsupported AFV protocol ${data.protocol} v${data.version}` });
+                        socket?.close();
+                        return;
+                    }
+                    ngReady = true;
+                    set({ connected: true, afv_version: String(data.clientVersion || ''), ngError: null });
+                    ngAct({ type: 'sync' });
+                    ngAct({ type: 'set_device', device: get().currentUI === 'vscs' ? 'VSCS' : 'OTHER' });
+                    return;
+                }
+                if (ngReady) {
+                    if (data.type === 'result') {
+                        const resolve = pendingNgRequests.get(String(data.reqId));
+                        if (resolve) { pendingNgRequests.delete(String(data.reqId)); resolve(data); }
+                    } else if (data.type === 'positions') {
+                        set({ ngPositions: data });
+                    } else if (data.type === 'ptt') {
+                        set({ ptt: !!data.open });
+                    } else if (data.type === 'ag_state') {
+                        set({ ag_status: ngChannelsToLegacy((data.channels || []) as NgChannel[]) });
+                    } else if (data.type === 'll_state') {
+                        const ll = data as NgState;
+                        const main = ll.session?.positions.find(position => position.facilityId === ll.session?.mainPosition.facilityId && position.positionId === ll.session?.mainPosition.positionId);
+                        const ui = main?.systemType?.toLowerCase();
+                        const columns = ui === 'vscs' ? 9 : ui === 'rdvs' ? 10 : 3;
+                        const gg = ngButtonsToLegacy(ll.buttons || [], columns);
+                        const selected = main ? [{ cs: ll.afv.callsign || main.positionId, pos: main.positionId, freq: 0, rn: main.positionName, lines: gg.filter(item => !item.isPlaceholder).map(item => [item.call?.substring(3), item.lineType, item.call_name]) }] : [];
+                        const overrides = (ll.buttons || []).filter(button => button.calls?.some(call => call.kind === 'OVERRIDE' && call.incoming));
+                        set({ ngState: ll, callsign: ll.afv.callsign || '', cid: Number(ll.afv.cid) || 0, selectedPositions: selected, ...(ui ? { currentUI: ui } : {}), gg_status: gg, overrideStatus: ngButtonsToLegacy(overrides), isBeingOverridden: overrides.length > 0, overrideCallStatus: overrides.length ? ngButtonsToLegacy(overrides)[0]?.status : 'off' });
+                        const states = [...(ll.buttons || []).map(button => button.state), ...(ll.ia || []).map(call => call.state)];
+                        for (const [kind, active] of [['ggchime', states.includes('ringing_in')], ['ringback', states.includes('ringing_out')]] as const) {
+                            const audio = getAudioElement(kind);
+                            if (audio && active) { audio.loop = true; if (audio.paused) void audio.play().catch(() => {}); }
+                            else if (audio) { audio.pause(); audio.currentTime = 0; }
+                        }
+                    }
+                    return;
+                }
                 // Log parsed JSON messages with type info
                 console.log('[WebSocket MSG]', data.type, data);
                 if (data.type === 'message') {

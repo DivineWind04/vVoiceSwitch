@@ -30,6 +30,8 @@ const StvsKeypad: React.FC<StvsKeypadProps> = ({ brightness = 1.0, trunkName, on
   const selectedPositions = useCoreStore((s: any) => s.selectedPositions);
   const dialCallStatus = useCoreStore((s: any) => s.dialCallStatus);
   const activeDialLine = useCoreStore((s: any) => s.activeDialLine);
+  const ngState = useCoreStore((s: any) => s.ngState);
+  const ngRequest = useCoreStore((s: any) => s.ngRequest);
   
   // Get current trunk name from active dial line if not provided as prop
   const currentTrunkName = trunkName || activeDialLine?.trunkName;
@@ -184,6 +186,26 @@ const StvsKeypad: React.FC<StvsKeypadProps> = ({ brightness = 1.0, trunkName, on
     
     // Play DTMF tone
     playDTMF(key);
+
+    if (ngState) {
+      if (key === '*') {
+        setDialBuffer('');
+        setCallStatus('idle');
+      } else if (key === '#') {
+        setDialBuffer('');
+      } else if (/^\d$/.test(key) && dialBuffer.length < 4) {
+        const number = dialBuffer + key;
+        setDialBuffer(number);
+        if (number.length === 4) {
+          setCallStatus('dialing');
+          void ngRequest({ type: 'call', dialNumber: number }).then((result: any) => {
+            setCallStatus(result.ok ? 'connected' : 'error');
+            if (result.ok) setDialBuffer('');
+          });
+        }
+      }
+      return;
+    }
     
     if (key === '*') {
       // Clear buffer
@@ -212,7 +234,7 @@ const StvsKeypad: React.FC<StvsKeypadProps> = ({ brightness = 1.0, trunkName, on
         setTimeout(() => executeDialCall(newBuffer), 200);
       }
     }
-  }, [dialBuffer, playDTMF, executeDialCall]);
+  }, [dialBuffer, playDTMF, executeDialCall, ngState, ngRequest]);
 
   // Keypad layout: 3 columns x 4 rows
   // These positions are percent-based, matching the SVG/viewBox logic in StvsBase

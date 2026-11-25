@@ -1,21 +1,14 @@
 "use client";
 
 import { useCoreStore } from "~/model";
-import { useCoreStore as useEtvsCoreStore } from "../../../../etvs-src/model";
 
 export default function LineTooltipToggleIcon() {
   const showLineTooltips = useCoreStore((s: any) => s.showLineTooltips);
   const setShowLineTooltips = useCoreStore((s: any) => s.setShowLineTooltips);
-  const setEtvsShowLineTooltips = useEtvsCoreStore((s: any) => s.setShowLineTooltips);
 
   const handleToggle = () => {
     const next = !showLineTooltips;
     setShowLineTooltips(next);
-    try {
-      setEtvsShowLineTooltips(next);
-    } catch {
-      // ignore ETVS sync errors if wrapper/store is not active
-    }
   };
 
   return (

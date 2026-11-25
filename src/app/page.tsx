@@ -17,6 +17,7 @@ import { loadAllFacilities, SUPPORTED_FACILITIES } from '../lib/facilityLoader';
 import { autoDetectPosition } from '../lib/vatsimController';
 import TestBenchIcon from '../testbench/TestBenchIcon';
 import LineTooltipToggleIcon from './_components/global/LineTooltipToggleIcon';
+import NgRegistration from '../components/NgRegistration';
 
 function normalizeVersion(version: string): string {
   return (version || '')
@@ -50,6 +51,8 @@ export default function Page() {
   const autoDetectAttempted = useRef<string | null>(null); // Track "cid:callsign" we've attempted
   
   const currentUI = useCoreStore(s => s.currentUI);
+  const ngState = useCoreStore(s => s.ngState);
+  const ngError = useCoreStore(s => s.ngError);
   const selectedPositions = useCoreStore(s => s.selectedPositions);
   const connected = useCoreStore(s => s.connected);
   const setPositionData = useCoreStore(s => s.setPositionData);
@@ -113,7 +116,7 @@ export default function Page() {
     const loadVersionInfo = async () => {
       try {
         console.log('Loading version info, current afv_version:', afv_version);
-        if (!afv_version || !afv_version.trim()) {
+        if (!afv_version || !afv_version.trim() || afv_version.startsWith('mock-')) {
           // AFV has not reported its version yet. Avoid false "update required" banners.
           setVersionAlert(null);
           return;
@@ -152,6 +155,7 @@ export default function Page() {
 
   // Auto-detect position from VATSIM when connected with CID/callsign
   useEffect(() => {
+    if (ngState) return;
     // Create a key from CID and callsign to track what we've attempted
     const attemptKey = `${cid}:${callsign}`;
     
@@ -195,7 +199,7 @@ export default function Page() {
     };
     
     performAutoDetect();
-  }, [connected, cid, callsign, positionData, updateSelectedPositions, setCurrentUI, autoDetectStatus]);
+  }, [connected, cid, callsign, positionData, updateSelectedPositions, setCurrentUI, autoDetectStatus, ngState]);
 
   // Function to retry auto-detection
   const retryAutoDetect = async () => {
@@ -309,6 +313,7 @@ export default function Page() {
 
   return (
     <div className="min-h-screen bg-zinc-700 p-4">
+      {(ngState || ngError) && <NgRegistration />}
       {/* Version Alert */}
       {versionAlert && (
         <Alert 
@@ -329,7 +334,9 @@ export default function Page() {
         />
       )}
       
-      {!connected && !isLocalhost ? (
+      {ngState && !ngState.session ? (
+        <div className="text-center text-white p-8">{ngState.afv.connected ? 'Select positions to register.' : 'Connect to AFV to register.'}</div>
+      ) : !connected && !isLocalhost ? (
         <div className="flex items-center justify-center min-h-screen">
           <div className="text-center text-white">
             <h2 className="text-2xl font-bold mb-4">AFV Client</h2>
@@ -341,7 +348,7 @@ export default function Page() {
             </p>
           </div>
         </div>
-      ) : !selectedPositions || selectedPositions.length === 0 || !uiLoaded ? (
+      ) : !selectedPositions || selectedPositions.length === 0 || (!uiLoaded && !ngState) ? (
         <div className="flex items-center justify-center min-h-screen">
           <div className="text-center text-white">
             <h2 className="text-2xl font-bold mb-4">Welcome to AFV Client</h2>

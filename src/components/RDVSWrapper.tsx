@@ -546,6 +546,11 @@ export default function RDVSWrapper({ variant = 'default' }: RDVSWrapperProps) {
     const status = statusObj?.status || 'off';
     const callPrefix = statusObj?.call?.substring(0, 2);
 
+    if (statusObj?.ngButton) {
+      if (!statusObj.disabled) sendMsg({ type: 'call', cmd1: call_id });
+      return;
+    }
+
     // v-VSCS WebRTC calls — route through v-VSCS handler
     if (statusObj?.isVvscs && statusObj?.vvscsLineId) {
       vvscsHandleButtonPress(statusObj.vvscsLineId, status);

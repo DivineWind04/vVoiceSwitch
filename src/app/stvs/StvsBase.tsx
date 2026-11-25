@@ -268,7 +268,9 @@ const StvsBase: React.FC = () => {
           
           if (ggItem && ggItem.call) {
             // v-VSCS WebRTC calls — route through v-VSCS handler
-            if (ggItem.isLandline && ggItem.landlineCallId) {
+            if (ggItem.ngButton) {
+              if (!ggItem.disabled) onClick = () => sendMsg({ type: 'call', cmd1: ggItem.call.substring(3) });
+            } else if (ggItem.isLandline && ggItem.landlineCallId) {
               // LineType 3 dial lines → toggle active dial line or end call
               if (ggItem.lineType === 3 && (!ggItem.status || ggItem.status === 'off' || ggItem.status === 'idle')) {
                 const trunkName = ggItem.call_name || ggItem.call || '';
@@ -399,7 +401,8 @@ const StvsBase: React.FC = () => {
           <StvsButton
             key={"xmit-"+i}
             label="XMIT"
-            hasFreq={!!freqButtons[i]}
+            hasFreq={!!freqData[i]?.t}
+            onClick={() => freqData[i] && sendMsg({ type: 'tx', cmd1: String(freqData[i].freq), dbl1: !freqData[i].t })}
             brightness={brightness}
             style={{
               left: `${(423 + i*49)/899.16*72}%`,
@@ -417,7 +420,8 @@ const StvsBase: React.FC = () => {
           <StvsButton
             key={"rcv-"+i}
             label="RCV"
-            hasFreq={!!freqButtons[i]}
+            hasFreq={!!freqData[i]?.r}
+            onClick={() => freqData[i] && sendMsg({ type: 'rx', cmd1: String(freqData[i].freq), dbl1: !freqData[i].r })}
             brightness={brightness}
             style={{
               left: `${(423 + i*49)/899.16*72}%`,

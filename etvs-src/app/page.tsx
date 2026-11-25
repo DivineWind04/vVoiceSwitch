@@ -10,7 +10,7 @@ import AreaFour from "./_components/special_func/AreaFour";
 import SettingModal from '../../src/pages/setting';
 import { useState, useEffect } from "react";
 import axios from "axios";
-import { useCoreStore } from '../model';
+import { useCoreStore } from '../../src/model';
 import { isReliefCallsign } from '../../src/lib/facilityLoader';
 
 // VATSIM controllers feed URL (proxied through API to avoid CORS)
@@ -20,8 +20,9 @@ export default function HomePage() {
   const [isGG3Active, setIsGG3Active] = useState(false);
   const [currentGGPage, setCurrentGGPage] = useState(1);
   const [settingModal, setSettingModal] = useState(false);
-  const setPosData = require('../model').useCoreStore((s: any) => s.setPositionData);
+  const setPosData = useCoreStore((s: any) => s.setPositionData);
   const updateSelectedPositions = useCoreStore((s: any) => s.updateSelectedPositions);
+  const ngState = useCoreStore((s: any) => s.ngState);
   const callsign = useCoreStore((s: any) => s.callsign);
   const cid = useCoreStore((s: any) => s.cid);
   const [filteredPosition, setFilteredPosition] = useState<any>(null);
@@ -63,7 +64,7 @@ export default function HomePage() {
       return null;
     }
 
-    if (!callsign) return;
+    if (!callsign || ngState) return;
 
     axios.get('/zoa_position.json').then(async (r) => {
       const facility = findFacility(r.data);
@@ -118,7 +119,7 @@ export default function HomePage() {
     }).catch(() => {
       // Optionally handle error
     });
-  }, [setPosData, updateSelectedPositions, callsign, cid]);
+  }, [setPosData, updateSelectedPositions, callsign, cid, ngState]);
 
   const handleGG3Toggle = (isActive: boolean, page: number) => {
     setIsGG3Active(isActive);
